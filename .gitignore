@@ -16,3 +16,8 @@ Thumbs.db
 *.db-shm
 .zaocode/
 /share/
+
+# 2.0 推送排除
+_dist_uxlab/
+.daymug-uploads/
+.codex/
