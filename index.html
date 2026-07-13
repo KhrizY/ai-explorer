@@ -3,32 +3,291 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI 探险号 2.0 · 实验室导航</title>
+<title>AI 探险号 · UX Demo 库（20+ 可玩原型）</title>
+<link rel="stylesheet" href="ui-system.css">
 <style>
-  body { margin:0; font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
-    background:radial-gradient(130% 120% at 50% -10%,#1b1145,#0a0620 62%); color:#e8e4ff; min-height:100vh;
-    display:grid; place-items:center; padding:40px 16px; }
-  .hub { max-width:640px; text-align:center; }
-  h1 { font-size:28px; margin:0 0 6px; }
-  .tag { color:#b4aede; font-size:14px; margin-bottom:32px; }
-  .cards { display:grid; gap:18px; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); }
-  a.card { text-decoration:none; color:#fff; background:linear-gradient(160deg,rgba(45,32,90,.8),rgba(20,14,48,.85));
-    border:1px solid rgba(167,139,250,.3); border-radius:20px; padding:26px 20px; transition:transform .2s,box-shadow .2s; }
-  a.card:hover { transform:translateY(-6px); box-shadow:0 0 30px rgba(139,92,246,.5); }
-  a.card .emo { font-size:44px; } a.card b { display:block; font-size:18px; margin:10px 0 6px; }
-  a.card span { font-size:12.5px; color:#b4aede; line-height:1.6; }
-  .foot { margin-top:30px; font-size:12px; color:#6b6690; }
+  body { background:#eef1f6; }
+  .wrap { max-width:1080px; margin:0 auto; padding:22px 14px 90px; }
+  h1 { font-size:22px; color:#1e1b3a; margin:0 0 4px; }
+  .sub { color:#6b7280; font-size:13px; margin-bottom:16px; }
+  /* 可拖拽标签条 */
+  .tabs { display:flex; gap:10px; overflow-x:auto; padding:6px 2px 12px; cursor:grab; scrollbar-width:none; }
+  .tabs::-webkit-scrollbar { display:none; }
+  .tabs.drag { cursor:grabbing; }
+  .tab { flex:none; padding:9px 18px; border-radius:999px; background:#fff; border:2px solid #e6e9f2; font-weight:800;
+    font-size:14px; color:#6b7280; cursor:pointer; white-space:nowrap; transition:all .15s; user-select:none; }
+  .tab.on { background:linear-gradient(90deg,var(--violet),var(--violet-d)); color:#fff; border-color:transparent; box-shadow:0 4px 12px rgba(139,92,246,.4); }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:18px; margin-top:8px; }
+  .demo { background:#fff; border:1.5px solid #e6e9f2; border-radius:16px; overflow:hidden; box-shadow:0 6px 18px rgba(60,50,110,.07); }
+  .demo-head { padding:11px 14px; display:flex; align-items:center; gap:8px; background:linear-gradient(90deg,#f6f4ff,#eef1fb); border-bottom:1px solid #eceef5; }
+  .demo-head .n { font-size:12px; font-weight:900; color:#fff; background:var(--violet); border-radius:6px; padding:1px 7px; }
+  .demo-head b { font-size:14px; color:#1e1b3a; }
+  .demo-head .cat { margin-left:auto; font-size:11px; font-weight:800; padding:2px 8px; border-radius:999px; }
+  .cat-g { background:#dcfce7; color:#15803d; } .cat-v { background:#e0f2fe; color:#0369a1; } .cat-e { background:#fef3c7; color:#b45309; }
+  .demo-teach { font-size:11.5px; color:#8b90a6; padding:6px 14px 0; }
+  .demo-stage { position:relative; margin:12px 14px 16px; background:#0f0a26; border-radius:12px; min-height:200px; padding:14px; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .demo-stage.light { background:#f4f6fb; }
+  .stg-btn { font-family:var(--font); font-weight:900; border:none; cursor:pointer; border-radius:12px; padding:10px 22px; font-size:14px;
+    background:var(--correct); color:#fff; box-shadow:0 4px 0 var(--correct-d); margin-top:10px; }
+  .stg-btn:active { transform:translateY(3px); box-shadow:0 1px 0 var(--correct-d); }
+  .stg-btn.v { background:linear-gradient(90deg,var(--violet-l),var(--cyan)); color:#08122e; box-shadow:0 4px 0 #4b3fb0; }
+  .stg-msg { color:#cbd0e6; font-size:12.5px; text-align:center; min-height:18px; margin-top:8px; }
+  .demo-stage.light .stg-msg { color:#4b4869; }
+  .stg-score { position:absolute; top:8px; right:12px; color:var(--gold); font-weight:800; font-size:13px; z-index:4; }
+  /* 大反馈闪屏 */
+  .bigflash { position:absolute; inset:0; display:grid; place-items:center; font-size:40px; font-weight:900; z-index:9; pointer-events:none;
+    animation:bigF .7s ease-out forwards; }
+  @keyframes bigF { 0%{opacity:0;transform:scale(.4)} 30%{opacity:1;transform:scale(1.1)} 70%{opacity:1;transform:scale(1)} 100%{opacity:0;transform:scale(1)} }
+  @keyframes shk { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 60%{transform:translateX(8px)} }
+  .shake { animation:shk .35s ease; }
 </style>
 </head>
 <body>
-<div class="hub">
-  <h1>🚀 AI 探险号 2.0 · 实验室</h1>
-  <div class="tag">迭代中的产出，点进去看/玩</div>
-  <div class="cards">
-    <a class="card" href="ui-lab/index.html"><span class="emo">🎨</span><b>UI 模板样板间</b><span>星空实验室视觉语言 · 全模块样式</span></a>
-    <a class="card" href="ux-lab/index.html"><span class="emo">🎮</span><b>Game-UX 可玩原型</b><span>分拣/训练机/QTE/钓鱼/黄金矿工</span></a>
-  </div>
-  <div class="foot">设计文档见 design/ 目录 · 1.0 已归档于 archive/v1.0/</div>
+<div class="wrap">
+  <h1>🧪 AI 探险号 · UX Demo 库</h1>
+  <div class="sub">20 个可玩原型 · 三类：🎮游戏交互 / 🔬可视化讲解 / 🎚️探索模拟 · 标签条可左右拖动 · 文字内容为占位</div>
+  <div class="tabs" id="tabs"></div>
+  <div class="grid" id="grid"></div>
 </div>
+
+<script>
+// ============ 公共工具 ============
+function spark(x,y){var E=['✨','⭐','🎉','💫','🌟'];for(var i=0;i<9;i++){var s=document.createElement('div');s.className='spark';s.textContent=E[i%5];s.style.left=x+'px';s.style.top=y+'px';var a=Math.PI*2*i/9;s.style.setProperty('--dx',Math.cos(a)*66+'px');s.style.setProperty('--dy',(Math.sin(a)*66-24)+'px');document.body.appendChild(s);(function(el){setTimeout(function(){el.remove();},900);})(s);}}
+function bigFlash(stage, txt, ok){var f=document.createElement('div');f.className='bigflash';f.textContent=txt;f.style.color=ok?'#7CFC66':'#ffd166';stage.appendChild(f);stage.classList.add('shake');setTimeout(function(){f.remove();stage.classList.remove('shake');},700);if(ok){var r=stage.getBoundingClientRect();spark(r.left+r.width/2,r.top+r.height/2);}}
+function el(tag,cls,html){var e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e;}
+
+// ============ Demo 注册表 ============
+var DEMOS=[];
+function demo(o){DEMOS.push(o);}
+
+// ---------- 🎮 游戏交互 ----------
+demo({id:'sort',cat:'g',title:'拖拽分拣',teach:'教「分类」——AI 最核心的动作',mount:function(s){
+  var DATA=[{e:'🍎',a:1},{e:'🍅',a:0},{e:'🍏',a:1},{e:'🐱',a:0},{e:'🍊',a:0},{e:'🍎',a:1}];
+  var score=0,sel=null; var sc=el('div','stg-score','0 分');s.appendChild(sc);
+  var row=el('div');row.style.cssText='display:flex;gap:10px;flex-wrap:wrap;justify-content:center;min-height:56px;margin-bottom:14px';
+  var bins=el('div');bins.style.cssText='display:flex;gap:12px;width:100%';
+  function mk(){row.innerHTML='';DATA.forEach(function(f,i){var d=el('div',null,f.e);d.style.cssText='width:48px;height:48px;border-radius:12px;background:#fff;display:grid;place-items:center;font-size:28px;cursor:pointer;transition:transform .15s';d.onclick=function(){row.querySelectorAll('div').forEach(function(x){x.style.transform='';x.style.boxShadow='';});d.style.transform='scale(1.25) translateY(-6px)';d.style.boxShadow='0 0 0 3px #ffd66d';sel={el:d,i:i};};row.appendChild(d);});}
+  [['🍎 苹果','1'],['🚫 不是','0']].forEach(function(b){var bn=el('div',null,b[0]);bn.style.cssText='flex:1;padding:14px;border-radius:12px;border:2.5px dashed #7c6fb0;color:#cbd0e6;text-align:center;font-weight:800;cursor:pointer';bn.onclick=function(e){if(!sel)return;var ok=(''+DATA[sel.i].a)===b[1];if(ok){score+=10;bigFlash(s,'对！✓',true);sel.el.style.transform='scale(0)';var d=sel.el;setTimeout(function(){d.remove();},250);}else{score=Math.max(0,score-5);bigFlash(s,'再想想～',false);}sc.textContent=score+' 分';sel=null;if(!row.querySelector('div'))setTimeout(mk,400);};bins.appendChild(bn);});
+  s.appendChild(row);s.appendChild(bins);mk();
+}});
+
+demo({id:'crank',cat:'g',title:'手摇训练机',teach:'教「训练循环」——狂点看准确率爬升',mount:function(s){
+  var acc=8,done=false;var face=el('div',null,'😵');face.style.cssText='font-size:52px;transition:transform .1s';
+  var bar=el('div');bar.style.cssText='height:14px;width:240px;border-radius:9px;background:rgba(255,255,255,.12);overflow:hidden;margin:10px 0 6px';
+  var fill=el('div');fill.style.cssText='height:100%;width:8%;border-radius:9px;background:linear-gradient(90deg,var(--violet),var(--cyan));transition:width .25s';bar.appendChild(fill);
+  var lbl=el('div','stg-msg','准确率 8% —— 全靠瞎猜…');
+  var btn=el('button','stg-btn v','🔧 训练一下！');
+  btn.onclick=function(e){acc+=(96-acc)*0.16+Math.random()*3;if(acc>98)acc=98;var v=Math.round(acc);fill.style.width=v+'%';face.textContent=v<25?'😵':v<55?'😐':v<85?'🙂':'😻';face.style.transform='scale('+(1+v/300)+')';lbl.textContent='准确率 '+v+'% —— '+(v<25?'瞎猜…':v<55?'有感觉了…':v<85?'越来越准！':'认猫高手！');if(v>=90&&!done){done=true;bigFlash(s,'🎉 训练成功!',true);}};
+  s.appendChild(face);s.appendChild(bar);s.appendChild(lbl);s.appendChild(btn);
+}});
+
+demo({id:'qte',cat:'g',title:'计时判定 QTE',teach:'教「抓住时机」+ 明显成败反馈',mount:function(s){
+  var combo=0,pos=0,dir=1,speed=1.1,zw=22,zx=50,run=true;
+  var track=el('div');track.style.cssText='position:relative;height:32px;width:100%;max-width:360px;border-radius:9px;background:rgba(255,255,255,.1);overflow:hidden;margin:10px 0';
+  var zone=el('div');zone.style.cssText='position:absolute;top:0;bottom:0;background:linear-gradient(var(--correct),var(--correct-d));opacity:.6';
+  var ind=el('div');ind.style.cssText='position:absolute;top:-3px;width:6px;height:38px;background:#fff;border-radius:3px;box-shadow:0 0 8px #fff';
+  track.appendChild(zone);track.appendChild(ind);
+  var msg=el('div','stg-msg','连击 0');var btn=el('button','stg-btn','抓！');
+  function place(){zx=12+Math.random()*(88-zw);zone.style.left=zx+'%';zone.style.width=zw+'%';}
+  function loop(){if(run){pos+=dir*speed;if(pos>=100){pos=100;dir=-1;}if(pos<=0){pos=0;dir=1;}ind.style.left=pos+'%';}requestAnimationFrame(loop);}
+  btn.onclick=function(){if(pos>=zx&&pos<=zx+zw){combo++;bigFlash(s,'🎯 命中!',true);speed+=0.22;zw=Math.max(9,zw-1.6);msg.textContent='连击 '+combo+' 🔥';place();}else{combo=0;speed=1.1;zw=22;bigFlash(s,'✗ 差一点!',false);msg.textContent='连击断了，再来！';place();}};
+  s.appendChild(track);s.appendChild(msg);s.appendChild(btn);place();loop();
+}});
+
+demo({id:'fish',cat:'g',title:'长按滑条（钓鱼式）',teach:'教「平衡/调参」——用按钮把值稳在区间',mount:function(s){
+  var H=180,barH=28,tgtH=48,barY=140,vy=0,hold=false,p=0,t=0,won=false;
+  var wrap=el('div');wrap.style.cssText='display:flex;gap:12px;align-items:flex-start';
+  var track=el('div');track.style.cssText='position:relative;width:70px;height:'+H+'px;border-radius:12px;background:linear-gradient(#123,#012);overflow:hidden';
+  var tgt=el('div',null,'<div style="text-align:center;font-size:24px;line-height:48px">🐟</div>');tgt.style.cssText='position:absolute;left:6px;right:6px;height:48px;border-radius:8px;background:rgba(88,204,2,.25);border:2px solid var(--correct)';
+  var bar=el('div');bar.style.cssText='position:absolute;left:6px;right:6px;height:28px;border-radius:6px;background:rgba(167,139,250,.55);border:2px solid var(--violet-l)';
+  track.appendChild(tgt);track.appendChild(bar);
+  var prog=el('div');prog.style.cssText='width:12px;height:'+H+'px;border-radius:6px;background:rgba(255,255,255,.12);overflow:hidden;position:relative';
+  var pf=el('div');pf.style.cssText='position:absolute;bottom:0;left:0;right:0;height:0%;background:linear-gradient(var(--cyan),var(--correct))';prog.appendChild(pf);
+  wrap.appendChild(track);wrap.appendChild(prog);
+  var msg=el('div','stg-msg','按住下面的按钮收线');
+  var btn=el('button','stg-btn v','🎣 按住收线');
+  btn.addEventListener('pointerdown',function(e){e.preventDefault();hold=true;});window.addEventListener('pointerup',function(){hold=false;});
+  function loop(){t+=0.03;var ty=(H-tgtH)/2+Math.sin(t)*((H-tgtH)/2-4);tgt.style.top=ty+'px';vy+=hold?-0.55:0.45;vy*=0.9;barY+=vy;if(barY<0){barY=0;vy=0;}if(barY>H-barH){barY=H-barH;vy=0;}bar.style.top=barY+'px';var ov=(barY<ty+tgtH)&&(barY+barH>ty);p+=ov?0.8:-0.5;if(p<0)p=0;if(p>100)p=100;pf.style.height=p+'%';if(!won)msg.textContent=ov?'罩住了！稳住～ '+Math.round(p)+'%':'按住/松手去罩住🐟';if(p>=100&&!won){won=true;msg.textContent='通关！';bigFlash(s,'🎉 稳住啦!',true);}requestAnimationFrame(loop);}
+  s.appendChild(wrap);s.appendChild(msg);s.appendChild(btn);loop();
+}});
+
+demo({id:'claw',cat:'g',title:'抓娃娃机（横移+下抓）',teach:'教「抓正确样本」——只抓干净数据',mount:function(s){
+  var ITEMS=[{e:'🐱',c:1,x:12},{e:'💩',c:0,x:30},{e:'🍎',c:1,x:50},{e:'💩',c:0,x:70},{e:'🐶',c:1,x:88}];
+  var score=0,clawX=50,dir=1,state='move',dropY=0,grabbed=null;
+  var sc=el('div','stg-score','0 分');s.appendChild(sc);
+  var box=el('div');box.style.cssText='position:relative;width:100%;height:190px';
+  var claw=el('div',null,'🦾');claw.style.cssText='position:absolute;top:0;font-size:26px;transform:translateX(-50%);transition:none;z-index:2';
+  var rope=el('div');rope.style.cssText='position:absolute;top:0;width:3px;background:#ffd66d;transform:translateX(-50%);height:8px';
+  box.appendChild(rope);box.appendChild(claw);
+  ITEMS.forEach(function(o){var d=el('div',null,o.e);d.style.cssText='position:absolute;bottom:6px;left:'+o.x+'%;transform:translateX(-50%);width:42px;height:42px;border-radius:10px;display:grid;place-items:center;font-size:24px;background:'+(o.c?'rgba(88,204,2,.22)':'rgba(251,113,133,.22)');o.el=d;box.appendChild(d);});
+  var msg=el('div','stg-msg','抓钩横向移动，点按钮向下抓');var btn=el('button','stg-btn','⬇️ 抓！');
+  function pos(){claw.style.left=clawX+'%';rope.style.left=clawX+'%';claw.style.top=dropY+'px';rope.style.height=(dropY+8)+'px';}
+  function loop(){if(state==='move'){clawX+=dir*0.55;if(clawX>92){clawX=92;dir=-1;}if(clawX<8){clawX=8;dir=1;}}else if(state==='drop'){dropY+=4;if(dropY>=140){grab();state='up';}}else if(state==='up'){dropY-=5;if(dropY<=0){dropY=0;if(grabbed){grabbed.el.remove();grabbed=null;}state='move';}}pos();requestAnimationFrame(loop);}
+  function grab(){var hit=null,best=9;ITEMS.forEach(function(o){if(!o.el.parentElement)return;var d=Math.abs(o.x-clawX);if(d<best){best=d;hit=o;}});if(hit){grabbed=hit;if(hit.c){score+=10;bigFlash(s,'🐱 干净数据 +10',true);}else{score=Math.max(0,score-8);bigFlash(s,'💩 脏数据 -8',false);}sc.textContent=score+' 分';}else{msg.textContent='没抓到，再瞄准！';}}
+  btn.onclick=function(){if(state==='move'){state='drop';dropY=0;}};
+  s.appendChild(box);s.appendChild(msg);s.appendChild(btn);pos();loop();
+}});
+
+demo({id:'quick',cat:'g',title:'二选一快判',teach:'教「快速判断」——WarioWare 式',mount:function(s){
+  var Q=[{t:'手机认出照片里的猫',a:1},{t:'计算器算 1+1',a:0},{t:'AI 下棋赢冠军',a:1},{t:'闹钟准点响',a:0},{t:'翻译软件翻句子',a:1},{t:'电灯按开关亮',a:0}];
+  var i=0,score=0;var sc=el('div','stg-score','0 分');s.appendChild(sc);
+  var card=el('div');card.style.cssText='font-size:20px;color:#fff;font-weight:800;text-align:center;min-height:60px;display:grid;place-items:center;padding:10px';
+  var btns=el('div');btns.style.cssText='display:flex;gap:12px';
+  var msg=el('div','stg-msg','这是 AI 学来的，还是人写死的？');
+  function show(){card.textContent=Q[i%Q.length].t;}
+  [['🤖 AI学的',1],['⚙️ 人写的',0]].forEach(function(b){var bn=el('button','stg-btn'+(b[1]?' v':''),b[0]);bn.style.marginTop='0';bn.onclick=function(){var ok=Q[i%Q.length].a===b[1];if(ok){score+=10;bigFlash(s,'✓ 对!',true);}else{bigFlash(s,'✗ 再想想',false);}sc.textContent=score+' 分';i++;show();};btns.appendChild(bn);});
+  s.appendChild(card);s.appendChild(btns);s.appendChild(msg);show();
+}});
+
+demo({id:'match',cat:'g',title:'匹配配对',teach:'教「模式识别」——找相同',mount:function(s){
+  var P=['🐱','🍎','⭐','🚀'];var cards=P.concat(P).map(function(e,i){return{e:e,i:i};});
+  for(var k=cards.length-1;k>0;k--){var j=Math.floor(Math.random()*(k+1));var tmp=cards[k];cards[k]=cards[j];cards[j]=tmp;}
+  var grid=el('div');grid.style.cssText='display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%;max-width:280px';
+  var open=[],lock=false,done=0;var msg=el('div','stg-msg','翻开两张相同的');
+  cards.forEach(function(c){var d=el('div',null,'❓');d.style.cssText='aspect-ratio:1;border-radius:10px;background:#2a1f52;color:#fff;display:grid;place-items:center;font-size:24px;cursor:pointer';d.dataset.e=c.e;d.flip=function(o){d.textContent=o?d.dataset.e:'❓';d.style.background=o?'#4b3fb0':'#2a1f52';};d.onclick=function(){if(lock||d.textContent!=='❓')return;d.flip(1);open.push(d);if(open.length===2){lock=true;if(open[0].dataset.e===open[1].dataset.e){var r=s.getBoundingClientRect();spark(r.left+r.width/2,r.top+40);done++;open=[];lock=false;if(done===P.length){bigFlash(s,'🎉 全配对!',true);}}else{setTimeout(function(){open[0].flip(0);open[1].flip(0);open=[];lock=false;},650);}}};grid.appendChild(d);});
+  s.appendChild(grid);s.appendChild(msg);
+}});
+
+demo({id:'wordchain',cat:'g',title:'词语接龙预言家',teach:'教「猜下一个词」——大模型原理',mount:function(s){
+  var NEXT={'今天':['天气☀️','我们','真'],'天气':['很好','不错','真棒'],'我':['喜欢','想','们'],'小猫':['喵喵','很可爱','跑了']};
+  var starts=['今天','我','小猫'];var sent=[starts[Math.floor(Math.random()*3)]];
+  var view=el('div');view.style.cssText='font-size:20px;color:#fff;font-weight:700;min-height:40px;text-align:center';
+  var cand=el('div');cand.style.cssText='display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:12px';
+  var msg=el('div','stg-msg','点一个词，把句子接下去');
+  function render(){view.textContent=sent.join('');cand.innerHTML='';var last=sent[sent.length-1];var opts=NEXT[last]||['。','！','～'];opts.forEach(function(w){var b=el('button','stg-btn v',w);b.style.cssText+=';padding:7px 14px;font-size:13px;margin-top:0';b.onclick=function(e){sent.push(w.replace(/[☀️]/g,'').replace(/[^一-龥！。～]/g,''));spark(e.clientX,e.clientY);if(sent.length>6){bigFlash(s,'📝 一句话!',true);sent=[starts[Math.floor(Math.random()*3)]];}render();};cand.appendChild(b);});}
+  s.appendChild(view);s.appendChild(cand);s.appendChild(msg);render();
+}});
+
+// ---------- 🔬 可视化讲解 ----------
+demo({id:'tree',cat:'v',title:'决策树逐层展开',teach:'点条件，看 AI 一层层做判断',mount:function(s){
+  s.classList.add('light');
+  var T={q:'会汪汪叫吗？',y:{q:'体型大吗？',y:{r:'🐕 大狗'},n:{r:'🐩 小狗'}},n:{q:'会喵喵叫吗？',y:{r:'🐱 猫'},n:{r:'🐣 别的动物'}}};
+  var root=el('div');root.style.cssText='width:100%';
+  function node(t,depth){var box=el('div');box.style.marginLeft=(depth*16)+'px';if(t.r){var o=el('div',null,t.r);o.style.cssText='display:inline-block;margin:4px 0;padding:6px 12px;border-radius:8px;background:#dcfce7;color:#15803d;font-weight:800';box.appendChild(o);return box;}var q=el('div',null,'❓ '+t.q+' <span style="color:#8b5cf6">▼</span>');q.style.cssText='display:inline-block;margin:4px 0;padding:6px 12px;border-radius:8px;background:#ede9fe;color:#6d28d9;font-weight:800;cursor:pointer';var kids=el('div');kids.style.display='none';var open=false;q.onclick=function(){open=!open;kids.style.display=open?'block':'none';q.innerHTML='❓ '+t.q+' <span style="color:#8b5cf6">'+(open?'▲':'▼')+'</span>';if(open&&!kids.hasChildNodes()){var yes=el('div',null,'<span style="color:#16a34a;font-size:12px;font-weight:800">是 →</span>');yes.style.marginLeft=(depth*16+16)+'px';yes.appendChild(node(t.y,depth+1));var no=el('div',null,'<span style="color:#dc2626;font-size:12px;font-weight:800">否 →</span>');no.style.marginLeft=(depth*16+16)+'px';no.appendChild(node(t.n,depth+1));kids.appendChild(yes);kids.appendChild(no);}};box.appendChild(q);box.appendChild(kids);return box;}
+  root.appendChild(node(T,0));var msg=el('div','stg-msg','👆 点问号，一层层展开 AI 的判断');s.appendChild(root);s.appendChild(msg);
+}});
+
+demo({id:'conv',cat:'v',title:'卷积滑窗扫描',teach:'小窗口扫过图片，扫到边缘就亮',mount:function(s){
+  s.classList.add('light');var N=6,IMG=[];for(var r=0;r<N;r++){IMG.push([]);for(var c=0;c<N;c++)IMG[r].push(c<3?0:1);}
+  var wx=0,wy=0;var gw=el('div');gw.style.cssText='display:grid;grid-template-columns:repeat('+N+',26px);gap:2px;position:relative';
+  var cells=[];for(var r=0;r<N;r++)for(var c=0;c<N;c++){var d=el('div');d.style.cssText='width:26px;height:26px;border-radius:4px;background:'+(IMG[r][c]?'#1e1b3a':'#dbe3ef');cells.push(d);gw.appendChild(d);}
+  var win=el('div');win.style.cssText='position:absolute;width:80px;height:80px;border:3px solid #f59e0b;border-radius:6px;pointer-events:none;transition:all .12s;box-shadow:0 0 12px #f59e0b';gw.appendChild(win);
+  var msg=el('div','stg-msg','用方向键移动黄框');
+  var ctrl=el('div');ctrl.style.cssText='display:flex;gap:6px;margin-top:10px';
+  function upd(){win.style.left=(wx*28)+'px';win.style.top=(wy*28)+'px';var edge=false;for(var i=0;i<3;i++)for(var j=0;j<3;j++){if(IMG[wy+i][wx+j]!==IMG[wy+i][wx])edge=true;}win.style.borderColor=edge?'#22c55e':'#f59e0b';win.style.boxShadow='0 0 14px '+(edge?'#22c55e':'#f59e0b');msg.textContent=edge?'⚡ 发现边缘！这里明暗在交界':'平坦区，没什么特征…';}
+  [['◀',-1,0],['▶',1,0],['▲',0,-1],['▼',0,1]].forEach(function(b){var bn=el('button','stg-btn',b[0]);bn.style.cssText='margin-top:0;padding:8px 12px;font-size:14px';bn.onclick=function(){wx=Math.max(0,Math.min(N-3,wx+b[1]));wy=Math.max(0,Math.min(N-3,wy+b[2]));upd();};ctrl.appendChild(bn);});
+  s.appendChild(gw);s.appendChild(ctrl);s.appendChild(msg);upd();
+}});
+
+demo({id:'pixel',cat:'v',title:'像素放大镜',teach:'图片在电脑眼里就是一堆数字',mount:function(s){
+  s.classList.add('light');var N=8;var COL=[[124,192,255],[255,214,109],[251,113,133],[88,204,2]];
+  var grid=el('div');grid.style.cssText='display:grid;grid-template-columns:repeat('+N+',24px);gap:1px';
+  var info=el('div','stg-msg','👆 点一个格子，看它的数字');
+  for(var r=0;r<N;r++)for(var c=0;c<N;c++){var col=COL[(r+c)%4];var d=el('div');d.style.cssText='width:24px;height:24px;border-radius:3px;cursor:pointer;background:rgb('+col[0]+','+col[1]+','+col[2]+')';d.dataset.rgb=col.join(', ');d.onclick=function(e){info.innerHTML='这个格子 = <b style="color:#6d28d9">RGB('+e.target.dataset.rgb+')</b> —— 三个数字！';e.target.style.outline='3px solid #1e1b3a';setTimeout(function(t){return function(){t.style.outline='';};}(e.target),600);};grid.appendChild(d);}
+  s.appendChild(grid);s.appendChild(info);
+}});
+
+demo({id:'forward',cat:'v',title:'神经网络前向传播',teach:'信号一层层往前传，最后点亮答案',mount:function(s){
+  var L=[3,4,4,2];var svg='';var W=100/(L.length),nodes=[];
+  var box=el('div');box.style.cssText='position:relative;width:100%;height:150px';
+  L.forEach(function(n,li){for(var i=0;i<n;i++){var d=el('div');var x=(li+0.5)*(100/L.length),y=(i+0.5)*(100/n);d.style.cssText='position:absolute;width:18px;height:18px;border-radius:50%;background:#2a1f52;border:2px solid #6d28d9;transform:translate(-50%,-50%);left:'+x+'%;top:'+y+'%;transition:all .3s';d.li=li;box.appendChild(d);nodes.push(d);}});
+  var msg=el('div','stg-msg','点按钮，看信号从左流到右');var btn=el('button','stg-btn v','⚡ 输入信号');
+  btn.onclick=function(){nodes.forEach(function(d){d.style.background='#2a1f52';d.style.boxShadow='';});L.forEach(function(n,li){setTimeout(function(){nodes.filter(function(d){return d.li===li;}).forEach(function(d){d.style.background='#a78bfa';d.style.boxShadow='0 0 14px #a78bfa';});if(li===L.length-1){bigFlash(s,'💡 得出答案!',true);}},li*450);});};
+  s.appendChild(box);s.appendChild(msg);s.appendChild(btn);
+}});
+
+demo({id:'attention',cat:'v',title:'注意力连线',teach:'AI 读句子时，词和词在互相「关注」',mount:function(s){
+  s.classList.add('light');var W=['小猫','在','沙发','上','睡觉'];var LINK={0:[2,4],2:[0,3],4:[0]};
+  var wrap=el('div');wrap.style.cssText='position:relative;display:flex;gap:14px;justify-content:center;padding:30px 0';
+  var svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.style.cssText='position:absolute;inset:0;width:100%;height:100%;pointer-events:none';wrap.appendChild(svg);
+  var chips=[];W.forEach(function(w,i){var c=el('div',null,w);c.style.cssText='position:relative;z-index:2;padding:8px 12px;border-radius:10px;background:#ede9fe;color:#4b4869;font-weight:800;cursor:pointer';c.onclick=function(){draw(i);};wrap.appendChild(c);chips.push(c);});
+  var msg=el('div','stg-msg','👆 点一个词，看它在关注谁');
+  function draw(i){svg.innerHTML='';chips.forEach(function(c){c.style.background='#ede9fe';});chips[i].style.background='#a78bfa';var a=chips[i],ar=a.getBoundingClientRect(),wr=wrap.getBoundingClientRect();(LINK[i]||[]).forEach(function(j){chips[j].style.background='#c4b5fd';var br=chips[j].getBoundingClientRect();var ln=document.createElementNS('http://www.w3.org/2000/svg','line');ln.setAttribute('x1',ar.left-wr.left+ar.width/2);ln.setAttribute('y1',ar.top-wr.top+ar.height/2);ln.setAttribute('x2',br.left-wr.left+br.width/2);ln.setAttribute('y2',br.top-wr.top+br.height/2);ln.setAttribute('stroke','#8b5cf6');ln.setAttribute('stroke-width','3');ln.setAttribute('opacity','.6');svg.appendChild(ln);});}
+  s.appendChild(wrap);s.appendChild(msg);setTimeout(function(){draw(0);},100);
+}});
+
+demo({id:'pool',cat:'v',title:'池化压缩',teach:'把图缩小：每块只留最强的信号',mount:function(s){
+  s.classList.add('light');var G=[[3,8,1,2],[5,6,7,0],[2,1,9,4],[8,3,2,6]];
+  var wrap=el('div');wrap.style.cssText='display:flex;gap:20px;align-items:center';
+  function mkgrid(m,sz){var g=el('div');g.style.cssText='display:grid;grid-template-columns:repeat('+m.length+','+sz+'px);gap:2px';m.forEach(function(row){row.forEach(function(v){var d=el('div',null,v);d.style.cssText='width:'+sz+'px;height:'+sz+'px;border-radius:4px;background:hsl(258,60%,'+(90-v*6)+'%);color:'+(v>5?'#fff':'#333')+';display:grid;place-items:center;font-size:12px;font-weight:800';g.appendChild(d);});});return g;}
+  var left=mkgrid(G,30);var arrow=el('div',null,'→');arrow.style.cssText='font-size:24px;color:#8b5cf6';var right=el('div');
+  wrap.appendChild(left);wrap.appendChild(arrow);wrap.appendChild(right);
+  var msg=el('div','stg-msg','点按钮，2×2 每块只留最大值');var btn=el('button','stg-btn v','🗜️ 压缩！');
+  btn.onclick=function(){var R=[[Math.max(G[0][0],G[0][1],G[1][0],G[1][1]),Math.max(G[0][2],G[0][3],G[1][2],G[1][3])],[Math.max(G[2][0],G[2][1],G[3][0],G[3][1]),Math.max(G[2][2],G[2][3],G[3][2],G[3][3])]];right.innerHTML='';right.appendChild(mkgrid(R,40));bigFlash(s,'缩小一半!',true);};
+  s.appendChild(wrap);s.appendChild(msg);s.appendChild(btn);
+}});
+
+demo({id:'loss',cat:'v',title:'训练误差曲线',teach:'训练越久，错误越少（loss 下降）',mount:function(s){
+  var cv=document.createElement('canvas');cv.width=300;cv.height=140;cv.style.cssText='background:#160f33;border-radius:8px;max-width:100%';var ctx=cv.getContext('2d');
+  var loss=1,step=0,pts=[];
+  var msg=el('div','stg-msg','点「训练一步」，看错误一路下降');var btn=el('button','stg-btn v','📉 训练一步');
+  function draw(){ctx.clearRect(0,0,300,140);ctx.strokeStyle='#334';ctx.beginPath();ctx.moveTo(30,10);ctx.lineTo(30,120);ctx.lineTo(290,120);ctx.stroke();ctx.strokeStyle='#22d3ee';ctx.lineWidth=2.5;ctx.beginPath();pts.forEach(function(p,i){var x=30+i*12,y=10+p*105;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);});ctx.stroke();pts.forEach(function(p,i){ctx.fillStyle='#a78bfa';ctx.beginPath();ctx.arc(30+i*12,10+p*105,3,0,7);ctx.fill();});}
+  btn.onclick=function(){loss*=0.82+Math.random()*0.06;step++;pts.push(loss);if(pts.length>21)pts.shift();draw();msg.textContent='第 '+step+' 步 · 错误 '+(loss*100).toFixed(0)+'%';if(loss<0.12){bigFlash(s,'✓ 学好了!',true);}};
+  pts.push(loss);draw();s.appendChild(cv);s.appendChild(msg);s.appendChild(btn);
+}});
+
+// ---------- 🎚️ 探索模拟 ----------
+demo({id:'slider',cat:'e',title:'训练程度滑块',teach:'拖一拖，看训练程度如何改变结果',mount:function(s){
+  var face=el('div',null,'😐');face.style.cssText='font-size:54px;transition:transform .1s';
+  var rng=el('input');rng.type='range';rng.min=0;rng.max=100;rng.value=40;rng.style.cssText='width:80%;accent-color:#a78bfa';
+  var lbl=el('div','stg-msg','训练程度 40%');
+  rng.oninput=function(){var v=+rng.value;face.textContent=v<25?'😵':v<55?'😐':v<85?'🙂':'😻';face.style.transform='scale('+(1+v/200)+')';lbl.textContent='训练程度 '+v+'% —— '+(v<25?'瞎猜':v<55?'学习中':v<85?'挺准':'高手');};
+  s.appendChild(face);s.appendChild(rng);s.appendChild(lbl);
+}});
+
+demo({id:'threshold',cat:'e',title:'阈值滑块分类',teach:'挪动界线，看 AI 怎么分两类',mount:function(s){
+  s.classList.add('light');var vals=[10,22,30,41,48,55,63,72,80,90];var th=50;
+  var row=el('div');row.style.cssText='display:flex;gap:4px;align-items:flex-end;height:80px;width:100%;max-width:320px;justify-content:center;position:relative';
+  var line=el('div');line.style.cssText='position:absolute;top:0;bottom:0;width:3px;background:#dc2626;z-index:2';
+  var bars=vals.map(function(v){var b=el('div');b.style.cssText='width:20px;border-radius:4px 4px 0 0;height:'+(v)+'%';b.v=v;return b;});
+  bars.forEach(function(b){row.appendChild(b);});row.appendChild(line);
+  var rng=el('input');rng.type='range';rng.min=0;rng.max=100;rng.value=50;rng.style.cssText='width:80%;accent-color:#8b5cf6;margin-top:10px';
+  var msg=el('div','stg-msg','界线左边=🍎 小，右边=🍉 大');
+  function upd(){th=+rng.value;line.style.left=(th/100*100)+'%';bars.forEach(function(b){b.style.background=b.v<th?'#38bdf8':'#fb7185';});}
+  rng.oninput=upd;s.appendChild(row);s.appendChild(rng);s.appendChild(msg);upd();
+}});
+
+demo({id:'knn',cat:'e',title:'K近邻投票',teach:'看邻居是谁，就跟着投票',mount:function(s){
+  s.classList.add('light');var PTS=[];for(var i=0;i<12;i++)PTS.push({x:10+Math.random()*80,y:10+Math.random()*80,c:Math.random()>0.5?'a':'b'});
+  var stage=el('div');stage.style.cssText='position:relative;width:100%;max-width:280px;height:180px;background:#e8ecf5;border-radius:10px;cursor:crosshair';
+  PTS.forEach(function(p){var d=el('div');d.style.cssText='position:absolute;width:14px;height:14px;border-radius:50%;transform:translate(-50%,-50%);left:'+p.x+'%;top:'+p.y+'%;background:'+(p.c==='a'?'#38bdf8':'#fb7185');p.el=d;stage.appendChild(d);});
+  var q=el('div',null,'?');q.style.cssText='position:absolute;width:20px;height:20px;border-radius:50%;transform:translate(-50%,-50%);background:#facc15;color:#000;font-weight:900;display:none;place-items:center;font-size:12px;border:2px solid #000;z-index:3';stage.appendChild(q);
+  var msg=el('div','stg-msg','👆 点空白处放一个新点，看它归哪类');
+  stage.onclick=function(e){var r=stage.getBoundingClientRect();var qx=(e.clientX-r.left)/r.width*100,qy=(e.clientY-r.top)/r.height*100;q.style.left=qx+'%';q.style.top=qy+'%';q.style.display='grid';var ds=PTS.map(function(p){return{p:p,d:Math.hypot(p.x-qx,p.y-qy)};}).sort(function(a,b){return a.d-b.d;});stage.querySelectorAll('.ring').forEach(function(x){x.remove();});var a=0;ds.slice(0,3).forEach(function(o){a+=o.p.c==='a'?1:-1;var rg=el('div','ring');rg.style.cssText='position:absolute;width:22px;height:22px;border-radius:50%;transform:translate(-50%,-50%);left:'+o.p.x+'%;top:'+o.p.y+'%;border:2px solid #facc15;z-index:2';stage.appendChild(rg);});var res=a>0?'a':'b';q.style.background=res==='a'?'#38bdf8':'#fb7185';q.textContent=res==='a'?'蓝':'红';msg.innerHTML='最近 3 个邻居投票 → 归为 <b>'+(res==='a'?'蓝队':'红队')+'</b>';};
+  s.appendChild(stage);s.appendChild(msg);
+}});
+
+demo({id:'cluster',cat:'e',title:'自动聚类分组',teach:'AI 把相似的自动归成一堆',mount:function(s){
+  s.classList.add('light');var seeds=[{x:28,y:35,c:'#8b5cf6'},{x:70,y:65,c:'#22c55e'}];var PTS=[];for(var i=0;i<16;i++)PTS.push({x:10+Math.random()*80,y:10+Math.random()*80});
+  var stage=el('div');stage.style.cssText='position:relative;width:100%;max-width:280px;height:180px;background:#e8ecf5;border-radius:10px';
+  PTS.forEach(function(p){var d=el('div');d.style.cssText='position:absolute;width:14px;height:14px;border-radius:50%;transform:translate(-50%,-50%);left:'+p.x+'%;top:'+p.y+'%;background:#94a3b8;transition:background .5s';p.el=d;stage.appendChild(d);});
+  var msg=el('div','stg-msg','16 个灰点，点按钮自动分两组');var btn=el('button','stg-btn v','🎯 自动分组');
+  btn.onclick=function(){PTS.forEach(function(p){var d0=Math.hypot(p.x-seeds[0].x,p.y-seeds[0].y),d1=Math.hypot(p.x-seeds[1].x,p.y-seeds[1].y);p.el.style.background=d0<d1?seeds[0].c:seeds[1].c;});bigFlash(s,'分好了!',true);};
+  s.appendChild(stage);s.appendChild(msg);s.appendChild(btn);
+}});
+
+demo({id:'bias',cat:'e',title:'数据偏见实验',teach:'只喂一种数据，AI 就会「偏心」',mount:function(s){
+  s.classList.add('light');var mode=0;
+  var view=el('div');view.style.cssText='text-align:center;color:#4b4869;font-weight:700;font-size:14px;min-height:70px;display:grid;place-items:center';
+  var msg=el('div','stg-msg','');
+  var btns=el('div');btns.style.cssText='display:flex;gap:10px';
+  function upd(){if(mode===0){view.innerHTML='训练数据：🐱🐱🐱🐱🐱🐱<br><span style="color:#16a34a">各种猫都有</span>';msg.innerHTML='测试黑猫 🐈‍⬛ → <b style="color:#16a34a">认对了！是猫 ✓</b>';}else{view.innerHTML='训练数据：🐱🐱🐱（<span style="color:#dc2626">只有橘猫</span>）';msg.innerHTML='测试黑猫 🐈‍⬛ → <b style="color:#dc2626">认错了！以为不是猫 ✗</b>';}}
+  [['✅ 喂多样数据',0],['⚠️ 只喂橘猫',1]].forEach(function(b){var bn=el('button','stg-btn'+(b[1]?'':' v'),b[0]);bn.style.cssText+=';margin-top:0;padding:8px 14px;font-size:13px';bn.onclick=function(){mode=b[1];upd();if(mode)bigFlash(s,'😵 学偏了!',false);else bigFlash(s,'👍 学好了!',true);};btns.appendChild(bn);});
+  s.appendChild(view);s.appendChild(btns);s.appendChild(msg);upd();
+}});
+
+// ============ 渲染 ============
+var CATS=[['all','🌐 全部'],['g','🎮 游戏交互'],['v','🔬 可视化讲解'],['e','🎚️ 探索模拟']];
+var tabsEl=document.getElementById('tabs'),gridEl=document.getElementById('grid'),cur='all';
+CATS.forEach(function(c){var t=el('div','tab'+(c[0]==='all'?' on':''),c[1]);t.dataset.c=c[0];t.onclick=function(){if(dragged)return;cur=c[0];tabsEl.querySelectorAll('.tab').forEach(function(x){x.classList.toggle('on',x.dataset.c===cur);});render();};tabsEl.appendChild(t);});
+var CATCLS={g:'cat-g',v:'cat-v',e:'cat-e'},CATTXT={g:'🎮游戏',v:'🔬可视化',e:'🎚️探索'};
+function render(){gridEl.innerHTML='';DEMOS.forEach(function(d,i){if(cur!=='all'&&d.cat!==cur)return;var card=el('div','demo');var head=el('div','demo-head','<span class="n">'+(i+1)+'</span><b>'+d.title+'</b><span class="cat '+CATCLS[d.cat]+'">'+CATTXT[d.cat]+'</span>');var teach=el('div','demo-teach','💡 '+d.teach);var stage=el('div','demo-stage noselect');card.appendChild(head);card.appendChild(teach);card.appendChild(stage);gridEl.appendChild(card);try{d.mount(stage);}catch(err){stage.innerHTML='<div class="stg-msg">demo 加载出错</div>';}});}
+// 标签条拖动滚动
+var down=false,startX,scl,dragged=false;
+tabsEl.addEventListener('pointerdown',function(e){down=true;dragged=false;startX=e.clientX;scl=tabsEl.scrollLeft;tabsEl.classList.add('drag');});
+window.addEventListener('pointermove',function(e){if(!down)return;var dx=e.clientX-startX;if(Math.abs(dx)>5)dragged=true;tabsEl.scrollLeft=scl-dx;});
+window.addEventListener('pointerup',function(){down=false;tabsEl.classList.remove('drag');setTimeout(function(){dragged=false;},50);});
+render();
+</script>
 </body>
 </html>
