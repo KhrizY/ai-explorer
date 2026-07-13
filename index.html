@@ -291,6 +291,77 @@ demo({id:'bias',cat:'e',title:'选数据·训练·评判',teach:'你亲手选数
   s.appendChild(tip);s.appendChild(grid);s.appendChild(btn);s.appendChild(result);
 }});
 
+// ---------- 🔬🎚️ 按 viz-ux-skill 新增（第二批） ----------
+demo({id:'grad',cat:'e',title:'梯度下降·下山找最低点',teach:'AI 学习=一步步往误差更低处走',mount:function(s){
+  var cv=document.createElement('canvas');cv.width=300;cv.height=150;cv.style.cssText='background:#160f33;border-radius:8px;max-width:100%';var ctx=cv.getContext('2d');
+  var cx=150,bx;
+  function loss(x){return Math.min(1,Math.pow((x-cx)/120,2));}
+  function sy(x){return 25+(1-loss(x))*100;}
+  function draw(){ctx.clearRect(0,0,300,150);ctx.strokeStyle='#4b3f7a';ctx.lineWidth=2.5;ctx.beginPath();for(var x=15;x<=285;x+=2){var y=sy(x);if(x===15)ctx.moveTo(x,y);else ctx.lineTo(x,y);}ctx.stroke();ctx.fillStyle='#22d3ee';ctx.shadowColor='#22d3ee';ctx.shadowBlur=10;ctx.beginPath();ctx.arc(bx,sy(bx)-8,7,0,7);ctx.fill();ctx.shadowBlur=0;}
+  bx=30+Math.random()*40;if(Math.random()>0.5)bx=300-bx;
+  var msg=el('div','stg-msg','点「走一步」，小球顺坡滚向最低点');var btn=el('button','stg-btn v','⛷️ 走一步');
+  btn.onclick=function(){var g=2*(bx-cx)/(120*120);bx-=g*4200;bx=Math.max(15,Math.min(285,bx));draw();if(Math.abs(bx-cx)<6){bigFlash(s,'🏁 最低点!',true);msg.textContent='误差最低！AI 就是这样一步步学好的';}else{msg.textContent='往低处走…还差一点';}};
+  s.appendChild(cv);s.appendChild(msg);s.appendChild(btn);draw();
+}});
+
+demo({id:'neuron',cat:'e',title:'神经元·会不会激活',teach:'输入够强，神经元就"点火"',mount:function(s){
+  s.classList.add('light');var x1=0.5,x2=0.5,w1=0.6,w2=0.7,th=0.6;
+  var core=el('div',null,'😴');core.style.cssText='font-size:44px;width:74px;height:74px;border-radius:50%;display:grid;place-items:center;background:#e5e7eb;transition:all .2s;margin:2px auto';
+  var sumbar=el('div');sumbar.style.cssText='height:12px;width:80%;max-width:260px;border-radius:8px;background:#e5e7eb;overflow:hidden;margin:8px auto;position:relative';
+  var sf=el('div');sf.style.cssText='height:100%;width:0;background:linear-gradient(90deg,#a78bfa,#22d3ee)';sumbar.appendChild(sf);
+  var thm=el('div');thm.style.cssText='position:absolute;top:-3px;bottom:-3px;width:2px;background:#dc2626;left:'+(th*100)+'%';sumbar.appendChild(thm);
+  var lbl=el('div','stg-msg','');
+  function slider(name,get,set){var wrap=el('div');wrap.style.cssText='display:flex;align-items:center;gap:8px;width:80%;max-width:260px;margin:4px auto;font-size:12px;color:#4b4869';var t=el('span',null,name);t.style.width='40px';var r=el('input');r.type='range';r.min=0;r.max=100;r.value=get()*100;r.style.cssText='flex:1;accent-color:#8b5cf6';r.oninput=function(){set(+r.value/100);upd();};wrap.appendChild(t);wrap.appendChild(r);return wrap;}
+  function upd(){var sum=x1*w1+x2*w2;sf.style.width=Math.min(100,sum*100)+'%';var fire=sum>=th;core.textContent=fire?'⚡':'😴';core.style.background=fire?'#fde68a':'#e5e7eb';lbl.innerHTML=fire?'总和 '+sum.toFixed(2)+' ≥ 门槛 → <b style="color:#b45309">激活! ⚡</b>':'总和 '+sum.toFixed(2)+' < 门槛 → 没反应';}
+  s.appendChild(core);s.appendChild(sumbar);s.appendChild(slider('输入1',function(){return x1;},function(v){x1=v;}));s.appendChild(slider('输入2',function(){return x2;},function(v){x2=v;}));s.appendChild(lbl);upd();
+}});
+
+demo({id:'diffusion',cat:'v',title:'扩散生成·从噪点到图',teach:'AI 画画=从一团噪点一步步"去噪"',mount:function(s){
+  var N=10,cells=[],step=0;
+  var heart=[[0,1,1,0,0,0,0,1,1,0],[1,1,1,1,0,0,1,1,1,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1],[0,1,1,1,1,1,1,1,1,0],[0,0,1,1,1,1,1,1,0,0],[0,0,0,1,1,1,1,0,0,0],[0,0,0,0,1,1,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0]];
+  var grid=el('div');grid.style.cssText='display:grid;grid-template-columns:repeat('+N+',18px);gap:2px';
+  function rndc(){return 'hsl('+Math.floor(Math.random()*360)+',60%,60%)';}
+  for(var r=0;r<N;r++)for(var c=0;c<N;c++){var d=el('div');d.style.cssText='width:18px;height:18px;border-radius:3px;transition:background .3s';cells.push({el:d,r:r,c:c,done:false});grid.appendChild(d);}
+  cells.forEach(function(o){o.el.style.background=rndc();});
+  var msg=el('div','stg-msg','一团噪点…点「去噪一步」');var btn=el('button','stg-btn v','✨ 去噪一步');
+  btn.onclick=function(){step++;var rev=0;cells.forEach(function(o){if(!o.done&&Math.random()<0.45){o.done=true;o.el.style.background=heart[o.r][o.c]?'#fb7185':'#160f33';}if(o.done)rev++;});msg.textContent='去噪第 '+step+' 步…';if(rev===cells.length){bigFlash(s,'❤️ 画好了!',true);msg.textContent='噪点变成一颗心！AI 画画就是这样';}};
+  s.appendChild(grid);s.appendChild(msg);s.appendChild(btn);
+}});
+
+demo({id:'overfit',cat:'e',title:'过拟合·死记 vs 真学会',teach:'太用力记每个点，反而学不到规律',mount:function(s){
+  var cv=document.createElement('canvas');cv.width=300;cv.height=150;cv.style.cssText='background:#160f33;border-radius:8px;max-width:100%';var ctx=cv.getContext('2d');
+  var P=[];for(var i=0;i<9;i++){var x=25+i*31,y=90-i*4+(Math.random()*40-20);P.push({x:x,y:Math.max(20,Math.min(130,y))});}
+  var c=0.3;
+  function straightY(x){var a=P[0],b=P[P.length-1];return a.y+(b.y-a.y)*(x-a.x)/(b.x-a.x);}
+  function zigY(x){for(var i=0;i<P.length-1;i++){if(x>=P[i].x&&x<=P[i+1].x){var t=(x-P[i].x)/(P[i+1].x-P[i].x);return P[i].y+(P[i+1].y-P[i].y)*t;}}return P[P.length-1].y;}
+  function draw(){ctx.clearRect(0,0,300,150);ctx.strokeStyle='#22d3ee';ctx.lineWidth=2.5;ctx.beginPath();for(var x=P[0].x;x<=P[P.length-1].x;x++){var y=straightY(x)*(1-c)+zigY(x)*c;if(x===P[0].x)ctx.moveTo(x,y);else ctx.lineTo(x,y);}ctx.stroke();ctx.fillStyle='#ffd66d';P.forEach(function(p){ctx.beginPath();ctx.arc(p.x,p.y,4,0,7);ctx.fill();});}
+  var lbl=el('div','stg-msg','');var rng=el('input');rng.type='range';rng.min=0;rng.max=100;rng.value=30;rng.style.cssText='width:80%;accent-color:#8b5cf6';
+  rng.oninput=function(){c=+rng.value/100;draw();lbl.innerHTML=c<0.3?'线太直——<b>没抓到规律（欠拟合）</b>':c<0.72?'<b style="color:#16a34a">刚刚好！抓住了大趋势</b>':'线太扭——<b style="color:#dc2626">死记每个点（过拟合）</b>';};
+  s.appendChild(cv);s.appendChild(rng);s.appendChild(lbl);draw();rng.oninput();
+}});
+
+demo({id:'token',cat:'v',title:'分词·句子拆成小块',teach:'AI 读句子前，先切成一小块一小块',mount:function(s){
+  s.classList.add('light');var SENT=['小猫','喜欢','在','沙发','上','睡觉'];
+  var view=el('div');view.style.cssText='font-size:20px;font-weight:700;color:#1e1b3a;min-height:36px;display:flex;flex-wrap:wrap;gap:3px;justify-content:center;align-items:center';
+  var colors=['#c4b5fd','#93c5fd','#6ee7b7','#fcd34d','#fca5a5','#f0abfc'],split=false;
+  function whole(){view.innerHTML='';view.appendChild(el('span',null,SENT.join('')));}
+  var msg=el('div','stg-msg','这是一句话，点按钮切成 token');var btn=el('button','stg-btn v','✂️ 分词');
+  btn.onclick=function(){split=!split;view.innerHTML='';if(split){SENT.forEach(function(w,i){var c=el('span',null,w);c.style.cssText='padding:4px 9px;border-radius:8px;background:'+colors[i%colors.length]+';animation:popIn .3s '+(i*0.06)+'s both';view.appendChild(c);});msg.innerHTML='切成了 <b>'+SENT.length+'</b> 个 token —— AI 一块块地读';btn.textContent='🔗 合起来';}else{whole();msg.textContent='合回一句话';btn.textContent='✂️ 分词';}};
+  whole();s.appendChild(view);s.appendChild(msg);s.appendChild(btn);
+}});
+
+demo({id:'temp',cat:'e',title:'温度·AI 有多"放飞"',teach:'温度越高，AI 说话越大胆越随机',mount:function(s){
+  s.classList.add('light');
+  var SAFE=['今天天气很好','我喜欢吃苹果','小猫在睡觉'],WILD=['今天天空在跳舞','苹果唱起了歌','小猫开火箭上月球','彩虹掉进了汤里'];
+  var t=30;
+  var out=el('div');out.style.cssText='font-size:18px;font-weight:700;color:#6d28d9;min-height:48px;display:grid;place-items:center;text-align:center;padding:6px';
+  var rng=el('input');rng.type='range';rng.min=0;rng.max=100;rng.value=30;rng.style.cssText='width:80%;accent-color:#8b5cf6';
+  var lbl=el('div','stg-msg','');var btn=el('button','stg-btn v','🎲 生成一句');
+  function gen(){var pool=t<45?SAFE:t<80?SAFE.concat(WILD):WILD;out.textContent='「'+pool[Math.floor(Math.random()*pool.length)]+'」';}
+  rng.oninput=function(){t=+rng.value;lbl.innerHTML='温度 '+t+'% —— '+(t<45?'安全稳妥':t<80?'有点创意':'<b style="color:#dc2626">放飞自我</b>');};
+  btn.onclick=gen;s.appendChild(out);s.appendChild(rng);s.appendChild(lbl);s.appendChild(btn);rng.oninput();gen();
+}});
+
 // ============ 渲染 ============
 var CATS=[['all','🌐 全部'],['g','🎮 游戏交互'],['v','🔬 可视化讲解'],['e','🎚️ 探索模拟']];
 var tabsEl=document.getElementById('tabs'),gridEl=document.getElementById('grid'),cur='all';
