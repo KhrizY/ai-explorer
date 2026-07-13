@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 探险号 · UI 样例实验室</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --font: "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
+  }
+  body {
+    font-family: var(--font);
+    background: #eef1f6;
+    color: #1a1a2e;
+    padding: 32px 16px 80px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .lab-head { max-width: 1100px; margin: 0 auto 8px; }
+  .lab-head h1 { font-size: 26px; letter-spacing: .5px; }
+  .lab-head p { color: #6b7280; margin-top: 8px; font-size: 15px; line-height: 1.7; }
+  .lab-note { max-width: 1100px; margin: 4px auto 36px; font-size: 13px; color: #9aa1ac; }
+
+  .arena {
+    max-width: 1100px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 28px; align-items: start;
+  }
+  .stage { display: flex; flex-direction: column; gap: 14px; }
+  .stage-label { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .stage-label b { font-size: 17px; }
+  .stage-label span { font-size: 12.5px; color: #8b93a0; }
+  .stage-canvas {
+    border-radius: 24px; padding: 34px 26px;
+    display: flex; align-items: center; justify-content: center; min-height: 360px;
+  }
+  .stage-desc { font-size: 12.5px; color: #7a828f; line-height: 1.7; padding: 0 4px; }
+  .stage-desc code { background: #e6e9ef; padding: 1px 6px; border-radius: 5px; font-size: 11.5px; }
+
+  /* ============ 通用卡片交互提示 ============ */
+  .tap-hint {
+    text-align: center; font-size: 12px; opacity: .55; margin-top: 2px;
+    animation: hintPulse 1.8s ease-in-out infinite;
+  }
+  @keyframes hintPulse { 0%,100%{opacity:.35} 50%{opacity:.75} }
+
+  /* ==================================================================
+     方案 A · 多邻国活力风（Duo Pop）
+     ================================================================== */
+  .canvas-a { background: linear-gradient(160deg, #f2fbe9, #e4f5fb); }
+  .card-a {
+    width: 280px; background: #fff; border-radius: 26px; padding: 24px 22px 22px;
+    border: 2px solid #e8ebf0; box-shadow: 0 6px 0 #d9dee6, 0 12px 24px rgba(90,110,140,.14);
+    cursor: pointer; transition: transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s;
+    position: relative;
+  }
+  .card-a:hover { transform: translateY(-6px); box-shadow: 0 12px 0 #d9dee6, 0 20px 34px rgba(90,110,140,.2); }
+  .card-a:active { transform: translateY(2px); box-shadow: 0 3px 0 #d9dee6, 0 8px 16px rgba(90,110,140,.18); }
+  .a-icon {
+    width: 74px; height: 74px; border-radius: 20px; display: grid; place-items: center;
+    font-size: 40px; background: linear-gradient(145deg, #8b5cf6, #6d28d9);
+    box-shadow: 0 5px 0 #5b21b6, 0 8px 18px rgba(109,40,217,.4);
+    animation: aBob 2.6s ease-in-out infinite;
+  }
+  @keyframes aBob { 0%,100%{transform:translateY(0) rotate(-2deg)} 50%{transform:translateY(-6px) rotate(2deg)} }
+  .a-tag { display:inline-block; margin:16px 0 6px; font-size:11px; font-weight:800; letter-spacing:1px;
+    color:#7c3aed; background:#f1eaff; padding:4px 10px; border-radius:20px; }
+  .a-title { font-size: 21px; font-weight: 900; letter-spacing:.3px; }
+  .a-hook { font-size: 13.5px; color: #6b7280; margin-top: 6px; line-height: 1.55; }
+  .a-bar { display:flex; gap:5px; margin:16px 0 4px; }
+  .a-seg { height:8px; flex:1; border-radius:6px; background:#e8ebf0; }
+  .a-seg.on { background:linear-gradient(90deg,#8b5cf6,#a78bfa); }
+  .a-foot { display:flex; align-items:center; justify-content:space-between; margin-top:14px; }
+  .a-badge { font-size:12px; font-weight:700; color:#9333ea; }
+  .a-btn {
+    font-family:var(--font); font-size:14px; font-weight:900; color:#fff; letter-spacing:1px;
+    background:#58cc02; border:none; border-radius:16px; padding:11px 20px; cursor:pointer;
+    box-shadow:0 4px 0 #46a302; transition:transform .1s, box-shadow .1s;
+  }
+  .a-btn:active { transform:translateY(3px); box-shadow:0 1px 0 #46a302; }
+
+  /* ==================================================================
+     方案 B · 深空探险风（Cosmic Wonder）
+     ================================================================== */
+  .canvas-b { background: radial-gradient(120% 120% at 30% 0%, #1b1145 0%, #0a0620 60%); position:relative; overflow:hidden; }
+  .canvas-b::before {
+    content:""; position:absolute; inset:0;
+    background-image: radial-gradient(1.5px 1.5px at 20% 30%, #fff8 40%, transparent),
+      radial-gradient(1.5px 1.5px at 70% 60%, #fff6 40%, transparent),
+      radial-gradient(2px 2px at 45% 80%, #c4b5fd88 40%, transparent),
+      radial-gradient(1px 1px at 85% 25%, #fff7 40%, transparent),
+      radial-gradient(1.5px 1.5px at 60% 15%, #93c5fd88 40%, transparent);
+    animation: twinkle 4s ease-in-out infinite;
+  }
+  @keyframes twinkle { 0%,100%{opacity:.5} 50%{opacity:1} }
+  .card-b {
+    position:relative; width:280px; border-radius:24px; padding:26px 22px 22px; cursor:pointer;
+    background: linear-gradient(160deg, rgba(45,32,90,.75), rgba(20,14,48,.85));
+    border:1px solid transparent; backdrop-filter: blur(8px);
+    box-shadow: 0 0 0 1px rgba(167,139,250,.25), 0 18px 44px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.08);
+    transition: transform .25s ease, box-shadow .25s ease; overflow:hidden;
+  }
+  .card-b::after {
+    content:""; position:absolute; top:0; left:-60%; width:50%; height:100%;
+    background:linear-gradient(100deg, transparent, rgba(255,255,255,.18), transparent);
+    transform:skewX(-18deg); animation: sheen 3.6s ease-in-out infinite;
+  }
+  @keyframes sheen { 0%{left:-60%} 55%,100%{left:130%} }
+  .card-b:hover { transform: translateY(-6px) scale(1.015); box-shadow:0 0 0 1px rgba(167,139,250,.6), 0 0 34px rgba(139,92,246,.45), 0 22px 50px rgba(0,0,0,.6); }
+  .b-icon {
+    width:74px; height:74px; border-radius:50%; display:grid; place-items:center; font-size:38px;
+    background: radial-gradient(circle at 35% 30%, #a78bfa, #6d28d9 70%);
+    box-shadow: 0 0 26px rgba(139,92,246,.75), inset 0 0 14px rgba(255,255,255,.25);
+    animation: bHalo 2.8s ease-in-out infinite;
+  }
+  @keyframes bHalo { 0%,100%{box-shadow:0 0 20px rgba(139,92,246,.6),inset 0 0 14px rgba(255,255,255,.25); transform:translateY(0)}
+    50%{box-shadow:0 0 40px rgba(139,92,246,.95),inset 0 0 14px rgba(255,255,255,.3); transform:translateY(-4px)} }
+  .b-tag { display:inline-block; margin:16px 0 6px; font-size:11px; font-weight:700; letter-spacing:2px;
+    color:#c4b5fd; text-transform:uppercase; }
+  .b-title { font-size:21px; font-weight:800; color:#fff;
+    background:linear-gradient(90deg,#e9d5ff,#93c5fd); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  .b-hook { font-size:13.5px; color:#b4aede; margin-top:7px; line-height:1.55; }
+  .b-bar { height:8px; border-radius:6px; background:rgba(255,255,255,.1); margin:18px 0 4px; overflow:hidden; }
+  .b-fill { width:40%; height:100%; border-radius:6px; background:linear-gradient(90deg,#8b5cf6,#22d3ee);
+    box-shadow:0 0 12px rgba(34,211,238,.8); animation: bFlow 2.4s linear infinite; background-size:200% 100%; }
+  @keyframes bFlow { 0%{background-position:0 0} 100%{background-position:200% 0} }
+  .b-foot { display:flex; align-items:center; justify-content:space-between; margin-top:14px; }
+  .b-badge { font-size:12px; color:#22d3ee; font-weight:700; }
+  .b-btn { font-family:var(--font); font-size:13px; font-weight:800; letter-spacing:1px; color:#0a0620;
+    background:linear-gradient(90deg,#c4b5fd,#67e8f9); border:none; border-radius:14px; padding:10px 18px; cursor:pointer;
+    box-shadow:0 0 18px rgba(103,232,249,.5); transition:filter .15s; }
+  .b-btn:hover { filter:brightness(1.12); }
+
+  /* ==================================================================
+     方案 C · 手绘科学笔记风（Doodle Lab）
+     ================================================================== */
+  .canvas-c { background: #fdf6e9; background-image: radial-gradient(#e6d9bd 1px, transparent 1px); background-size: 22px 22px; }
+  .card-c {
+    position:relative; width:280px; background:#fffdf7; padding:26px 24px 22px; cursor:pointer;
+    border:2.5px solid #2d2a26; border-radius:14px;
+    box-shadow: 5px 6px 0 #2d2a26; transform: rotate(-1.6deg);
+    transition: transform .2s cubic-bezier(.34,1.56,.64,1), box-shadow .2s;
+  }
+  .card-c::before {
+    content:""; position:absolute; top:-11px; left:50%; transform:translateX(-50%) rotate(-3deg);
+    width:78px; height:22px; background:rgba(255,214,120,.7); border:1.5px dashed #b8860020;
+    box-shadow:0 1px 2px rgba(0,0,0,.08);
+  }
+  .card-c:hover { transform: rotate(0deg) translateY(-4px); box-shadow: 7px 9px 0 #2d2a26; }
+  .card-c:active { transform: rotate(0deg) translateY(1px); box-shadow: 3px 4px 0 #2d2a26; }
+  .c-icon {
+    width:72px; height:72px; display:grid; place-items:center; font-size:40px;
+    background:#fff; border:2.5px solid #2d2a26; border-radius:16px; box-shadow:3px 3px 0 #2d2a26;
+    animation: cWiggle 3s ease-in-out infinite;
+  }
+  @keyframes cWiggle { 0%,100%{transform:rotate(-4deg)} 50%{transform:rotate(4deg)} }
+  .c-tag { display:inline-block; margin:16px 0 4px; font-size:12px; font-weight:800; color:#c2410c;
+    border:2px solid #c2410c; border-radius:20px; padding:2px 10px; transform:rotate(-1deg); }
+  .c-title { font-size:22px; font-weight:900; color:#2d2a26; }
+  .c-uline { display:block; margin-top:2px; }
+  .c-hook { font-size:13.5px; color:#5b544a; margin-top:8px; line-height:1.55; }
+  .c-bar { display:flex; gap:8px; align-items:center; margin:16px 0 4px; font-size:18px; }
+  .c-check { filter:grayscale(1) opacity(.35); }
+  .c-check.on { filter:none; }
+  .c-foot { display:flex; align-items:center; justify-content:space-between; margin-top:14px; }
+  .c-badge { font-size:12px; font-weight:800; color:#2d2a26; }
+  .c-btn { font-family:var(--font); font-size:14px; font-weight:900; color:#fffdf7; background:#2d2a26;
+    border:none; border-radius:12px; padding:10px 20px; cursor:pointer; box-shadow:3px 3px 0 #c2410c;
+    transition:transform .1s, box-shadow .1s; }
+  .c-btn:active { transform:translate(2px,2px); box-shadow:1px 1px 0 #c2410c; }
+
+  /* ============ 点击撒花反馈（共用） ============ */
+  .spark { position:fixed; pointer-events:none; font-size:18px; z-index:99; animation: sparkUp .9s ease-out forwards; }
+  @keyframes sparkUp { 0%{opacity:1; transform:translate(0,0) scale(.6)} 100%{opacity:0; transform:translate(var(--dx),var(--dy)) scale(1.3)} }
+</style>
+</head>
+<body>
+
+  <div class="lab-head">
+    <h1>🧪 AI 探险号 · UI 样例实验室</h1>
+    <p>同一张卡片（第二章「🧠 学 · AI 怎么自己学会？」的岛屿卡），三种视觉方向，都带动画。<b>把鼠标移上去、点一下按钮</b>看交互反馈。请挑一个方向，我再据此铺开整站视觉语言。</p>
+  </div>
+  <div class="lab-note">卡片内容取自 2.0 大纲真实数据 · 进度 2/5 · 徽章「小小训练师」 · 纯 HTML+CSS，零依赖零框架</div>
+
+  <div class="arena">
+
+    <!-- ========== A ========== -->
+    <div class="stage">
+      <div class="stage-label"><b>方案 A · 多邻国活力风</b><span>Duo Pop</span></div>
+      <div class="stage-canvas canvas-a">
+        <div class="card-a spark-src">
+          <div class="a-icon">🧠</div>
+          <div class="a-tag">第 2 站 · 学</div>
+          <div class="a-title">AI 怎么自己学会？</div>
+          <div class="a-hook">没人教它，它怎么就会认猫的？</div>
+          <div class="a-bar"><i class="a-seg on"></i><i class="a-seg on"></i><i class="a-seg"></i><i class="a-seg"></i><i class="a-seg"></i></div>
+          <div class="a-foot"><span class="a-badge">🏅 小小训练师</span><button class="a-btn">开始 →</button></div>
+        </div>
+      </div>
+      <div class="stage-desc">厚实圆角 + <code>实心投影</code>的 3D 按压手感、糖果配色、图标俏皮弹跳。亲切、明快、门槛最低，最贴近儿童教育爆款(多邻国)。天然适配吉祥物。</div>
+    </div>
+
+    <!-- ========== B ========== -->
+    <div class="stage">
+      <div class="stage-label"><b>方案 B · 深空探险风</b><span>Cosmic Wonder</span></div>
+      <div class="stage-canvas canvas-b">
+        <div class="card-b spark-src">
+          <div class="b-icon">🧠</div>
+          <div class="b-tag">STATION 02 · 学</div>
+          <div class="b-title">AI 怎么自己学会？</div>
+          <div class="b-hook">没人教它，它怎么就会认猫的？</div>
+          <div class="b-bar"><div class="b-fill"></div></div>
+          <div class="b-foot"><span class="b-badge">🏅 小小训练师</span><button class="b-btn">启程 →</button></div>
+        </div>
+      </div>
+      <div class="stage-desc">星空 + 霓虹辉光 + 流光扫过 + 能量条流动。呼应「AI 星球探险」主题，<code>惊奇感/科技感</code>最强，是对 1.0 暗紫主题的进化。氛围酷，但需注意别太"冷"。</div>
+    </div>
+
+    <!-- ========== C ========== -->
+    <div class="stage">
+      <div class="stage-label"><b>方案 C · 手绘科学笔记风</b><span>Doodle Lab</span></div>
+      <div class="stage-canvas canvas-c">
+        <div class="card-c spark-src">
+          <div class="c-icon">🧠</div>
+          <div class="c-tag">第 2 站 · 学</div>
+          <div class="c-title">AI 怎么自己学会？
+            <svg class="c-uline" width="180" height="10" viewBox="0 0 180 10"><path d="M2 6 Q 45 1 90 5 T 178 4" stroke="#c2410c" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+          </div>
+          <div class="c-hook">没人教它，它怎么就会认猫的？</div>
+          <div class="c-bar"><span class="c-check on">✅</span><span class="c-check on">✅</span><span class="c-check">⬜</span><span class="c-check">⬜</span><span class="c-check">⬜</span></div>
+          <div class="c-foot"><span class="c-badge">🏅 小小训练师</span><button class="c-btn">出发 →</button></div>
+        </div>
+      </div>
+      <div class="stage-desc">牛皮纸 + 手绘描边 + 胶带贴纸 + 歪一点的俏皮角度 + 涂鸦下划线。<code>创造性/人文感</code>最强，像孩子自己的科学笔记本，独特不撞脸。信息密度略低。</div>
+    </div>
+
+  </div>
+
+<script>
+  // 点击卡片/按钮 → 撒花正反馈（演示"强反馈"基调，非最终逻辑）
+  var EMO = ['✨','⭐','🎉','💫','🌟'];
+  document.querySelectorAll('.spark-src').forEach(function(card){
+    card.addEventListener('click', function(e){
+      for (var i=0;i<10;i++){
+        var s = document.createElement('div');
+        s.className = 'spark';
+        s.textContent = EMO[i % EMO.length];
+        s.style.left = e.clientX + 'px';
+        s.style.top = e.clientY + 'px';
+        var ang = (Math.PI*2) * (i/10);
+        s.style.setProperty('--dx', Math.cos(ang)*70 + 'px');
+        s.style.setProperty('--dy', (Math.sin(ang)*70 - 30) + 'px');
+        document.body.appendChild(s);
+        setTimeout((function(el){ return function(){ el.remove(); }; })(s), 900);
+      }
+    });
+  });
+</script>
+</body>
+</html>
