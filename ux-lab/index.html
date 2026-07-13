@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 探险号 · Game-UX 可玩原型</title>
+<link rel="stylesheet" href="../ui-lab/ui-system.css">
+<style>
+  body { background:#e9ecf3; }
+  .room { max-width:840px; margin:0 auto; padding:26px 16px 90px; }
+  .room > h1 { font-size:23px; color:#1e1b3a; }
+  .room > .sub { color:#6b7280; font-size:14px; margin:8px 0 8px; line-height:1.7; }
+  .room > .sub2 { color:#9aa1ac; font-size:12.5px; margin-bottom:24px; }
+  .mod { margin:26px 0; }
+  .mod > .lead { font-size:12.5px; color:#8b90a6; margin:6px 2px 10px; line-height:1.6; }
+  .stage { background:#0f0a26; border-radius:14px; padding:18px; position:relative; overflow:hidden; }
+  .score { position:absolute; top:10px; right:14px; color:#ffd66d; font-weight:800; font-size:13px; z-index:3; }
+  .play { position:relative; }
+  /* 分拣 */
+  .fruits { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin:6px 0 18px; min-height:56px; }
+  .fruit { width:52px; height:52px; border-radius:14px; background:#fff; display:grid; place-items:center; font-size:30px; cursor:pointer; transition:transform .15s var(--ease-bounce), box-shadow .15s; }
+  .fruit.sel { transform:scale(1.25) translateY(-6px); box-shadow:0 0 0 3px var(--gold), 0 8px 16px rgba(0,0,0,.4); }
+  .bins { display:flex; gap:14px; justify-content:center; }
+  .bin { flex:1; max-width:180px; padding:16px; border-radius:14px; border:2.5px dashed #7c6fb0; color:#cbd0e6; text-align:center; font-weight:800; cursor:pointer; transition:background .15s; }
+  .bin:hover { background:rgba(139,92,246,.18); }
+  /* 手摇 */
+  .crank-wrap { text-align:center; color:#eee; }
+  .crank-face { font-size:60px; margin:4px 0 10px; transition:transform .1s; }
+  .crank-bar { height:16px; border-radius:10px; background:rgba(255,255,255,.12); overflow:hidden; margin:0 auto 6px; max-width:300px; }
+  .crank-fill { height:100%; width:8%; border-radius:10px; background:linear-gradient(90deg,var(--violet),var(--cyan)); transition:width .25s var(--ease); }
+  .crank-lbl { font-size:13px; color:#c4b5fd; margin-bottom:12px; }
+  /* QTE */
+  .qte-track { position:relative; height:34px; border-radius:10px; background:rgba(255,255,255,.1); overflow:hidden; max-width:420px; margin:14px auto; }
+  .qte-zone { position:absolute; top:0; bottom:0; background:linear-gradient(var(--correct),var(--correct-d)); opacity:.55; }
+  .qte-ind { position:absolute; top:-4px; width:6px; height:42px; background:#fff; border-radius:3px; box-shadow:0 0 10px #fff; }
+  .qte-msg { text-align:center; color:#eee; font-size:14px; min-height:20px; font-weight:700; }
+  /* 钓鱼 */
+  .fish-track { position:relative; width:80px; height:220px; margin:6px auto; border-radius:14px; background:linear-gradient(#123,#012); overflow:hidden; touch-action:none; cursor:pointer; }
+  .fish-target { position:absolute; left:8px; right:8px; height:52px; border-radius:10px; background:rgba(88,204,2,.25); border:2px solid var(--correct); }
+  .fish-fish { position:absolute; left:0; right:0; text-align:center; font-size:26px; }
+  .fish-bar { position:absolute; left:8px; right:8px; height:30px; border-radius:8px; background:rgba(167,139,250,.5); border:2px solid var(--violet-l); }
+  .fish-prog { width:14px; height:220px; border-radius:8px; background:rgba(255,255,255,.12); overflow:hidden; display:inline-block; vertical-align:top; margin-left:10px; position:relative; }
+  .fish-prog i { position:absolute; bottom:0; left:0; right:0; background:linear-gradient(var(--cyan),var(--correct)); height:0%; transition:height .1s; }
+  .fish-row { display:flex; justify-content:center; align-items:flex-start; }
+  /* 黄金矿工 */
+  .miner { position:relative; height:230px; max-width:420px; margin:0 auto; }
+  .hook-pivot { position:absolute; top:6px; left:50%; width:2px; height:0; transform-origin:top center; }
+  .hook-line { position:absolute; top:0; left:-1px; width:4px; background:#ffd66d; border-radius:2px; height:100%; }
+  .claw { position:absolute; bottom:-10px; left:50%; transform:translateX(-50%); font-size:22px; }
+  .ore { position:absolute; width:44px; height:44px; border-radius:12px; display:grid; place-items:center; font-size:24px; }
+</style>
+</head>
+<body>
+<div class="room">
+  <h1>🎮 AI 探险号 · Game-UX 可玩原型</h1>
+  <div class="sub">把成熟游戏机制抽象成教学交互。<b>都能真上手玩</b>——每个原型都标了它教什么 AI 概念。</div>
+  <div class="sub2">复用 <code style="background:#e6e9ef;padding:1px 5px;border-radius:4px">ui-lab/ui-system.css</code> · 反馈基调：对=撒花、错=暖色鼓励不用红叉</div>
+
+  <!-- A 拖拽分拣 -->
+  <div class="mod">
+    <div class="gf-head" style="border-radius:12px 12px 0 0"><span class="gf-ico">🍎</span><b>拖拽分拣</b><span>教「分类」· 学章 S1</span></div>
+    <div class="lead">👆 点一个水果选中，再点它该进的筐。分类就是 AI 最核心的动作。</div>
+    <div class="stage"><div class="score" id="sortScore">0 分</div>
+      <div class="play">
+        <div class="fruits" id="fruits"></div>
+        <div class="bins"><div class="bin" data-apple="1">🍎 苹果</div><div class="bin" data-apple="0">🚫 不是苹果</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- B 手摇训练机 -->
+  <div class="mod">
+    <div class="gf-head" style="border-radius:12px 12px 0 0"><span class="gf-ico">🔧</span><b>手摇训练机</b><span>教「训练循环」· 学章 S2⭐</span></div>
+    <div class="lead">👆 一直点「训练」，看阿波的准确率从瞎猜一路爬到高手。这就是"喂→猜→调整"转很多圈。</div>
+    <div class="stage"><div class="crank-wrap">
+      <div class="crank-face" id="crankFace">😵</div>
+      <div class="crank-bar"><div class="crank-fill" id="crankFill"></div></div>
+      <div class="crank-lbl" id="crankLbl">准确率 8% —— 全靠瞎猜…</div>
+      <button class="btn btn-glow" id="crankBtn">🔧 训练一下！</button>
+    </div></div>
+  </div>
+
+  <!-- C QTE 计时判定 -->
+  <div class="mod">
+    <div class="gf-head" style="border-radius:12px 12px 0 0"><span class="gf-ico">🎯</span><b>计时判定 QTE</b><span>教「抓住时机」· 通用检测</span></div>
+    <div class="lead">👆 白线扫到绿区时点「抓！」。命中区会越来越小——WarioWare 式递增难度。</div>
+    <div class="stage"><div class="crank-wrap">
+      <div class="qte-track"><div class="qte-zone" id="qteZone"></div><div class="qte-ind" id="qteInd"></div></div>
+      <div class="qte-msg" id="qteMsg">连击 0</div>
+      <button class="btn btn-primary" id="qteBtn">抓！</button>
+    </div></div>
+  </div>
+
+  <!-- D 钓鱼式长按滑条 -->
+  <div class="mod">
+    <div class="gf-head" style="border-radius:12px 12px 0 0"><span class="gf-ico">🎣</span><b>长按滑条控制（钓鱼式）</b><span>教「平衡/调参」· 学章进阶</span></div>
+    <div class="lead">👆 <b>按住</b>水池让紫条上升、松手下落，把紫条罩住绿色目标——就像把"准确率"稳定控制在高位。填满即通关。</div>
+    <div class="stage"><div class="fish-row">
+      <div class="fish-track" id="fishTrack">
+        <div class="fish-target" id="fishTarget"><div class="fish-fish" style="line-height:52px">🐟</div></div>
+        <div class="fish-bar" id="fishBar"></div>
+      </div>
+      <div class="fish-prog"><i id="fishProg"></i></div>
+    </div><div class="qte-msg" id="fishMsg" style="margin-top:10px">按住水池开始</div></div>
+  </div>
+
+  <!-- E 黄金矿工式蓄力抓取 -->
+  <div class="mod">
+    <div class="gf-head" style="border-radius:12px 12px 0 0"><span class="gf-ico">⛏️</span><b>蓄力抓取（黄金矿工式）</b><span>教「抓正确样本」· 学章 S3</span></div>
+    <div class="lead">👆 抓钩来回摆，点一下放钩。只抓「干净数据」🐱🍎，抓到「脏数据」💩会扣分——好数据才能训练好 AI。</div>
+    <div class="stage"><div class="score" id="minerScore">0 分</div>
+      <div class="miner" id="miner">
+        <div class="hook-pivot" id="hookPivot"><div class="hook-line"></div><div class="claw">🪝</div></div>
+      </div>
+      <div class="qte-msg" id="minerMsg" style="margin-top:6px">点击放钩</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// 通用撒花
+function spark(x,y){ var E=['✨','⭐','🎉','💫','🌟']; for(var i=0;i<8;i++){ var s=document.createElement('div'); s.className='spark'; s.textContent=E[i%5]; s.style.left=x+'px'; s.style.top=y+'px'; var a=Math.PI*2*i/8; s.style.setProperty('--dx',Math.cos(a)*60+'px'); s.style.setProperty('--dy',(Math.sin(a)*60-20)+'px'); document.body.appendChild(s); (function(el){setTimeout(function(){el.remove();},900);})(s);} }
+
+// ============ A 拖拽分拣 ============
+(function(){
+  var DATA=[{e:'🍎',a:1},{e:'🍅',a:0},{e:'🍏',a:1},{e:'🐱',a:0},{e:'🍎',a:1},{e:'🍊',a:0}];
+  var box=document.getElementById('fruits'), scoreEl=document.getElementById('sortScore'), score=0, sel=null;
+  function render(){ box.innerHTML=''; DATA.forEach(function(f,i){ var d=document.createElement('div'); d.className='fruit'; d.textContent=f.e; d.dataset.i=i;
+    d.addEventListener('click',function(){ document.querySelectorAll('.fruit.sel').forEach(function(x){x.classList.remove('sel');}); d.classList.add('sel'); sel=d; }); box.appendChild(d); }); }
+  document.querySelectorAll('.bin').forEach(function(bin){ bin.addEventListener('click',function(e){ if(!sel) return;
+    var i=+sel.dataset.i, ok=(''+DATA[i].a)===bin.dataset.apple;
+    if(ok){ score+=10; spark(e.clientX,e.clientY); sel.style.transition='transform .3s,opacity .3s'; sel.style.transform='scale(0)'; sel.style.opacity='0'; var s2=sel; setTimeout(function(){s2.remove();},300); }
+    else { score=Math.max(0,score-5); bin.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}],{duration:300}); }
+    scoreEl.textContent=score+' 分'; sel=null;
+    if(!document.querySelector('.fruit')){ setTimeout(function(){ render(); },500); }
+  }); });
+  render();
+})();
+
+// ============ B 手摇训练机 ============
+(function(){
+  var acc=8, face=document.getElementById('crankFace'), fill=document.getElementById('crankFill'), lbl=document.getElementById('crankLbl'), btn=document.getElementById('crankBtn'), done=false;
+  btn.addEventListener('click',function(e){
+    acc += (96-acc)*0.16 + Math.random()*3; if(acc>98) acc=98;
+    var v=Math.round(acc); fill.style.width=v+'%';
+    var f=v<25?'😵':v<55?'😐':v<85?'🙂':'😻';
+    var m=v<25?'全靠瞎猜…':v<55?'开始有点感觉了…':v<85?'越来越准了！':'认猫高手！';
+    face.textContent=f; face.style.transform='scale('+(1+v/300)+')'; lbl.textContent='准确率 '+v+'% —— '+m;
+    if(v>=90 && !done){ done=true; spark(e.clientX,e.clientY); lbl.textContent='🎉 准确率 '+v+'%！你训练出了第一个 AI！'; }
+  });
+})();
+
+// ============ C QTE 计时判定 ============
+(function(){
+  var ind=document.getElementById('qteInd'), zone=document.getElementById('qteZone'), msg=document.getElementById('qteMsg'), btn=document.getElementById('qteBtn');
+  var pos=0, dir=1, speed=1.1, zw=22, zx=55, combo=0, track=ind.parentElement;
+  function placeZone(){ zx=15+Math.random()*(100-15-zw); zone.style.left=zx+'%'; zone.style.width=zw+'%'; }
+  function loop(){ pos+=dir*speed; if(pos>=100){pos=100;dir=-1;} if(pos<=0){pos=0;dir=1;} ind.style.left=pos+'%'; requestAnimationFrame(loop); }
+  btn.addEventListener('click',function(e){ if(pos>=zx && pos<=zx+zw){ combo++; spark(e.clientX,e.clientY); msg.textContent='命中！连击 '+combo+' 🔥'; speed+=0.25; zw=Math.max(9,zw-1.5); placeZone(); }
+    else { combo=0; speed=1.1; zw=22; msg.textContent='差一点点～再来！'; placeZone(); } });
+  placeZone(); loop();
+})();
+
+// ============ D 钓鱼式长按滑条 ============
+(function(){
+  var track=document.getElementById('fishTrack'), target=document.getElementById('fishTarget'), bar=document.getElementById('fishBar'), prog=document.getElementById('fishProg'), msg=document.getElementById('fishMsg');
+  var H=220, barH=30, tgtH=52, barY=150, vy=0, hold=false, p=0, t=0, won=false;
+  track.addEventListener('pointerdown',function(){hold=true;});
+  window.addEventListener('pointerup',function(){hold=false;});
+  function loop(){
+    t+=0.03; var ty=(H-tgtH)/2 + Math.sin(t)*((H-tgtH)/2-6); target.style.top=ty+'px';
+    vy += hold? -0.6 : 0.5; vy*=0.92; barY+=vy; if(barY<0){barY=0;vy=0;} if(barY>H-barH){barY=H-barH;vy=0;} bar.style.top=barY+'px';
+    var overlap = (barY < ty+tgtH) && (barY+barH > ty);
+    p += overlap? 0.7 : -0.5; if(p<0)p=0; if(p>100)p=100; prog.style.height=p+'%';
+    if(!won){ msg.textContent = overlap? '罩住了！稳住～ '+Math.round(p)+'%' : '按住/松手，去罩住🐟'; }
+    if(p>=100 && !won){ won=true; msg.textContent='🎉 通关！你把准确率稳住了！'; var r=track.getBoundingClientRect(); spark(r.left+r.width/2, r.top+r.height/2); }
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+// ============ E 黄金矿工式蓄力抓取 ============
+(function(){
+  var box=document.getElementById('miner'), pivot=document.getElementById('hookPivot'), scoreEl=document.getElementById('minerScore'), msg=document.getElementById('minerMsg');
+  var ORE=[{e:'🐱',clean:1,x:60},{e:'💩',clean:0,x:150},{e:'🍎',clean:1,x:250},{e:'💩',clean:0,x:340},{e:'🐶',clean:1,x:400}];
+  var score=0, ang=0, t=0, state='swing', len=34, grabbed=null;
+  ORE.forEach(function(o){ var d=document.createElement('div'); d.className='ore'; d.textContent=o.e; d.style.left=o.x+'px'; d.style.bottom='6px'; d.style.background=o.clean?'rgba(88,204,2,.25)':'rgba(251,113,133,.25)'; box.appendChild(d); o.el=d; });
+  function W(){ return box.clientWidth; }
+  function loop(){
+    if(state==='swing'){ t+=0.045; ang=Math.sin(t)*62; }
+    else if(state==='shoot'){ len+=6; if(len>=210){ grab(); state='retract'; } }
+    else if(state==='retract'){ len-=8; if(len<=34){ len=34; if(grabbed){ grabbed.el.remove(); grabbed=null; } state='swing'; } }
+    pivot.style.transform='rotate('+ang+'deg)'; pivot.style.height=len+'px';
+    requestAnimationFrame(loop);
+  }
+  function grab(){
+    var cx=W()/2, rad=ang*Math.PI/180, gx=cx+210*Math.sin(rad);
+    var hit=null,best=40;
+    ORE.forEach(function(o){ if(!o.el.parentElement) return; var d=Math.abs((o.x+22)-gx); if(d<best){best=d;hit=o;} });
+    if(hit){ grabbed=hit; var r=box.getBoundingClientRect();
+      if(hit.clean){ score+=10; msg.textContent='抓到干净数据！+10'; spark(r.left+gx, r.bottom-30); }
+      else { score=Math.max(0,score-8); msg.textContent='啊，抓到脏数据💩 -8'; }
+      scoreEl.textContent=score+' 分';
+    } else { msg.textContent='没抓到，再瞄准！'; }
+  }
+  box.addEventListener('click',function(){ if(state==='swing'){ state='shoot'; } });
+  loop();
+})();
+</script>
+</body>
+</html>
