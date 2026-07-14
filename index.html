@@ -66,7 +66,8 @@
   .game-stage-light{position:relative;height:240px;background:linear-gradient(180deg,#f8fafc,#eef2ff);border:2px solid #e6e9f2;border-radius:14px;overflow:hidden;touch-action:manipulation;}
   .game-chip{position:absolute;display:grid;place-items:center;border-radius:14px;background:#fff;border:2px solid #e6e9f2;box-shadow:0 6px 14px rgba(60,50,110,.13);cursor:pointer;user-select:none;}
   .game-chip.good{border-color:#bbf7d0;background:#ecfdf5}.game-chip.bad{border-color:#fde68a;background:#fffbeb}
-  .game-hud{display:flex;justify-content:space-between;align-items:center;gap:10px;font-weight:900;color:#6d28d9;font-size:13px;margin-bottom:8px;}
+  .game-hud{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:900;color:#6d28d9;font-size:13px;margin-bottom:8px;flex-wrap:wrap;}
+  .game-hud span{white-space:nowrap;}
   .game-meter{height:9px;background:#e6e9f2;border-radius:999px;overflow:hidden;margin-bottom:10px}.game-meter i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#58cc02,#fbbf24,#fb7185);transition:width .08s linear;}
   .toastbig{position:fixed;left:50%;top:30%;transform:translateX(-50%);z-index:50;font-size:30px;font-weight:900;text-shadow:0 2px 8px #fff;animation:bigF .8s ease-out forwards;pointer-events:none;}
   @keyframes bigF{0%{opacity:0;transform:translateX(-50%) scale(.4)}30%{opacity:1;transform:translateX(-50%) scale(1.1)}70%{opacity:1;transform:translateX(-50%) scale(1)}100%{opacity:0;transform:translateX(-50%) scale(1)}}
@@ -748,8 +749,12 @@ function buildClawGame(cfg,onWin,onReset){var b=ixbox(cfg.title,cfg.hint,onReset
   btn.onclick=function(){if(state==='move')state='drop';};pos();window._gR=requestAnimationFrame(loop);
   w.appendChild(hud);w.appendChild(stage);w.appendChild(btn);return b;}
 function buildTrainClaw(onWin,onReset){return buildClawGame({title:'🕹️ 数据抓娃娃机',hint:'用抓钩只抓干净数据🐱，别抓脏数据💩！抓 4 个',goal:4,scoreName:'抓到',pool:[{e:'🐱',good:1},{e:'🐈‍⬛',good:1},{e:'🐈',good:1},{e:'💩',good:0},{e:'🐶',good:0},{e:'🌫️',good:0}],goodMsg:'干净数据 +1',badMsg:'抓到脏数据了！',doneMsg:'训练数据抓满！'},onWin,onReset);}
+function buildVisionMatch(onWin,onReset){return buildMemoryGame({title:'🧩 特征配对记忆赛',hint:'翻开卡片，把相同视觉线索配成对',pairs:['🔍','⚡','📷','🧩'],hint2:'找出 4 对相同特征'},onWin,onReset);}
+function buildWordRhythm(onWin,onReset){return buildRhythmGame({title:'💬 词块快闪赛',hint:'点顺口词块，避开怪词',goal:7,rate:760,life:1450,good:['今天','小猫','喜欢','睡觉','天气','很好'],bad:['香蕉','倒飞','咕噜','火箭汤'],badMsg:'怪词别点'},onWin,onReset);}
+function buildToolTiming(onWin,onReset){return buildTimingGame({title:'🛠️ 工具时机条',hint:'指针进入绿色区时派出工具',goal:5,speed:.72,scoreName:'派出',btn:'⚡ 派工具！',doneMsg:'工具派送完成！'},onWin,onReset);}
+function buildSafetyHold(onWin,onReset){return buildHoldGame({title:'⚖️ 安全护盾',hint:'按住/松手，让护盾罩住安全目标',icon:'🔒',doneMsg:'安全守住了！'},onWin,onReset);}
 function buildTimingGame(cfg,onWin,onReset){var b=ixbox(cfg.title,cfg.hint,onReset);var w=b._body;clearGame();
-  var score=0,combo=0,miss=0,goal=cfg.goal||6,done=false,p=0,dir=1,speed=cfg.speed||1.1,zw=22,zx=40;
+  var score=0,combo=0,miss=0,goal=cfg.goal||6,done=false,p=0,dir=1,speed=cfg.speed||.8,zw=30,zx=40;
   var hud=el('div','game-hud');var scEl=el('span',null,(cfg.scoreName||'命中')+' 0/'+goal);var cbEl=el('span',null,'连击 0');hud.appendChild(scEl);hud.appendChild(cbEl);
   var track=el('div');track.style.cssText='position:relative;height:34px;border-radius:10px;background:#eef2ff;border:2px solid #e6e9f2;overflow:hidden;margin:8px 0';
   var zone=el('div');zone.style.cssText='position:absolute;top:0;bottom:0;background:linear-gradient(#bbf7d0,#86efac)';var ind=el('div');ind.style.cssText='position:absolute;top:-3px;width:6px;height:40px;background:#6d28d9;border-radius:3px';track.appendChild(zone);track.appendChild(ind);
@@ -757,17 +762,17 @@ function buildTimingGame(cfg,onWin,onReset){var b=ixbox(cfg.title,cfg.hint,onRes
   function place(){zx=10+Math.random()*(88-zw);zone.style.left=zx+'%';zone.style.width=zw+'%';}
   function end(e){done=true;clearGame();toast(starOf(miss)+' 通关!',true);lineFeedback(w,true,cfg.doneMsg||'时机大师！');setTimeout(function(){onWin(e||{});},380);}
   function loop(){if(done)return;p+=dir*speed;if(p>=100){p=100;dir=-1;}if(p<=0){p=0;dir=1;}ind.style.left=p+'%';window._gR=requestAnimationFrame(loop);}
-  btn.onclick=function(e){if(done)return;if(p>=zx&&p<=zx+zw){score++;combo++;spark(e.clientX,e.clientY);scEl.textContent=(cfg.scoreName||'命中')+' '+score+'/'+goal;cbEl.textContent='连击 '+combo+(combo>=3?' 🔥':'');speed+=0.16;zw=Math.max(10,zw-1.2);place();if(score>=goal)end(e);}else{miss++;combo=0;cbEl.textContent='连击 0';speed=cfg.speed||1.1;zw=22;lineFeedback(w,false,'差一点，看准绿区！');place();}};
+  btn.onclick=function(e){if(done)return;if(p>=zx&&p<=zx+zw){score++;combo++;spark(e.clientX,e.clientY);scEl.textContent=(cfg.scoreName||'命中')+' '+score+'/'+goal;cbEl.textContent='连击 '+combo+(combo>=3?' 🔥':'');speed+=0.08;zw=Math.max(18,zw-1);place();if(score>=goal)end(e);}else{miss++;combo=0;cbEl.textContent='连击 0';speed=cfg.speed||.8;zw=30;lineFeedback(w,false,'差一点，看准绿区！');place();}};
   place();loop();w.appendChild(hud);w.appendChild(track);w.appendChild(btn);return b;}
 function buildMemoryGame(cfg,onWin,onReset){var b=ixbox(cfg.title,cfg.hint,onReset);var w=b._body;
   var P=cfg.pairs,cards=P.concat(P);for(var k=cards.length-1;k>0;k--){var j=Math.floor(Math.random()*(k+1)),t=cards[k];cards[k]=cards[j];cards[j]=t;}
   var open=[],lock=false,matched=0,miss=0;
   var msg=el('div',null,cfg.hint2||'翻开两张一样的');msg.style.cssText='text-align:center;font-size:12.5px;color:#6b7280;margin-bottom:8px';
-  var grid=el('div');grid.style.cssText='display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:300px;margin:0 auto';
+  var grid=el('div');grid.style.cssText='display:grid;grid-template-columns:repeat(4,minmax(48px,1fr));gap:8px;width:100%;max-width:300px;margin:0 auto';
   cards.forEach(function(c){var d=el('div',null,'❓');d.style.cssText='aspect-ratio:1;border-radius:12px;background:#fff;border:2px solid #e6e9f2;display:grid;place-items:center;font-size:22px;cursor:pointer;color:#8b5cf6';d.flip=function(o){d.textContent=o?c:'❓';d.style.background=o?'#f5f3ff':'#fff';};d.onclick=function(e){if(lock||d.textContent!=='❓')return;d.flip(1);open.push({d:d,c:c});if(open.length===2){lock=true;if(open[0].c===open[1].c){spark(e.clientX,e.clientY);matched++;open=[];lock=false;if(matched===P.length){toast(starOf(miss)+' 通关!',true);lineFeedback(w,true,'全配对！');setTimeout(function(){onWin(e);},380);}}else{miss++;var o=open;setTimeout(function(){o[0].d.flip(0);o[1].d.flip(0);open=[];lock=false;},650);}}};grid.appendChild(d);});
   w.appendChild(msg);w.appendChild(grid);return b;}
 function buildHoldGame(cfg,onWin,onReset){var b=ixbox(cfg.title,cfg.hint,onReset);var w=b._body;clearGame();
-  var H=196,barH=34,tgtH=54,barY=140,vy=0,hold=false,p=0,t=0,done=false;
+  var H=186,barH=46,tgtH=66,barY=118,vy=0,hold=false,p=0,t=0,done=false;
   var hud=el('div','game-hud');var pEl=el('span',null,'稳定度 0%');var tEl=el('span',null,'按住上升');hud.appendChild(pEl);hud.appendChild(tEl);
   var track=el('div');track.style.cssText='position:relative;width:74px;height:'+H+'px;margin:6px auto;border-radius:14px;background:linear-gradient(#e0e7ff,#eef2ff);border:2px solid #c7d2fe;overflow:hidden;touch-action:none';
   var tgt=el('div',null,cfg.icon||'🎯');tgt.style.cssText='position:absolute;left:6px;right:6px;height:'+tgtH+'px;border-radius:10px;background:rgba(88,204,2,.25);border:2px solid #58cc02;display:grid;place-items:center;font-size:24px';
@@ -775,14 +780,14 @@ function buildHoldGame(cfg,onWin,onReset){var b=ixbox(cfg.title,cfg.hint,onReset
   var btn=el('button','btn btn-glow','🎣 按住不放');btn.style.cssText+=';display:block;margin:8px auto 0';
   btn.addEventListener('pointerdown',function(e){e.preventDefault();hold=true;});window.addEventListener('pointerup',function(){hold=false;});
   function end(e){done=true;clearGame();toast('⭐⭐⭐ 通关!',true);lineFeedback(w,true,cfg.doneMsg||'稳住啦！');setTimeout(function(){onWin(e||{});},380);}
-  function loop(){if(done)return;t+=0.03;var ty=(H-tgtH)/2+Math.sin(t)*((H-tgtH)/2-6);tgt.style.top=ty+'px';vy+=hold?-0.55:0.45;vy*=0.9;barY+=vy;if(barY<0){barY=0;vy=0;}if(barY>H-barH){barY=H-barH;vy=0;}bar.style.top=barY+'px';var ov=(barY<ty+tgtH)&&(barY+barH>ty);p+=ov?0.8:-0.5;if(p<0)p=0;if(p>100)p=100;pEl.textContent='稳定度 '+Math.round(p)+'%';tEl.textContent=ov?'罩住了！🔥':'去罩住目标';if(p>=100)end({});window._gR=requestAnimationFrame(loop);}
+  function loop(){if(done)return;t+=0.024;var ty=(H-tgtH)/2+Math.sin(t)*((H-tgtH)/2-6);tgt.style.top=ty+'px';vy+=hold?-0.42:0.34;vy*=0.9;barY+=vy;if(barY<0){barY=0;vy=0;}if(barY>H-barH){barY=H-barH;vy=0;}bar.style.top=barY+'px';var ov=(barY<ty+tgtH)&&(barY+barH>ty);p+=ov?1.05:-0.28;if(p<0)p=0;if(p>100)p=100;pEl.textContent='稳定度 '+Math.round(p)+'%';tEl.textContent=ov?'罩住了！🔥':'去罩住目标';if(p>=100)end({});window._gR=requestAnimationFrame(loop);}
   loop();w.appendChild(hud);w.appendChild(track);w.appendChild(btn);return b;}
 function buildRhythmGame(cfg,onWin,onReset){var b=ixbox(cfg.title,cfg.hint,onReset);var w=b._body;clearGame();
   var score=0,combo=0,miss=0,goal=cfg.goal||10,done=false;
   var hud=el('div','game-hud');var scEl=el('span',null,'击中 0/'+goal);var cbEl=el('span',null,'连击 0');hud.appendChild(scEl);hud.appendChild(cbEl);
   var stage=el('div','game-stage-light');stage.style.height='220px';
   function end(e){done=true;clearGame();toast(starOf(miss)+' 通关!',true);lineFeedback(w,true,'手速真快！');setTimeout(function(){onWin(e||{});},380);}
-  function pop(){if(done)return;var good=Math.random()>.28;var arr=good?cfg.good:cfg.bad;var ic=arr[Math.floor(Math.random()*arr.length)];var d=el('div',null,ic);var x=6+Math.random()*80,y=6+Math.random()*70;d.style.cssText='position:absolute;left:'+x+'%;top:'+y+'%;font-size:34px;cursor:pointer;animation:popIn .2s both';var life=setTimeout(function(){if(!d.dead){if(good){miss++;combo=0;cbEl.textContent='连击 0';}if(d.parentElement)d.remove();}},cfg.life||1100);d.onclick=function(e){if(d.dead||done)return;d.dead=1;clearTimeout(life);if(good){score++;combo++;spark(e.clientX,e.clientY);scEl.textContent='击中 '+score+'/'+goal;cbEl.textContent='连击 '+combo+(combo>=4?' 🔥':'');d.remove();if(score>=goal)end(e);}else{miss++;combo=0;cbEl.textContent='连击 0';lineFeedback(w,false,cfg.badMsg||'那个别点');d.remove();}};stage.appendChild(d);}
+  function pop(){if(done)return;var good=Math.random()>.24;var arr=good?cfg.good:cfg.bad;var ic=arr[Math.floor(Math.random()*arr.length)];var d=el('div',null,ic);var x=6+Math.random()*72,y=6+Math.random()*66;d.style.cssText='position:absolute;left:'+x+'%;top:'+y+'%;min-width:58px;height:44px;padding:0 10px;border-radius:14px;background:#fff;border:2px solid '+(good?'#bbf7d0':'#fde68a')+';display:grid;place-items:center;font-size:20px;font-weight:900;cursor:pointer;animation:popIn .2s both;box-shadow:0 5px 12px rgba(60,50,110,.12)';var life=setTimeout(function(){if(!d.dead){if(good){miss++;combo=0;cbEl.textContent='连击 0';}if(d.parentElement)d.remove();}},cfg.life||1400);d.onclick=function(e){if(d.dead||done)return;d.dead=1;clearTimeout(life);if(good){score++;combo++;spark(e.clientX,e.clientY);scEl.textContent='击中 '+score+'/'+goal;cbEl.textContent='连击 '+combo+(combo>=4?' 🔥':'');d.remove();if(score>=goal)end(e);}else{miss++;combo=0;cbEl.textContent='连击 0';lineFeedback(w,false,cfg.badMsg||'那个别点');d.remove();}};stage.appendChild(d);}
   window._gT=setInterval(pop,cfg.rate||640);w.appendChild(hud);w.appendChild(stage);return b;}
 
 // ========== 进阶课程（独立平铺） ==========
