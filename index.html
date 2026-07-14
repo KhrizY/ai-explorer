@@ -725,7 +725,7 @@ function renderSec(){
   wrap.scrollIntoView({behavior:'smooth',block:'start'});
 }
 function renderEnd(){if(document.getElementById('end-'+CH.id))return;var wrap=el('div','section');wrap.id='end-'+CH.id;wrap.appendChild(el('div','section-heading','<span class="section-num">🎮</span>通关挑战'));var host=el('div');var won=false;function mountG(){won=false;var old=document.getElementById('finish-'+CH.id);if(old)old.remove();host.innerHTML='';host.appendChild((CH.endGame||buildChallenge)(function(e){if(won)return;won=true;finishChapter(e);},mountG));}mountG();wrap.appendChild(host);var back=el('div','next-wrap');var backBtn=el('button','next-btn','🗺️ 返回主页面');backBtn.onclick=goMap;back.appendChild(backBtn);wrap.appendChild(back);document.getElementById('chbody').appendChild(wrap);wrap.scrollIntoView({behavior:document.body.classList.contains('debug-end')?'auto':'smooth'});}
-function finishChapter(e){if(window._finishingChapter===CH.id||document.getElementById('finish-'+CH.id))return;window._finishingChapter=CH.id;if(!ST.done[CH.id])awardCoins(50,e);if(ST.badges.indexOf(CH.badge.t)<0)ST.badges.push(CH.badge.t);ST.done[CH.id]=true;save();syncTop();
+function finishChapter(e){if(window._finishingChapter===CH.id||document.getElementById('finish-'+CH.id))return;window._finishingChapter=CH.id;if(!ST.done[CH.id])awardCoins(50,e);if(ST.badges.indexOf(CH.badge.t)<0)ST.badges.push(CH.badge.t);ST.done[CH.id]=true;save();syncTop();if(e&&e.stayInGame){setTimeout(function(){window._finishingChapter=null;},800);return;}
   var wrap=el('div','section');wrap.style.textAlign='center';
   wrap.id='finish-'+CH.id;
   wrap.appendChild(el('div',null,'<div style="font-size:20px;font-weight:900;color:#16a34a">🎉 恭喜通关「'+CH.id+'」章！</div>'));
@@ -751,19 +751,28 @@ function buildClawGame(cfg,onWin,onReset){var b=ixbox(cfg.title,cfg.hint,onReset
   w.appendChild(hud);w.appendChild(stage);w.appendChild(btn);return b;}
 function buildTrainClaw(onWin,onReset){return buildClawGame({title:'🕹️ 数据抓娃娃机',hint:'用抓钩只抓干净数据🐱，别抓脏数据💩！抓 4 个',goal:4,scoreName:'抓到',pool:[{e:'🐱',good:1},{e:'🐈‍⬛',good:1},{e:'🐈',good:1},{e:'💩',good:0},{e:'🐶',good:0},{e:'🌫️',good:0}],goodMsg:'干净数据 +1',badMsg:'抓到脏数据了！',doneMsg:'训练数据抓满！'},onWin,onReset);}
 function buildVisionMatch(onWin,onReset){return buildMemoryGame({title:'🧩 特征配对记忆赛',hint:'翻开卡片，把相同视觉线索配成对',pairs:['🔍','⚡','📷','🧩'],hint2:'找出 4 对相同特征'},onWin,onReset);}
-function buildWordRhythm(onWin,onReset){return buildRhythmGame({title:'💬 词块快闪赛',hint:'点顺口词块，避开怪词',goal:7,rate:760,life:1450,good:['今天','小猫','喜欢','睡觉','天气','很好'],bad:['香蕉','倒飞','咕噜','火箭汤'],badMsg:'怪词别点'},onWin,onReset);}
-function buildToolTiming(onWin,onReset){return buildTimingGame({title:'🛠️ 工具时机条',hint:'指针进入绿色区时派出工具',goal:5,speed:.72,scoreName:'派出',btn:'⚡ 派工具！',doneMsg:'工具派送完成！'},onWin,onReset);}
+function buildWordRhythm(onWin,onReset){return buildSentenceGame({
+  title:'💬 词块组句赛',
+  hint:'按顺序点词块，在上方拼出通顺句子',
+  rounds:[
+    ['小猫','喜欢','在','沙发上','睡觉'],
+    ['今天','天气','很好','适合','出去玩'],
+    ['机器人','先','理解任务','再','调用工具']
+  ],
+  decoys:['香蕉','倒飞','火箭汤','桌子跑步','云朵吃饭']
+},onWin,onReset);}
+function buildToolTiming(onWin,onReset){return buildTimingGame({title:'🛠️ 工具时机条',hint:'指针进入绿色区时派出工具',goal:5,speed:.82,scoreName:'派出',btn:'⚡ 派工具！',doneMsg:'工具派送完成！'},onWin,onReset);}
 function buildSafetyHold(onWin,onReset){return buildHoldGame({title:'⚖️ 安全护盾',hint:'按住/松手，让护盾罩住安全目标',icon:'🔒',doneMsg:'安全守住了！'},onWin,onReset);}
 function buildTimingGame(cfg,onWin,onReset){var b=ixbox(cfg.title,cfg.hint,onReset);var w=b._body;clearGame();
-  var score=0,combo=0,miss=0,goal=cfg.goal||6,done=false,p=0,dir=1,speed=cfg.speed||.8,zw=30,zx=40;
+  var score=0,combo=0,miss=0,goal=cfg.goal||6,awarded=false,p=0,dir=1,speed=cfg.speed||.8,zw=32,zx=40;
   var hud=el('div','game-hud');var scEl=el('span',null,(cfg.scoreName||'命中')+' 0/'+goal);var cbEl=el('span',null,'连击 0');hud.appendChild(scEl);hud.appendChild(cbEl);
   var track=el('div');track.style.cssText='position:relative;height:34px;border-radius:10px;background:#eef2ff;border:2px solid #e6e9f2;overflow:hidden;margin:8px 0';
-  var zone=el('div');zone.style.cssText='position:absolute;top:0;bottom:0;background:linear-gradient(#bbf7d0,#86efac)';var ind=el('div');ind.style.cssText='position:absolute;top:-3px;width:6px;height:40px;background:#6d28d9;border-radius:3px';track.appendChild(zone);track.appendChild(ind);
+  var zone=el('div');zone.style.cssText='position:absolute;top:0;bottom:0;background:linear-gradient(#bbf7d0,#86efac)';var ind=el('div');ind.style.cssText='position:absolute;top:-3px;width:6px;height:40px;background:#6d28d9;border-radius:3px;transform:translateX(-50%)';track.appendChild(zone);track.appendChild(ind);
   var btn=el('button','btn btn-primary',cfg.btn||'⚡ 就是现在！');btn.style.cssText+=';display:block;margin:6px auto 0';
-  function place(){zx=10+Math.random()*(88-zw);zone.style.left=zx+'%';zone.style.width=zw+'%';}
-  function end(e){done=true;clearGame();toast(starOf(miss)+' 通关!',true);lineFeedback(w,true,cfg.doneMsg||'时机大师！');setTimeout(function(){onWin(e||{});},380);}
-  function loop(){if(done)return;p+=dir*speed;if(p>=100){p=100;dir=-1;}if(p<=0){p=0;dir=1;}ind.style.left=p+'%';window._gR=requestAnimationFrame(loop);}
-  btn.onclick=function(e){if(done)return;if(p>=zx&&p<=zx+zw){score++;combo++;spark(e.clientX,e.clientY);scEl.textContent=(cfg.scoreName||'命中')+' '+score+'/'+goal;cbEl.textContent='连击 '+combo+(combo>=3?' 🔥':'');speed+=0.08;zw=Math.max(18,zw-1);place();if(score>=goal)end(e);}else{miss++;combo=0;cbEl.textContent='连击 0';speed=cfg.speed||.8;zw=30;lineFeedback(w,false,'差一点，看准绿区！');place();}};
+  function place(){zx=8+Math.random()*(92-zw);zone.style.left=zx+'%';zone.style.width=zw+'%';}
+  function award(e){if(awarded)return;awarded=true;toast(starOf(miss)+' 通关!',true);lineFeedback(w,true,(cfg.doneMsg||'时机大师！')+' 获得勋章后还能继续挑战连击');var ev={clientX:e&&e.clientX,clientY:e&&e.clientY,stayInGame:true};setTimeout(function(){onWin(ev);},380);}
+  function loop(){p+=dir*speed;if(p>=100){p=100;dir=-1;}if(p<=0){p=0;dir=1;}ind.style.left=p+'%';window._gR=requestAnimationFrame(loop);}
+  btn.onclick=function(e){var hit=p>=zx&&p<=zx+zw;if(hit){score++;combo++;spark(e.clientX,e.clientY);scEl.textContent=(cfg.scoreName||'命中')+' '+score+'/'+goal;cbEl.textContent='连击 '+combo+(combo>=3?' 🔥':'');speed+=0.16+combo*0.025;zw=Math.max(10,zw-2.4);place();if(score>=goal)award(e);}else{miss++;combo=0;cbEl.textContent='连击 0';speed=Math.max(cfg.speed||.8,speed*.72);zw=Math.min(32,zw+5);lineFeedback(w,false,'差一点，看准绿区！');place();}};
   place();loop();w.appendChild(hud);w.appendChild(track);w.appendChild(btn);return b;}
 function buildMemoryGame(cfg,onWin,onReset){var b=ixbox(cfg.title,cfg.hint,onReset);var w=b._body;
   var P=cfg.pairs,cards=P.concat(P);for(var k=cards.length-1;k>0;k--){var j=Math.floor(Math.random()*(k+1)),t=cards[k];cards[k]=cards[j];cards[j]=t;}
@@ -773,7 +782,7 @@ function buildMemoryGame(cfg,onWin,onReset){var b=ixbox(cfg.title,cfg.hint,onRes
   cards.forEach(function(c){var d=el('div',null,'❓');d.style.cssText='aspect-ratio:1;border-radius:12px;background:#fff;border:2px solid #e6e9f2;display:grid;place-items:center;font-size:22px;cursor:pointer;color:#8b5cf6';d.flip=function(o){d.textContent=o?c:'❓';d.style.background=o?'#f5f3ff':'#fff';};d.onclick=function(e){if(lock||d.textContent!=='❓')return;d.flip(1);open.push({d:d,c:c});if(open.length===2){lock=true;if(open[0].c===open[1].c){spark(e.clientX,e.clientY);matched++;open=[];lock=false;if(matched===P.length){toast(starOf(miss)+' 通关!',true);lineFeedback(w,true,'全配对！');setTimeout(function(){onWin(e);},380);}}else{miss++;var o=open;setTimeout(function(){o[0].d.flip(0);o[1].d.flip(0);open=[];lock=false;},650);}}};grid.appendChild(d);});
   w.appendChild(msg);w.appendChild(grid);return b;}
 function buildHoldGame(cfg,onWin,onReset){var b=ixbox(cfg.title,cfg.hint,onReset);var w=b._body;clearGame();
-  var H=186,barH=46,tgtH=66,barY=118,vy=0,hold=false,p=0,t=0,done=false;
+  var H=250,barH=50,tgtH=72,barY=178,vy=0,hold=false,p=0,t=0,done=false;
   var hud=el('div','game-hud');var pEl=el('span',null,'稳定度 0%');var tEl=el('span',null,'按住上升');hud.appendChild(pEl);hud.appendChild(tEl);
   var track=el('div');track.style.cssText='position:relative;width:74px;height:'+H+'px;margin:6px auto;border-radius:14px;background:linear-gradient(#e0e7ff,#eef2ff);border:2px solid #c7d2fe;overflow:hidden;touch-action:none';
   var tgt=el('div',null,cfg.icon||'🎯');tgt.style.cssText='position:absolute;left:6px;right:6px;height:'+tgtH+'px;border-radius:10px;background:rgba(88,204,2,.25);border:2px solid #58cc02;display:grid;place-items:center;font-size:24px';
@@ -781,8 +790,17 @@ function buildHoldGame(cfg,onWin,onReset){var b=ixbox(cfg.title,cfg.hint,onReset
   var btn=el('button','btn btn-glow','🎣 按住不放');btn.style.cssText+=';display:block;margin:8px auto 0';
   btn.addEventListener('pointerdown',function(e){e.preventDefault();hold=true;});window.addEventListener('pointerup',function(){hold=false;});
   function end(e){done=true;clearGame();toast('⭐⭐⭐ 通关!',true);lineFeedback(w,true,cfg.doneMsg||'稳住啦！');setTimeout(function(){onWin(e||{});},380);}
-  function loop(){if(done)return;t+=0.024;var ty=(H-tgtH)/2+Math.sin(t)*((H-tgtH)/2-6);tgt.style.top=ty+'px';vy+=hold?-0.42:0.34;vy*=0.9;barY+=vy;if(barY<0){barY=0;vy=0;}if(barY>H-barH){barY=H-barH;vy=0;}bar.style.top=barY+'px';var ov=(barY<ty+tgtH)&&(barY+barH>ty);p+=ov?1.05:-0.28;if(p<0)p=0;if(p>100)p=100;pEl.textContent='稳定度 '+Math.round(p)+'%';tEl.textContent=ov?'罩住了！🔥':'去罩住目标';if(p>=100)end({});window._gR=requestAnimationFrame(loop);}
+  function loop(){if(done)return;t+=0.024;var ty=(H-tgtH)/2+Math.sin(t)*((H-tgtH)/2-6);tgt.style.top=ty+'px';vy+=hold?-0.42:0.34;vy*=0.9;barY+=vy;if(barY<0){barY=0;vy=0;}if(barY>H-barH){barY=H-barH;vy=0;}bar.style.top=barY+'px';var ov=(barY<ty+tgtH)&&(barY+barH>ty);p+=(hold&&ov)?0.34:-0.4;if(p<0)p=0;if(p>100)p=100;pEl.textContent='稳定度 '+Math.round(p)+'%';tEl.textContent=hold?(ov?'罩住了，稳住！':'位置不对，微调'):'按住才会积累';if(p>=100)end({});window._gR=requestAnimationFrame(loop);}
   loop();w.appendChild(hud);w.appendChild(track);w.appendChild(btn);return b;}
+function buildSentenceGame(cfg,onWin,onReset){var b=ixbox(cfg.title,cfg.hint,onReset);var w=b._body;clearGame();
+  var rounds=cfg.rounds||[],round=0,pos=0,done=false,miss=0;
+  var hud=el('div','game-hud');var scEl=el('span',null,'句子 1/'+rounds.length);var pEl=el('span',null,'0 个词');hud.appendChild(scEl);hud.appendChild(pEl);
+  var sentence=el('div');sentence.style.cssText='min-height:46px;background:#fff;border:2px solid #e6e9f2;border-radius:14px;padding:8px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:10px';
+  var bank=el('div');bank.style.cssText='display:grid;grid-template-columns:repeat(auto-fit,minmax(78px,1fr));gap:8px';
+  function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t;}return a;}
+  function chip(txt){var d=el('button','btn btn-ghost',txt);d.style.cssText+=';min-height:42px;padding:8px 10px;font-size:14px;color:#4b4869;background:#fff';d.onclick=function(e){if(done||d.disabled)return;var right=rounds[round][pos];if(txt===right){d.disabled=true;d.style.opacity='.45';var s=el('span',null,txt);s.style.cssText='background:#ecfdf5;border:1px solid #bbf7d0;color:#15803d;border-radius:999px;padding:5px 9px;font-size:13px;font-weight:900';sentence.appendChild(s);pos++;pEl.textContent=pos+' 个词';spark(e.clientX,e.clientY);if(pos>=rounds[round].length){lineFeedback(w,true,'句子通顺：'+rounds[round].join(''));round++;if(round>=rounds.length){done=true;toast(starOf(miss)+' 通关!',true);setTimeout(function(){onWin(e);},380);}else{setTimeout(render,650);}}}else{miss++;lineFeedback(w,false,'这个词接不上，看看上方句子该往哪走');d.animate([{transform:'translateX(0)'},{transform:'translateX(-5px)'},{transform:'translateX(5px)'},{transform:'translateX(0)'}],{duration:260});}};return d;}
+  function render(){pos=0;sentence.innerHTML='';bank.innerHTML='';scEl.textContent='句子 '+(round+1)+'/'+rounds.length;pEl.textContent='0 个词';var target=rounds[round],words=shuffle(target.concat(shuffle((cfg.decoys||[]).slice()).slice(0,3)));words.forEach(function(x){bank.appendChild(chip(x));});}
+  render();w.appendChild(hud);w.appendChild(sentence);w.appendChild(bank);return b;}
 function buildRhythmGame(cfg,onWin,onReset){var b=ixbox(cfg.title,cfg.hint,onReset);var w=b._body;clearGame();
   var score=0,combo=0,miss=0,goal=cfg.goal||10,done=false,spots=[];
   var hud=el('div','game-hud');var scEl=el('span',null,'击中 0/'+goal);var cbEl=el('span',null,'连击 0');hud.appendChild(scEl);hud.appendChild(cbEl);
