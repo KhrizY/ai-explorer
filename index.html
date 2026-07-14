@@ -762,7 +762,7 @@ function buildWordRhythm(onWin,onReset){return buildSentenceGame({
   decoys:['香蕉','倒飞','火箭汤','桌子跑步','云朵吃饭']
 },onWin,onReset);}
 function buildToolTiming(onWin,onReset){return buildTimingGame({title:'🛠️ 工具时机条',hint:'指针进入绿色区时派出工具',goal:5,speed:.82,scoreName:'派出',btn:'⚡ 派工具！',doneMsg:'工具派送完成！'},onWin,onReset);}
-function buildSafetyHold(onWin,onReset){return buildHoldGame({title:'⚖️ 安全护盾',hint:'按住/松手，让护盾罩住安全目标',icon:'🔒',doneMsg:'安全守住了！'},onWin,onReset);}
+function buildSafetyHold(onWin,onReset){return buildHoldGame({title:'⚖️ 安全护盾',hint:'按住/松手控制护盾，重合就会增加稳定度',icon:'🔒',doneMsg:'安全守住了！'},onWin,onReset);}
 function buildTimingGame(cfg,onWin,onReset){var b=ixbox(cfg.title,cfg.hint,onReset);var w=b._body;clearGame();
   var score=0,combo=0,miss=0,goal=cfg.goal||6,awarded=false,p=0,dir=1,speed=cfg.speed||.8,zw=32,zx=40;
   var hud=el('div','game-hud');var scEl=el('span',null,(cfg.scoreName||'命中')+' 0/'+goal);var cbEl=el('span',null,'连击 0');hud.appendChild(scEl);hud.appendChild(cbEl);
@@ -783,14 +783,14 @@ function buildMemoryGame(cfg,onWin,onReset){var b=ixbox(cfg.title,cfg.hint,onRes
   w.appendChild(msg);w.appendChild(grid);return b;}
 function buildHoldGame(cfg,onWin,onReset){var b=ixbox(cfg.title,cfg.hint,onReset);var w=b._body;clearGame();
   var H=250,barH=50,tgtH=72,barY=178,vy=0,hold=false,p=0,t=0,done=false;
-  var hud=el('div','game-hud');var pEl=el('span',null,'稳定度 0%');var tEl=el('span',null,'按住上升');hud.appendChild(pEl);hud.appendChild(tEl);
+  var hud=el('div','game-hud');var pEl=el('span',null,'稳定度 0%');var tEl=el('span',null,'重合加值');hud.appendChild(pEl);hud.appendChild(tEl);
   var track=el('div');track.style.cssText='position:relative;width:74px;height:'+H+'px;margin:6px auto;border-radius:14px;background:linear-gradient(#e0e7ff,#eef2ff);border:2px solid #c7d2fe;overflow:hidden;touch-action:none';
   var tgt=el('div',null,cfg.icon||'🎯');tgt.style.cssText='position:absolute;left:6px;right:6px;height:'+tgtH+'px;border-radius:10px;background:rgba(88,204,2,.25);border:2px solid #58cc02;display:grid;place-items:center;font-size:24px';
   var bar=el('div');bar.style.cssText='position:absolute;left:6px;right:6px;height:'+barH+'px;border-radius:8px;background:rgba(139,92,246,.4);border:2px solid #a78bfa';track.appendChild(tgt);track.appendChild(bar);
-  var btn=el('button','btn btn-glow','🎣 按住不放');btn.style.cssText+=';display:block;margin:8px auto 0';
+  var btn=el('button','btn btn-glow','🎣 按住上移');btn.style.cssText+=';display:block;margin:8px auto 0';
   btn.addEventListener('pointerdown',function(e){e.preventDefault();hold=true;});window.addEventListener('pointerup',function(){hold=false;});
   function end(e){done=true;clearGame();toast('⭐⭐⭐ 通关!',true);lineFeedback(w,true,cfg.doneMsg||'稳住啦！');setTimeout(function(){onWin(e||{});},380);}
-  function loop(){if(done)return;t+=0.024;var ty=(H-tgtH)/2+Math.sin(t)*((H-tgtH)/2-6);tgt.style.top=ty+'px';vy+=hold?-0.42:0.34;vy*=0.9;barY+=vy;if(barY<0){barY=0;vy=0;}if(barY>H-barH){barY=H-barH;vy=0;}bar.style.top=barY+'px';var ov=(barY<ty+tgtH)&&(barY+barH>ty);p+=(hold&&ov)?0.34:-0.4;if(p<0)p=0;if(p>100)p=100;pEl.textContent='稳定度 '+Math.round(p)+'%';tEl.textContent=hold?(ov?'罩住了，稳住！':'位置不对，微调'):'按住才会积累';if(p>=100)end({});window._gR=requestAnimationFrame(loop);}
+  function loop(){if(done)return;t+=0.024;var ty=(H-tgtH)/2+Math.sin(t)*((H-tgtH)/2-6);tgt.style.top=ty+'px';vy+=hold?-0.42:0.34;vy*=0.9;barY+=vy;if(barY<0){barY=0;vy=0;}if(barY>H-barH){barY=H-barH;vy=0;}bar.style.top=barY+'px';var ov=(barY<ty+tgtH)&&(barY+barH>ty);p+=ov?0.34:-0.4;if(p<0)p=0;if(p>100)p=100;pEl.textContent='稳定度 '+Math.round(p)+'%';tEl.textContent=ov?'重合中，稳定度上升':'调整到绿色目标';if(p>=100)end({});window._gR=requestAnimationFrame(loop);}
   loop();w.appendChild(hud);w.appendChild(track);w.appendChild(btn);return b;}
 function buildSentenceGame(cfg,onWin,onReset){var b=ixbox(cfg.title,cfg.hint,onReset);var w=b._body;clearGame();
   var rounds=cfg.rounds||[],round=0,pos=0,done=false,miss=0;
