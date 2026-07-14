@@ -48,6 +48,35 @@
   .hook-line { position:absolute; top:0; left:-1px; width:4px; background:#ffd66d; border-radius:2px; height:100%; }
   .claw { position:absolute; bottom:-10px; left:50%; transform:translateX(-50%); font-size:22px; }
   .ore { position:absolute; width:44px; height:44px; border-radius:12px; display:grid; place-items:center; font-size:24px; }
+  .tier { margin:42px 0 10px; padding:18px 18px; border-radius:16px; background:#fff; border:1.5px solid #dfe4ef; box-shadow:0 8px 22px rgba(60,50,110,.07); }
+  .tier h2 { margin:0 0 6px; font-size:20px; color:#1e1b3a; }
+  .tier p { margin:0; color:#6b7280; font-size:13px; line-height:1.65; }
+  .microgrid { display:grid; grid-template-columns:repeat(auto-fit,minmax(42px,1fr)); gap:8px; width:100%; max-width:390px; margin:8px auto; }
+  .microcell { aspect-ratio:1; border-radius:10px; background:#261b4d; color:#e9d5ff; display:grid; place-items:center; font-weight:900; border:2px solid #3b2f6b; transition:.15s; }
+  .microcell.on { background:#58cc02; color:#fff; box-shadow:0 0 16px rgba(88,204,2,.75); transform:translateY(-2px); }
+  .weight-row { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; color:#e9d5ff; }
+  .weight-row label { min-width:120px; font-size:12px; font-weight:800; }
+  .weight-row input { width:120px; accent-color:#22d3ee; }
+  .sum-pill { padding:8px 14px; border-radius:999px; background:rgba(255,255,255,.12); color:#ffd66d; font-weight:900; }
+  .wordline { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:8px 0 12px; }
+  .wordchip { padding:8px 11px; border-radius:10px; background:#2a1f52; color:#e9d5ff; font-weight:900; cursor:pointer; border:2px solid #3b2f6b; }
+  .wordchip.hot { background:#8b5cf6; border-color:#c4b5fd; box-shadow:0 0 18px rgba(139,92,246,.8); }
+  .att-bars { display:grid; gap:6px; width:100%; max-width:360px; }
+  .attbar { display:grid; grid-template-columns:64px 1fr 38px; gap:8px; align-items:center; color:#d8d4f5; font-size:12px; font-weight:800; }
+  .attbar i { height:12px; border-radius:999px; background:linear-gradient(90deg,#8b5cf6,#22d3ee); width:0%; transition:width .25s; }
+  .pipe { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; width:100%; max-width:520px; }
+  .pipe-step { min-height:72px; border-radius:12px; border:2px solid #3b2f6b; background:#211744; color:#d8d4f5; display:grid; place-items:center; text-align:center; font-size:12px; font-weight:900; padding:8px; transition:.2s; }
+  .pipe-step.on { background:#0f766e; border-color:#2dd4bf; color:#fff; box-shadow:0 0 18px rgba(45,212,191,.65); transform:translateY(-3px); }
+  .noise-canvas { width:220px; height:220px; border-radius:14px; background:#111827; image-rendering:pixelated; box-shadow:inset 0 0 0 2px rgba(255,255,255,.08); }
+  .rl-board { display:grid; grid-template-columns:repeat(5,44px); gap:5px; justify-content:center; }
+  .rl-cell { width:44px; height:44px; border-radius:9px; background:#211744; display:grid; place-items:center; color:#e9d5ff; font-size:22px; border:2px solid #3b2f6b; }
+  .rl-cell.good { background:#14532d; border-color:#58cc02; }
+  .rl-cell.bad { background:#713f12; border-color:#fbbf24; }
+  .scale-wrap { width:100%; max-width:430px; }
+  .scale-bars { display:grid; gap:10px; margin:10px 0; }
+  .scale-line { display:grid; grid-template-columns:70px 1fr 46px; gap:8px; align-items:center; color:#d8d4f5; font-size:12px; font-weight:800; }
+  .scale-line i { height:14px; border-radius:999px; background:linear-gradient(90deg,#38bdf8,#58cc02); transition:width .2s; }
+  .scale-line.warn i { background:linear-gradient(90deg,#fbbf24,#fb7185); }
 </style>
 </head>
 <body>
@@ -113,6 +142,97 @@
         <div class="hook-pivot" id="hookPivot"><div class="hook-line"></div><div class="claw">🪝</div></div>
       </div>
       <div class="qte-msg" id="minerMsg" style="margin-top:6px">点击放钩</div>
+    </div>
+  </div>
+
+  <div class="tier">
+    <h2>🎓 进阶课程玩法草案</h2>
+    <p>从新进阶课程的知识点里先抽 6 个高价值原型：神经元点火、注意力权重、Transformer 流水线、扩散去噪、强化学习试错、规模法则权衡。目标是先验证“怎么玩懂”，暂不写成正式课。</p>
+  </div>
+
+  <!-- F 神经元点火 -->
+  <div class="mod">
+    <div class="gf-head" style="border-radius:12px 12px 0 0"><span class="gf-ico">🧠</span><b>神经元点火台</b><span>进阶 · 神经网络在算什么</span></div>
+    <div class="lead">👆 拖动三个输入强度，看“加权和”有没有超过阈值。超过就点火，没超过就沉默。</div>
+    <div class="stage">
+      <div class="weight-row">
+        <label>耳朵线索 <input id="neuA" type="range" min="0" max="10" value="4"></label>
+        <label>胡须线索 <input id="neuB" type="range" min="0" max="10" value="5"></label>
+        <label>叫声线索 <input id="neuC" type="range" min="0" max="10" value="2"></label>
+      </div>
+      <div id="neuFace" style="font-size:56px;margin:12px 0">😴</div>
+      <div class="sum-pill" id="neuSum">加权和 0 / 阈值 13</div>
+      <div class="qte-msg" id="neuMsg" style="margin-top:8px">把线索推高，让神经元点火</div>
+    </div>
+  </div>
+
+  <!-- G 注意力权重 -->
+  <div class="mod">
+    <div class="gf-head" style="border-radius:12px 12px 0 0"><span class="gf-ico">🔗</span><b>注意力权重调音台</b><span>进阶 · 注意力的数学</span></div>
+    <div class="lead">👆 点一个词，看它把注意力分给谁。条越长，代表这个词越“看重”对方。</div>
+    <div class="stage">
+      <div class="wordline" id="attWords"></div>
+      <div class="att-bars" id="attBars"></div>
+      <div class="qte-msg" id="attMsg">点“它”，看看“它”在关注谁</div>
+    </div>
+  </div>
+
+  <!-- H Transformer 流水线 -->
+  <div class="mod">
+    <div class="gf-head" style="border-radius:12px 12px 0 0"><span class="gf-ico">🤖</span><b>Transformer 流水线</b><span>进阶 · Transformer 全貌</span></div>
+    <div class="lead">👆 点下一步，看一句话穿过 token、位置、注意力、前馈层，最后猜出下一个词。</div>
+    <div class="stage">
+      <div class="pipe" id="tfPipe"></div>
+      <div class="qte-msg" id="tfMsg" style="margin-top:10px">准备输入：“小猫在沙发上”</div>
+      <button class="btn btn-glow" id="tfBtn">下一步</button>
+    </div>
+  </div>
+
+  <!-- I 扩散去噪 -->
+  <div class="mod">
+    <div class="gf-head" style="border-radius:12px 12px 0 0"><span class="gf-ico">🎨</span><b>扩散去噪画室</b><span>进阶 · 扩散模型怎么画画</span></div>
+    <div class="lead">👆 点“去噪一步”，从乱点里一步步擦出图案。核心体验：生成不是一笔画完，是反复去噪。</div>
+    <div class="stage">
+      <canvas class="noise-canvas" id="noiseCanvas" width="22" height="22"></canvas>
+      <div class="qte-msg" id="noiseMsg">噪声 100%</div>
+      <button class="btn btn-glow" id="noiseBtn">去噪一步</button>
+    </div>
+  </div>
+
+  <!-- J 强化学习试错 -->
+  <div class="mod">
+    <div class="gf-head" style="border-radius:12px 12px 0 0"><span class="gf-ico">🕹️</span><b>强化学习试错迷宫</b><span>进阶 · 强化学习</span></div>
+    <div class="lead">👆 用方向键走到奖励星星。撞到坑会扣分，但不会失败；AI 就是在试错里学策略。</div>
+    <div class="stage">
+      <div class="score" id="rlScore">奖励 0</div>
+      <div class="rl-board" id="rlBoard"></div>
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;justify-content:center">
+        <button class="btn btn-primary" data-rl="up">↑</button>
+        <button class="btn btn-primary" data-rl="left">←</button>
+        <button class="btn btn-primary" data-rl="down">↓</button>
+        <button class="btn btn-primary" data-rl="right">→</button>
+      </div>
+      <div class="qte-msg" id="rlMsg" style="margin-top:8px">找星星，避开坑</div>
+    </div>
+  </div>
+
+  <!-- K 规模法则 -->
+  <div class="mod">
+    <div class="gf-head" style="border-radius:12px 12px 0 0"><span class="gf-ico">📈</span><b>规模法则控制台</b><span>进阶 · 为什么越大越强</span></div>
+    <div class="lead">👆 加数据、参数、算力，能力会上升；但成本也会一起变大。体验“更大更强，但不免费”。</div>
+    <div class="stage">
+      <div class="scale-wrap">
+        <div class="weight-row">
+          <label>数据 <input id="scData" type="range" min="1" max="10" value="4"></label>
+          <label>参数 <input id="scParam" type="range" min="1" max="10" value="4"></label>
+          <label>算力 <input id="scCompute" type="range" min="1" max="10" value="4"></label>
+        </div>
+        <div class="scale-bars">
+          <div class="scale-line"><span>能力</span><i id="scPower"></i><b id="scPowerT">0</b></div>
+          <div class="scale-line warn"><span>成本</span><i id="scCost"></i><b id="scCostT">0</b></div>
+        </div>
+      </div>
+      <div class="qte-msg" id="scMsg">三个都要跟上，短板会拖后腿</div>
     </div>
   </div>
 
@@ -206,6 +326,112 @@ function spark(x,y){ var E=['✨','⭐','🎉','💫','🌟']; for(var i=0;i<8;i
   }
   box.addEventListener('click',function(){ if(state==='swing'){ state='shoot'; } });
   loop();
+})();
+
+// ============ F 神经元点火台 ============
+(function(){
+  var a=document.getElementById('neuA'),b=document.getElementById('neuB'),c=document.getElementById('neuC');
+  var face=document.getElementById('neuFace'),sum=document.getElementById('neuSum'),msg=document.getElementById('neuMsg');
+  function upd(){
+    var v=+a.value*0.7 + +b.value*1.0 + +c.value*0.5;
+    sum.textContent='加权和 '+v.toFixed(1)+' / 阈值 13';
+    if(v>=13){face.textContent='⚡';face.style.filter='drop-shadow(0 0 14px #22d3ee)';msg.textContent='点火！这个神经元把线索传给下一层';}
+    else if(v>=9){face.textContent='😳';face.style.filter='none';msg.textContent='快到了，还差一点线索';}
+    else{face.textContent='😴';face.style.filter='none';msg.textContent='线索太弱，神经元先不说话';}
+  }
+  [a,b,c].forEach(function(x){x.addEventListener('input',upd);});upd();
+})();
+
+// ============ G 注意力权重调音台 ============
+(function(){
+  var words=['它','把','球','放进','盒子'],data={
+    0:[['球',45],['盒子',35],['放进',20]],
+    2:[['它',35],['放进',35],['盒子',30]],
+    4:[['球',45],['放进',35],['它',20]]
+  };
+  var row=document.getElementById('attWords'),bars=document.getElementById('attBars'),msg=document.getElementById('attMsg');
+  words.forEach(function(w,i){var d=document.createElement('div');d.className='wordchip';d.textContent=w;d.onclick=function(){show(i,d);};row.appendChild(d);});
+  function show(i,node){
+    row.querySelectorAll('.wordchip').forEach(function(x){x.classList.remove('hot');});node.classList.add('hot');bars.innerHTML='';
+    var arr=data[i]||words.filter(function(_,j){return j!==i;}).slice(0,3).map(function(w){return[w,20+Math.round(Math.random()*35)];});
+    arr.forEach(function(x){var r=document.createElement('div');r.className='attbar';r.innerHTML='<span>'+x[0]+'</span><i></i><b>'+x[1]+'%</b>';bars.appendChild(r);setTimeout(function(){r.querySelector('i').style.width=x[1]+'%';},30);});
+    msg.textContent='这一步像在问：当前词最该看谁？';
+  }
+  show(0,row.children[0]);
+})();
+
+// ============ H Transformer 流水线 ============
+(function(){
+  var steps=[['✂️','切成 token'],['📍','加位置'],['🔗','注意力找关系'],['🧮','前馈层加工'],['🔮','猜下一个词：睡觉']];
+  var pipe=document.getElementById('tfPipe'),msg=document.getElementById('tfMsg'),btn=document.getElementById('tfBtn'),i=-1;
+  steps.forEach(function(s){var d=document.createElement('div');d.className='pipe-step';d.innerHTML='<div style="font-size:22px">'+s[0]+'</div><div>'+s[1]+'</div>';pipe.appendChild(d);});
+  btn.onclick=function(e){i++;if(i>=steps.length){i=-1;pipe.querySelectorAll('.pipe-step').forEach(function(x){x.classList.remove('on');});msg.textContent='重来：输入“小猫在沙发上”';return;}
+    pipe.children[i].classList.add('on');msg.textContent=steps[i][1];if(i===steps.length-1){spark(e.clientX,e.clientY);}
+  };
+})();
+
+// ============ I 扩散去噪画室 ============
+(function(){
+  var cv=document.getElementById('noiseCanvas'),ctx=cv.getContext('2d'),msg=document.getElementById('noiseMsg'),btn=document.getElementById('noiseBtn');
+  var step=0,N=22;
+  function target(x,y){
+    var dx=x-11,dy=y-11,d=Math.sqrt(dx*dx+dy*dy);
+    if(d<7 && y>5) return [255,214,109];
+    if(d<4 && y<11) return [88,204,2];
+    if(Math.abs(dx)<2 && y>13) return [120,70,35];
+    return [18,24,38];
+  }
+  function draw(){
+    var img=ctx.createImageData(N,N),noise=Math.max(0,1-step/8);
+    for(var y=0;y<N;y++)for(var x=0;x<N;x++){
+      var t=target(x,y),k=(y*N+x)*4;
+      img.data[k]=t[0]*(1-noise)+Math.random()*255*noise;
+      img.data[k+1]=t[1]*(1-noise)+Math.random()*255*noise;
+      img.data[k+2]=t[2]*(1-noise)+Math.random()*255*noise;
+      img.data[k+3]=255;
+    }
+    ctx.putImageData(img,0,0);msg.textContent='噪声 '+Math.round(noise*100)+'%';
+  }
+  btn.onclick=function(e){if(step<8){step++;draw();}if(step>=8){msg.textContent='完成：从噪点里去噪出图案';spark(e.clientX,e.clientY);}};
+  draw();
+})();
+
+// ============ J 强化学习试错迷宫 ============
+(function(){
+  var board=document.getElementById('rlBoard'),scoreEl=document.getElementById('rlScore'),msg=document.getElementById('rlMsg');
+  var pos=0,score=0,goal=24,bad={7:1,13:1,17:1},cells=[];
+  function draw(){
+    board.innerHTML='';cells=[];
+    for(var i=0;i<25;i++){var d=document.createElement('div');d.className='rl-cell'+(i===goal?' good':'')+(bad[i]?' bad':'');d.textContent=i===pos?'🤖':i===goal?'⭐':bad[i]?'坑':'';board.appendChild(d);cells.push(d);}
+    scoreEl.textContent='奖励 '+score;
+  }
+  function move(dir,e){
+    var x=pos%5,y=Math.floor(pos/5);
+    if(dir==='up')y=Math.max(0,y-1); if(dir==='down')y=Math.min(4,y+1); if(dir==='left')x=Math.max(0,x-1); if(dir==='right')x=Math.min(4,x+1);
+    pos=y*5+x;
+    if(pos===goal){score+=10;msg.textContent='拿到奖励！这条路值得记住';spark(e.clientX,e.clientY);pos=0;}
+    else if(bad[pos]){score=Math.max(0,score-3);msg.textContent='踩坑了，扣一点奖励，但学到“别走这格”';}
+    else{msg.textContent='继续试，奖励会告诉你方向对不对';}
+    draw();
+  }
+  document.querySelectorAll('[data-rl]').forEach(function(b){b.onclick=function(e){move(b.dataset.rl,e);};});draw();
+})();
+
+// ============ K 规模法则控制台 ============
+(function(){
+  var data=document.getElementById('scData'),param=document.getElementById('scParam'),compute=document.getElementById('scCompute');
+  var p=document.getElementById('scPower'),c=document.getElementById('scCost'),pt=document.getElementById('scPowerT'),ct=document.getElementById('scCostT'),msg=document.getElementById('scMsg');
+  function upd(){
+    var ds=+data.value,pa=+param.value,co=+compute.value;
+    var balance=Math.min(ds,pa,co),avg=(ds+pa+co)/3;
+    var power=Math.round((balance*7+avg*3));
+    var cost=Math.round((ds*ds+pa*pa+co*co)/3);
+    p.style.width=Math.min(100,power)+'%';c.style.width=Math.min(100,cost)+'%';pt.textContent=power;ct.textContent=cost;
+    if(balance<avg-2)msg.textContent='有短板：数据、参数、算力要一起长';
+    else if(cost>70)msg.textContent='能力很强，但成本也很高';
+    else msg.textContent='规模变大，能力在上升';
+  }
+  [data,param,compute].forEach(function(x){x.addEventListener('input',upd);});upd();
 })();
 </script>
 </body>
