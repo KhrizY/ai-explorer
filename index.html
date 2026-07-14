@@ -790,7 +790,7 @@ function buildHoldGame(cfg,onWin,onReset){var b=ixbox(cfg.title,cfg.hint,onReset
   var btn=el('button','btn btn-glow','🎣 按住上移');btn.style.cssText+=';display:block;margin:8px auto 0';
   btn.addEventListener('pointerdown',function(e){e.preventDefault();hold=true;});window.addEventListener('pointerup',function(){hold=false;});
   function end(e){done=true;clearGame();toast('⭐⭐⭐ 通关!',true);lineFeedback(w,true,cfg.doneMsg||'稳住啦！');setTimeout(function(){onWin(e||{});},380);}
-  function loop(){if(done)return;t+=0.024;var ty=(H-tgtH)/2+Math.sin(t)*((H-tgtH)/2-6);tgt.style.top=ty+'px';vy+=hold?-0.42:0.34;vy*=0.9;barY+=vy;if(barY<0){barY=0;vy=0;}if(barY>H-barH){barY=H-barH;vy=0;}bar.style.top=barY+'px';var ov=(barY<ty+tgtH)&&(barY+barH>ty);p+=ov?0.34:-0.4;if(p<0)p=0;if(p>100)p=100;pEl.textContent='稳定度 '+Math.round(p)+'%';tEl.textContent=ov?'重合中，稳定度上升':'调整到绿色目标';if(p>=100)end({});window._gR=requestAnimationFrame(loop);}
+  function loop(){if(done)return;t+=0.024;var ty=(H-tgtH)/2+Math.sin(t)*((H-tgtH)/2-6);tgt.style.top=ty+'px';vy+=hold?-0.42:0.34;vy*=0.9;barY+=vy;if(barY<0){barY=0;vy=0;}if(barY>H-barH){barY=H-barH;vy=0;}bar.style.top=barY+'px';var ov=(barY<ty+tgtH)&&(barY+barH>ty);p+=ov?0.34:-0.12;if(p<0)p=0;if(p>100)p=100;pEl.textContent='稳定度 '+Math.round(p)+'%';tEl.textContent=ov?'重合中，稳定度上升':'调整到绿色目标';if(p>=100)end({});window._gR=requestAnimationFrame(loop);}
   loop();w.appendChild(hud);w.appendChild(track);w.appendChild(btn);return b;}
 function buildSentenceGame(cfg,onWin,onReset){var b=ixbox(cfg.title,cfg.hint,onReset);var w=b._body;clearGame();
   var rounds=cfg.rounds||[],round=0,pos=0,done=false,miss=0;
