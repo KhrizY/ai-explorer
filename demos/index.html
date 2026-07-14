@@ -33,6 +33,13 @@
   .stg-btn.v { background:linear-gradient(90deg,var(--violet-l),var(--cyan)); color:#08122e; box-shadow:0 4px 0 #4b3fb0; }
   .stg-msg { color:#cbd0e6; font-size:12.5px; text-align:center; min-height:18px; margin-top:8px; }
   .demo-stage.light .stg-msg { color:#4b4869; }
+  .demo-stage:not(.light) { color:#e9d5ff; }
+  .demo-stage:not(.light) div:not(.adv-note):not(.trail-cell):not(.stg-score):not(.bigflash):not([style*="background:#fff"]):not([style*="background: #fff"]) { color:inherit; }
+  .demo-stage:not(.light) [style*="color:#1e1b3a"],
+  .demo-stage:not(.light) [style*="color:#4b4869"],
+  .demo-stage:not(.light) [style*="color:#6b7280"],
+  .demo-stage:not(.light) [style*="color:#333"] { color:#e9d5ff !important; }
+  .demo-stage:not(.light) .stg-msg b { color:#ffd66d !important; }
   .stg-score { position:absolute; top:8px; right:12px; color:var(--gold); font-weight:800; font-size:13px; z-index:4; }
   /* 大反馈闪屏 */
   .bigflash { position:absolute; inset:0; display:grid; place-items:center; font-size:40px; font-weight:900; z-index:9; pointer-events:none;
