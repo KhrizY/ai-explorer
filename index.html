@@ -17,6 +17,8 @@
   .wb-top .tb-back{background:#ede9fe;color:#6d28d9;box-shadow:0 3px 0 #c4b5fd;}
   .wb-top .title{font-weight:900;color:#1e1b3a;font-size:16px;}
   .wb-top .xp{margin-left:auto;font-size:13px;font-weight:800;color:#eab308;background:#fffbeb;border:1px solid #fde68a;padding:5px 12px;border-radius:999px;}
+  #chbody{padding-top:16px;}
+  #chbody .section:first-child{margin-top:6px;}
   .hook{background:linear-gradient(135deg,#fef9ff,#eef1fb);border:1.5px solid #ece9f7;border-left:4px solid var(--violet);border-radius:12px;padding:12px 14px;font-size:14.5px;color:#4b4869;line-height:1.6;margin-bottom:14px;}
   .hook b{color:#6d28d9;}
   .peg{display:inline-block;margin-top:8px;font-size:13px;background:#f5f3ff;color:#6d28d9;padding:4px 10px;border-radius:999px;font-weight:700;}
@@ -717,7 +719,6 @@ function renderSec(){
   mountIx();wrap.appendChild(host);
   sec.paras.forEach(function(p){wrap.appendChild(parseP(p,sec.terms));});
   wrap.appendChild(parseP(sec.close,sec.terms));
-  wrap.appendChild(el('div','peg',sec.peg));
   var nw=el('div','next-wrap');var btn=el('button','next-btn',sec.nextHint||'完成这一章 →');
   btn.onclick=function(){curSec++;renderSec();};
   nw.appendChild(btn);wrap.appendChild(nw);
@@ -854,41 +855,74 @@ function buildNeuronFire(rw,onReset){var b=ixbox('🔬 神经元实验台','拖�
     else{core.textContent='😴';core.style.transform='scale(1)';}}
   w.appendChild(rows);w.appendChild(barWrap);w.appendChild(core);w.appendChild(txt);calc();return b;}
 
-function _propNet(w,reverse,rw){var layers=[3,4,4,2],cols=[];
-  var net=el('div');net.style.cssText='display:flex;justify-content:space-around;align-items:center;min-height:118px;gap:6px';
-  layers.forEach(function(cnt){var l=el('div');l.style.cssText='display:flex;flex-direction:column;gap:12px';var nodes=[];for(var i=0;i<cnt;i++){var nd=el('div');nd.style.cssText='width:26px;height:26px;border-radius:50%;background:#fff;border:2.5px solid #a78bfa;transition:.2s';l.appendChild(nd);nodes.push(nd);}net.appendChild(l);cols.push(nodes);});
-  var order=reverse?cols.slice().reverse():cols,lit=reverse?'#22d3ee':'#ffd66d',ring=reverse?'#0891b2':'#eab308',playing=false,done=false;
-  var btn=el('button','next-btn',reverse?'⬅️ 从输出往回追责':'▶️ 输入信号，逐层点亮');btn.style.cssText+=';margin-top:12px';
-  btn.onclick=function(e){if(playing)return;playing=true;cols.forEach(function(c){c.forEach(function(n){n.style.background='#fff';n.style.borderColor='#a78bfa';n.style.transform='none';});});
-    order.forEach(function(col,ci){setTimeout(function(){col.forEach(function(n){n.style.background=lit;n.style.borderColor=ring;n.style.transform='scale(1.16)';});if(ci===order.length-1){playing=false;if(!done){done=true;rw(e);}}},ci*360);});};
-  var bw=el('div');bw.style.textAlign='center';bw.appendChild(btn);w.appendChild(net);w.appendChild(bw);}
+function _propNet(w,reverse,rw){var NS='http://www.w3.org/2000/svg',layers=[3,4,4,2],VW=320,VH=150,pad=30,nx=layers.length,done=false,playing=false;
+  var svg=document.createElementNS(NS,'svg');svg.setAttribute('viewBox','0 0 '+VW+' '+VH);svg.setAttribute('width','100%');svg.style.cssText='display:block;height:auto;max-height:210px';
+  var coords=[];for(var li=0;li<nx;li++){var cnt=layers[li],x=pad+(VW-2*pad)*(nx===1?0:li/(nx-1)),arr=[];for(var k=0;k<cnt;k++)arr.push({x:x,y:VH*(k+1)/(cnt+1)});coords.push(arr);}
+  var lines=[];for(var s=0;s<nx-1;s++){coords[s].forEach(function(a){coords[s+1].forEach(function(bp){var ln=document.createElementNS(NS,'line');ln.setAttribute('x1',a.x);ln.setAttribute('y1',a.y);ln.setAttribute('x2',bp.x);ln.setAttribute('y2',bp.y);ln.setAttribute('stroke','#dcdcef');ln.setAttribute('stroke-width','1.4');ln._seg=s;svg.appendChild(ln);lines.push(ln);});});}
+  var circles=[];coords.forEach(function(col){var cs=[];col.forEach(function(p){var c=document.createElementNS(NS,'circle');c.setAttribute('cx',p.x);c.setAttribute('cy',p.y);c.setAttribute('r',9);c.setAttribute('fill','#fff');c.setAttribute('stroke','#a78bfa');c.setAttribute('stroke-width','2.5');svg.appendChild(c);cs.push(c);});circles.push(cs);});
+  var lit=reverse?'#22d3ee':'#ffd66d',ring=reverse?'#0891b2':'#eab308';
+  var btn=el('button','next-btn',reverse?'⬅️ 从输出往回追责':'▶️ 输入信号，逐层点亮');btn.style.cssText+=';margin-top:10px';
+  btn.onclick=function(e){if(playing)return;playing=true;
+    circles.forEach(function(cs){cs.forEach(function(c){c.setAttribute('fill','#fff');c.setAttribute('stroke','#a78bfa');});});lines.forEach(function(l){l.setAttribute('stroke','#dcdcef');l.setAttribute('stroke-width','1.4');});
+    var order=[];for(var i=0;i<nx;i++)order.push(reverse?nx-1-i:i);
+    order.forEach(function(ci,stepI){setTimeout(function(){
+      circles[ci].forEach(function(c){c.setAttribute('fill',lit);c.setAttribute('stroke',ring);});
+      if(stepI>0){var seg=Math.min(ci,order[stepI-1]);lines.forEach(function(l){if(l._seg===seg){l.setAttribute('stroke',lit);l.setAttribute('stroke-width','2.8');}});}
+      if(stepI===order.length-1){playing=false;if(!done){done=true;rw(e);}}
+    },stepI*400);});};
+  var bw=el('div');bw.style.textAlign='center';bw.appendChild(btn);w.appendChild(svg);w.appendChild(bw);}
 function buildForwardProp(rw,onReset){var b=ixbox('➡️ 前向传播','点按钮，看信号一层层点亮到输出',onReset);_propNet(b._body,false,rw);return b;}
 function buildBackprop(rw,onReset){var b=ixbox('🔁 反向传播','点按钮，看误差从输出倒着传回输入',onReset);_propNet(b._body,true,rw);return b;}
 
 function buildLossCurve(rw,onReset){var b=ixbox('📉 损失曲线','反复点"训练一步"，把损失降到 20 以下',onReset);var w=b._body;
-  var loss=100,step=0,done=false;
-  var chart=el('div');chart.style.cssText='display:flex;align-items:flex-end;gap:3px;height:108px;padding:8px;background:#fff;border-radius:12px;border:1.5px solid #e6e9f2;overflow:hidden';
+  var NS='http://www.w3.org/2000/svg',VW=320,VH=150,pad=22,loss=100,step=0,done=false,hist=[100];
+  var svg=document.createElementNS(NS,'svg');svg.setAttribute('viewBox','0 0 '+VW+' '+VH);svg.setAttribute('width','100%');svg.style.cssText='display:block;height:auto;background:#fff;border:1.5px solid #e6e9f2;border-radius:12px';
+  var g;for(var gi=1;gi<4;gi++){g=document.createElementNS(NS,'line');var gy=pad+(VH-2*pad)*gi/3;g.setAttribute('x1',pad);g.setAttribute('y1',gy);g.setAttribute('x2',VW-pad);g.setAttribute('y2',gy);g.setAttribute('stroke','#f0f0f7');g.setAttribute('stroke-width','1');svg.appendChild(g);}
+  var poly=document.createElementNS(NS,'polyline');poly.setAttribute('fill','none');poly.setAttribute('stroke','#8b5cf6');poly.setAttribute('stroke-width','3');poly.setAttribute('stroke-linejoin','round');poly.setAttribute('stroke-linecap','round');svg.appendChild(poly);
+  var dot=document.createElementNS(NS,'circle');dot.setAttribute('r','5');dot.setAttribute('fill','#ffd66d');dot.setAttribute('stroke','#eab308');dot.setAttribute('stroke-width','2');svg.appendChild(dot);
   var info=el('div');info.style.cssText='text-align:center;font-size:12px;color:#4b4869;font-weight:700;margin:8px 0';
   var btn=el('button','next-btn','⚙️ 训练一步');
-  function redraw(){info.textContent='步数 '+step+' ｜ 损失 '+Math.round(loss)+' ｜ 准确率 '+Math.round(100-loss*0.9)+'%';}
-  btn.onclick=function(e){if(loss<=6)return;step++;loss=Math.max(4,loss-Math.max(2.5,loss*0.18));var bar=el('div');bar.style.cssText='width:12px;border-radius:3px 3px 0 0;background:linear-gradient(#8b5cf6,#22d3ee);height:'+loss+'%';chart.appendChild(bar);if(chart.children.length>18)chart.removeChild(chart.firstChild);redraw();if(loss<=20&&!done){done=true;spark(e.clientX,e.clientY);rw(e);}};
-  var bw=el('div');bw.style.textAlign='center';bw.appendChild(btn);w.appendChild(chart);w.appendChild(info);w.appendChild(bw);redraw();return b;}
+  function draw(){var n=hist.length,mx=Math.max(12,n),str='',lx=pad,ly=pad;for(var i=0;i<n;i++){var x=pad+(VW-2*pad)*(mx===1?0:i/(mx-1)),y=pad+(VH-2*pad)*(hist[i]/100);str+=x.toFixed(1)+','+y.toFixed(1)+' ';lx=x;ly=y;}poly.setAttribute('points',str.trim());dot.setAttribute('cx',lx);dot.setAttribute('cy',ly);info.textContent='步数 '+step+' ｜ 损失 '+Math.round(loss)+' ｜ 准确率 '+Math.round(100-loss*0.9)+'%';}
+  btn.onclick=function(e){if(loss<=6)return;step++;loss=Math.max(4,loss-Math.max(2.5,loss*0.18));hist.push(loss);if(hist.length>24)hist.shift();draw();if(loss<=20&&!done){done=true;spark(e.clientX,e.clientY);rw(e);}};
+  var bw=el('div');bw.style.textAlign='center';bw.appendChild(btn);w.appendChild(svg);w.appendChild(info);w.appendChild(bw);draw();return b;}
 
-function buildGradDesc(rw,onReset){var b=ixbox('⛰️ 梯度下降下山','选好步子大小，点"走一步"，把小球送到谷底',onReset);var w=b._body;
-  var N=11,valley=[],lr=2,pos=1,done=false;for(var i=0;i<N;i++)valley.push(Math.pow(i-5,2));
-  var track=el('div');track.style.cssText='display:flex;align-items:flex-end;justify-content:center;gap:4px;height:112px';
-  function draw(){track.innerHTML='';for(var i=0;i<N;i++){var h=94-valley[i]*3.2;if(h<10)h=10;var col=el('div');col.style.cssText='width:15px;border-radius:4px 4px 0 0;background:#ede9fe;height:'+h+'px;position:relative';if(i===Math.round(pos)){var ball=el('div',null,'🟡');ball.style.cssText='position:absolute;top:-21px;left:-3px;font-size:18px';col.appendChild(ball);}track.appendChild(col);}}
-  var lab=el('span',null,'步子：中');lab.style.cssText='font-size:12px;color:#6d28d9;font-weight:800';
-  var rng=el('input');rng.type='range';rng.min=1;rng.max=4;rng.step=1;rng.value=2;rng.style.cssText='width:72%;accent-color:#8b5cf6;display:block;margin:8px auto 4px';
-  rng.oninput=function(){lr=+rng.value;lab.textContent='步子：'+['','小','中','大','超大'][lr];};
-  var btn=el('button','next-btn','👣 走一步');
-  btn.onclick=function(e){pos=Math.max(0,Math.min(N-1,pos-(pos-5)*0.16*lr));draw();if(Math.abs(pos-5)<0.45&&!done){done=true;spark(e.clientX,e.clientY);rw(e);}};
-  var labWrap=el('div');labWrap.style.textAlign='center';labWrap.appendChild(lab);
-  var bw=el('div');bw.style.cssText='text-align:center;margin-top:6px';bw.appendChild(btn);
-  w.appendChild(track);w.appendChild(rng);w.appendChild(labWrap);w.appendChild(bw);draw();return b;}
+function buildGradDesc(rw,onReset){var b=ixbox('⛰️ 梯度下降：步长的魔法','拖"步长"滑块，实时看小球怎么下山——太大会冲过头',onReset);var w=b._body;
+  var NS='http://www.w3.org/2000/svg',VW=320,VH=160,padX=24,padT=14,padB=26,area=VH-padT-padB,VMAX=0.26,lr=0.4,done=false;
+  var svg=document.createElementNS(NS,'svg');svg.setAttribute('viewBox','0 0 '+VW+' '+VH);svg.setAttribute('width','100%');svg.style.cssText='display:block;height:auto;background:#fff;border:1.5px solid #e6e9f2;border-radius:12px';
+  function fx(x){return (x-0.5)*(x-0.5);}
+  function sx(x){return padX+(VW-2*padX)*Math.max(0,Math.min(1,x));}
+  function sy(v){return padT+area*(1-Math.min(v,VMAX)/VMAX);} // 谷底(v=0)在下方，两侧高在上方=U形
+  var curve=document.createElementNS(NS,'path'),d='';for(var i=0;i<=44;i++){var x=i/44;d+=(i?'L':'M')+sx(x).toFixed(1)+' '+sy(fx(x)).toFixed(1)+' ';}curve.setAttribute('d',d.trim());curve.setAttribute('fill','none');curve.setAttribute('stroke','#c4b5fd');curve.setAttribute('stroke-width','3');svg.appendChild(curve);
+  var floor=document.createElementNS(NS,'line');floor.setAttribute('x1',sx(0.5));floor.setAttribute('y1',sy(0)-2);floor.setAttribute('x2',sx(0.5));floor.setAttribute('y2',padT);floor.setAttribute('stroke','#ecfdf5');floor.setAttribute('stroke-width','0');svg.appendChild(floor);
+  var pathG=document.createElementNS(NS,'g');svg.appendChild(pathG);
+  var lab=el('div');lab.style.cssText='text-align:center;font-size:12.5px;font-weight:800;margin:8px 0 2px';
+  function run(){while(pathG.firstChild)pathG.removeChild(pathG.firstChild);
+    var x=0.06,pts=[x],diverged=false;
+    for(var s=0;s<16;s++){var gx=2*(x-0.5);x=x-lr*gx;if(x<-0.25||x>1.25){diverged=true;pts.push(x<0?-0.12:1.12);break;}pts.push(x);}
+    for(var k=1;k<pts.length;k++){var a=pts[k-1],c2=pts[k];var ln=document.createElementNS(NS,'line');ln.setAttribute('x1',sx(a));ln.setAttribute('y1',sy(fx(a)));ln.setAttribute('x2',sx(c2));ln.setAttribute('y2',sy(fx(c2)));ln.setAttribute('stroke',diverged?'#fb7185':'#22d3ee');ln.setAttribute('stroke-width','2');pathG.appendChild(ln);}
+    for(var j=0;j<pts.length;j++){var dc=document.createElementNS(NS,'circle');dc.setAttribute('cx',sx(pts[j]));dc.setAttribute('cy',sy(fx(pts[j])));dc.setAttribute('r',j===0?4.5:3);dc.setAttribute('fill',j===0?'#8b5cf6':(diverged?'#fb7185':'#38bdf8'));pathG.appendChild(dc);}
+    var last=pts[pts.length-1],ball=document.createElementNS(NS,'text');ball.setAttribute('x',sx(last));ball.setAttribute('y',sy(fx(last))-8);ball.setAttribute('font-size','15');ball.setAttribute('text-anchor','middle');ball.textContent='🟡';pathG.appendChild(ball);
+    var conv=!diverged&&Math.abs(last-0.5)<0.06;
+    lab.innerHTML=diverged?'步长过大 → <b style="color:#e11d48">冲飞了，发散！</b>':conv?'步长合适 → <b style="color:#16a34a">稳稳滚到谷底 ✅</b>':(Math.abs(last-0.5)<0.2?'步长偏小 → <b style="color:#d99a12">慢慢挪，还没到底</b>':'步长偏大 → <b style="color:#d99a12">在谷底两边反复横跳</b>');
+    if(conv&&!done){done=true;var r=svg.getBoundingClientRect?svg.getBoundingClientRect():{left:100,top:100,width:120};spark(r.left+(r.width||120)/2,r.top+40);rw({clientX:r.left+(r.width||120)/2,clientY:r.top+40});}}
+  var rng=el('input');rng.type='range';rng.min=0.1;rng.max=1.25;rng.step=0.05;rng.value=0.4;rng.style.cssText='width:82%;accent-color:#8b5cf6;display:block;margin:10px auto 2px';
+  rng.oninput=function(){lr=+rng.value;run();};
+  var scale=el('div');scale.style.cssText='display:flex;justify-content:space-between;width:82%;margin:0 auto;font-size:10.5px;color:#8b90a6';scale.innerHTML='<span>小·稳</span><span>快·刚好</span><span>过大·发散</span>';
+  w.appendChild(svg);w.appendChild(rng);w.appendChild(scale);w.appendChild(lab);run();return b;}
 
-// —— 注册：🧠 神经网络在算什么（5 节 + 通关挑战）——
-CHAPTERS['adv:nn']={id:'adv:nn',title:'🧠 神经网络在算什么',badge:{e:'🧠',t:'神经网络拆解师',s:'你亲手拆开了神经网络，看清它只是在"调数字"'},endGame:buildChallenge,sections:[
+// —— 收尾：课程小结卡（非街机，汇总心智桩，点按钮领徽章通关）——
+function buildNNRecap(onWin,onReset){var b=ixbox('🎓 课程小结','把这一课的秘密收进口袋',onReset);var w=b._body;
+  var pts=[['🔧','神经元','打分 ＋ 要不要点火'],['🪜','前向传播','一层层算到答案'],['🎯','损失','用一个数字量"错多少"'],['⛰️','梯度下降','顺着下坡一点点调数字'],['🔁','反向传播','把责任往回传，告诉每个数字怎么改']];
+  var list=el('div');list.style.cssText='display:flex;flex-direction:column;gap:8px;margin-bottom:12px';
+  pts.forEach(function(p){var row=el('div');row.style.cssText='display:flex;align-items:center;gap:10px;background:#faf8ff;border:1px solid #ece9f7;border-radius:12px;padding:9px 12px';row.innerHTML='<span style="font-size:22px">'+p[0]+'</span><span><b style="color:#6d28d9">'+p[1]+'</b> · <span style="color:#4b4869;font-size:13px">'+p[2]+'</span></span>';list.appendChild(row);});
+  var line=el('div');line.style.cssText='text-align:center;font-size:14px;font-weight:800;color:#1e1b3a;margin:4px 0 12px';line.innerHTML='一句话：<b style="color:#8b5cf6">神经网络没有魔法，全是在"调数字"🔧</b>';
+  var btn=el('button','next-btn','🏅 领取徽章，完成这一课'),done=false;
+  btn.onclick=function(e){if(done)return;done=true;spark(e.clientX,e.clientY);onWin(e);};
+  var bw=el('div');bw.style.textAlign='center';bw.appendChild(btn);
+  w.appendChild(list);w.appendChild(line);w.appendChild(bw);return b;}
+
+// —— 注册：🧠 神经网络在算什么（5 节 + 课程小结）——
+CHAPTERS['adv:nn']={id:'adv:nn',title:'🧠 神经网络在算什么',badge:{e:'🧠',t:'神经网络拆解师',s:'你亲手拆开了神经网络，看清它只是在"调数字"'},endGame:buildNNRecap,sections:[
  {n:1,heading:'神经元：会打分、会点火',hook:'<span class="apo">阿波：</span>别被"神经网络"这名字唬住！我拆开给你看——里面全是会算账的小格子。拖一拖，把我点亮⚡',build:buildNeuronFire,
   paras:['一个[[神经元]]，就是个会算账的小格子：几个数字进来，它吐一个数字出去。','每个输入有个[[权重]]＝它多重要，还有个[[偏置]]＝点火的门槛。把"输入×权重"全加起来（[[加权和]]），就是它的总分。','总分够高，就过[[激活函数]]这道关"点火"⚡；不够就熄火😴。几千几万个小格子连起来，就是神经网络。'],
   terms:{'神经元':{s:'网络里最小的计算单元：几个数字进来，吐一个数字出去。'},'权重':{s:'每个输入有多重要。',pro:'训练时被不断微调的数字，是网络"学到的东西"的载体。'},'偏置':{s:'让神经元更容易或更难"点火"的门槛。',pro:'给加权和加上的一个可调常数，相当于点火的起跑线。'},'加权和':{s:'输入乘以权重再相加。',pro:'深度学习里最基础、最高频的运算，AI 一秒要做上亿次。'},'激活函数':{s:'决定神经元输出强弱的一道"开关"。',pro:'如 ReLU、Sigmoid，给网络带来非线性，是它能学复杂规律的关键。'}},
