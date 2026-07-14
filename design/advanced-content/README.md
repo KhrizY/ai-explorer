@@ -44,8 +44,10 @@
 1. ✅ 🧠 神经网络在算什么（`nn-basics.md`）— 最多课的地基
 2. ✅ 🎨 扩散模型画画（`diffusion.md`，有 diffusion demo，最出彩）
 3. ✅ 🔗 注意力的数学（`attention-math.md`）→ ✅ 🤖 Transformer 全貌（`transformer.md`）— 说章深挖
-4. ⏳ 🏋️ 大模型训练三部曲（下一门，`token`/`loss`/`rltrail` demo 全能复用，直通"ChatGPT 是怎么炼成的"）
-5. 其余按兴趣补：👁️CNN深入 · 🔁RNN与记忆 · 🕹️强化学习 · 🍎苦涩的教训 · 📜AI简史 …
+4. ✅ 🏋️ 大模型训练三部曲（`training-trilogy.md`，8点，"ChatGPT 怎么炼成的"）— 新增玩法 `rlhf` 已录入测试页
+5. ⏳ 其余按兴趣补：👁️CNN深入 · 🔁RNN与记忆 · 🕹️强化学习 · 🍎苦涩的教训 · 📜AI简史 …
+
+> **UX 记录规则**：只有"全新玩法"才补录进测试页 `demos/index.html`（同类不重复，如神经元正/反向传播算同类）。每门课末尾附「新增玩法记录」小表。已录入的新玩法：`rlhf`（人类偏好 A/B 选择，训练三部曲）。
 
 ## 六、新增可视化 demo 清单（本轮设计里提出、待 app 侧实现）
 > 已复用现成 demo 之外，注意力+Transformer 两课提出以下新小演示（都遵循浅色舞台 + 重置 + 明显成功反馈）：

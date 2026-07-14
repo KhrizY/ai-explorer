@@ -485,6 +485,40 @@ demo({id:'temp',cat:'e',title:'温度·AI 有多"放飞"',teach:'温度越高，
   btn.onclick=gen;s.appendChild(out);s.appendChild(rng);s.appendChild(lbl);s.appendChild(btn);rng.oninput();gen();
 }});
 
+demo({id:'rlhf',cat:'g',title:'RLHF·选更好的回答',teach:'进阶「人类反馈」——你选哪个更好，AI 就往哪个方向学',mount:function(s){
+  s.classList.add('light');
+  var ROUNDS=[
+    {q:'什么是彩虹？',good:'彩虹是阳光穿过小水滴，被折射分成七种颜色形成的。',bad:'彩虹？你自己上网查不就知道了。'},
+    {q:'帮我给妈妈写一句生日祝福',good:'妈妈生日快乐！谢谢你一直照顾我，我爱你。',bad:'生日是地球绕太阳一圈的纪念日。'},
+    {q:'月亮为什么会发光？',good:'月亮自己不发光，它反射太阳的光，我们才看见它亮。',bad:'因为月亮里住着会发光的小兔子呀。'},
+    {q:'2 加 3 等于几？',good:'2 加 3 等于 5。',bad:'这个太难了，我不会。'}
+  ];
+  var idx=0,score=0,need=ROUNDS.length;
+  var face=el('div',null,'😐');face.style.cssText='font-size:40px;text-align:center';
+  var barWrap=el('div');barWrap.style.cssText='height:12px;border-radius:99px;background:#e6e9f2;overflow:hidden;margin:8px auto;max-width:260px';
+  var bar=el('i');bar.style.cssText='display:block;height:100%;width:0;background:linear-gradient(90deg,#8b5cf6,#22d3ee);transition:width .3s';barWrap.appendChild(bar);
+  var barLbl=el('div','stg-msg','奖励模型：AI 还不太懂你喜欢什么');
+  var qv=el('div');qv.style.cssText='font-weight:800;color:#1e1b3a;text-align:center;margin:10px 0 6px;font-size:15px';
+  var opts=el('div');opts.style.cssText='display:flex;flex-direction:column;gap:8px;max-width:340px;margin:0 auto';
+  function draw(){
+    if(idx>=need){face.textContent='✅';qv.textContent='';opts.innerHTML='';barLbl.innerHTML='🎓 它学会你喜欢的风格了！点右上角 ↻ 再来';bigFlash(s,'🎓 AI 毕业！',true);return;}
+    var r=ROUNDS[idx];qv.textContent='🙋 问题：'+r.q;
+    var pair=Math.random()<0.5?[{t:r.good,ok:1},{t:r.bad,ok:0}]:[{t:r.bad,ok:0},{t:r.good,ok:1}];
+    opts.innerHTML='';
+    pair.forEach(function(o,k){
+      var b=el('button','stg-btn',(k===0?'🅰 ':'🅱 ')+o.t);
+      b.style.cssText+=';text-align:left;white-space:normal;line-height:1.45;padding:10px 14px;font-size:13px;margin-top:0';
+      b.onclick=function(e){
+        if(o.ok){score++;idx++;spark(e.clientX,e.clientY);var pct=Math.round(score/need*100);bar.style.width=pct+'%';face.textContent=pct>=100?'😊':pct>=50?'🙂':'😐';barLbl.innerHTML='👍 你选了更好的！AI 对齐度 '+pct+'%';setTimeout(draw,480);}
+        else{bigFlash(s,'🤔 另一版更好哦',false);}
+      };
+      opts.appendChild(b);
+    });
+  }
+  var hint=el('div','stg-msg','两版回答，选你觉得更好的 —— 这就是 RLHF 在做的事');
+  s.appendChild(face);s.appendChild(barWrap);s.appendChild(barLbl);s.appendChild(qv);s.appendChild(opts);s.appendChild(hint);draw();
+}});
+
 // ============ 渲染 ============
 var CATS=[['all','🌐 全部'],['g','🎮 游戏交互'],['v','🔬 可视化讲解'],['e','🎚️ 探索模拟']];
 var tabsEl=document.getElementById('tabs'),gridEl=document.getElementById('grid'),cur='all';
