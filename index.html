@@ -125,10 +125,10 @@ function buildArcadeGame(cfg,onWin,onReset){var b=ixbox(cfg.title,cfg.hint,onRes
   function end(e){if(done)return;done=true;clearGame();toast(starOf(miss)+' 通关!',true);lineFeedback(w,true,'通关！连击 '+combo+'，失误 '+miss+' 次');setTimeout(function(){onWin(e||{});},380);}
   function fail(msg){miss++;combo=0;cbEl.textContent='连击 0';lineFeedback(w,false,msg||'差一点，继续！');}
   function spawn(){if(done)return;var badRate=(cfg.badRate==null ? .34 : cfg.badRate),good=Math.random()>badRate,pool=good?cfg.good:cfg.bad;var icon=pool[Math.floor(Math.random()*pool.length)];
-    var d=el('div','game-chip '+(good?'good':'bad'),icon);d.good=good;var sz=42+Math.random()*18;var x=4+Math.random()*82;d.style.cssText+=';width:'+sz+'px;height:'+sz+'px;left:'+x+'%;top:-18%;font-size:'+(sz*.58)+'px';d.y=-18;d.spd=(cfg.speed||.75)+Math.random()*.45+score*.035;d.onclick=function(e){if(done||d.dead)return;d.dead=1;if(d.good){score++;combo++;spark(e.clientX,e.clientY);lineFeedback(w,true,cfg.goodMsg||'命中！');scEl.textContent=(cfg.scoreName||'完成')+' '+score+'/'+goal;cbEl.textContent='连击 '+combo+(combo>=4?' 🔥':'');d.remove();if(score>=goal)end(e);}else{fail(cfg.badMsg||'这个先别点');d.animate([{transform:'scale(1)'},{transform:'scale(.7)',opacity:.2}],{duration:180});setTimeout(function(){if(d.parentElement)d.remove();},160);}};stage.appendChild(d);items.push(d);}
+    var d=el('div','game-chip '+(good?'good':'bad'),icon);d.good=good;var sz=(cfg.size||58)+Math.random()*16;var x=3+Math.random()*78;d.style.cssText+=';width:'+sz+'px;height:'+sz+'px;left:'+x+'%;top:-20%;font-size:'+(sz*.56)+'px';d.y=-20;d.spd=(cfg.speed||.42)+Math.random()*.24+score*.015;d.onclick=function(e){if(done||d.dead)return;d.dead=1;if(d.good){score++;combo++;spark(e.clientX,e.clientY);lineFeedback(w,true,cfg.goodMsg||'命中！');scEl.textContent=(cfg.scoreName||'完成')+' '+score+'/'+goal;cbEl.textContent='连击 '+combo+(combo>=4?' 🔥':'');d.remove();if(score>=goal)end(e);}else{fail(cfg.badMsg||'这个先别点');d.animate([{transform:'scale(1)'},{transform:'scale(.7)',opacity:.2}],{duration:180});setTimeout(function(){if(d.parentElement)d.remove();},160);}};stage.appendChild(d);items.push(d);}
   function loop(){if(done)return;timeLeft-=16;tmEl.textContent=Math.max(0,Math.ceil(timeLeft/1000))+'s';fill.style.width=Math.max(0,timeLeft/total*100)+'%';
     for(var i=items.length-1;i>=0;i--){var d=items[i];if(d.dead){items.splice(i,1);continue;}d.y+=d.spd;d.style.top=d.y+'%';if(d.y>108){if(d.good)fail(cfg.missMsg||'漏掉一个目标');if(d.parentElement)d.remove();items.splice(i,1);}}
-    if(timeLeft<=0){if(score>=Math.ceil(goal*.7))end({});else{timeLeft=5000;total=5000;lineFeedback(w,false,'加时 5 秒，抓紧冲刺！');}}
+    if(timeLeft<=0){if(score>=Math.ceil(goal*.6))end({});else{timeLeft=8000;total=8000;lineFeedback(w,false,'加时 8 秒，慢慢点也可以！');}}
     window._gR=requestAnimationFrame(loop);}
   window._gT=setInterval(spawn,cfg.spawn||620);loop();w.appendChild(hud);w.appendChild(meter);w.appendChild(stage);return b;}
 
@@ -255,7 +255,7 @@ function buildTree(rw,onReset){var b=ixbox('🌲 AI 用问题一层层猜','至�
 
 // —— 章末挑战(自动节奏) ——
 function buildChallenge(onWin,onReset){var b=ixbox('🎮 训练师大挑战','猫🐱出现就点它！点错扣分',onReset);var w=b._body;
-  return buildArcadeGame({title:'⚡ 训练师闪电赛',hint:'点会帮 AI 学会认猫的好样本，避开坏数据',good:['🐱','🐈','🐈‍⬛','📸'],bad:['🐶','🍊','🌫️','❌'],goal:10,time:19000,scoreName:'好样本',goodMsg:'好样本入库！',badMsg:'坏数据会教歪 AI',missMsg:'漏掉一个好样本',speed:.82,spawn:560},onWin,onReset);
+  return buildArcadeGame({title:'⚡ 训练师闪电赛',hint:'点会帮 AI 学会认猫的好样本，避开坏数据',good:['🐱','🐈','🐈‍⬛','📸'],bad:['🐶','🍊','🌫️','❌'],goal:6,time:22000,scoreName:'好样本',goodMsg:'好样本入库！',badMsg:'坏数据会教歪 AI',missMsg:'漏掉一个好样本',speed:.38,spawn:760,size:64,badRate:.25},onWin,onReset);
   if(window._chT){clearInterval(window._chT);window._chT=null;}
   var score=0,goal=5,pool=['🐱','🍎','🐶','🐱','🍊','🐱','🌫️','🐱','🐭','🐱'];
   var sc=el('div',null,'0 / '+goal);sc.style.cssText='text-align:center;font-weight:900;color:#6d28d9;font-size:18px';
@@ -352,7 +352,7 @@ function buildWave(rw,onReset){var b=ixbox('🔊 声音是波形数字','拖到�
   w.appendChild(cv);w.appendChild(rng);w.appendChild(lbl);draw();return b;}
 
 function buildDetective(onWin,onReset){var b=ixbox('🕵️ 像素侦探','点"看清楚点"，再猜是什么',onReset);var w=b._body;
-  return buildArcadeGame({title:'👁️ 视觉雷达冲刺',hint:'点清晰线索，别点噪声干扰',good:['🔍','⚡','🧩','📷'],bad:['🌫️','🌀','❓','🫧'],goal:10,time:18000,scoreName:'线索',goodMsg:'锁定特征！',badMsg:'这是噪声干扰',missMsg:'漏掉一条线索',speed:.86,spawn:540},onWin,onReset);
+  return buildArcadeGame({title:'👁️ 视觉雷达冲刺',hint:'点清晰线索，别点噪声干扰',good:['🔍','⚡','🧩','📷'],bad:['🌫️','🌀','❓','🫧'],goal:6,time:22000,scoreName:'线索',goodMsg:'锁定特征！',badMsg:'这是噪声干扰',missMsg:'漏掉一条线索',speed:.38,spawn:760,size:64,badRate:.25},onWin,onReset);
   var POOL=['🐱','🐶','🍎','🚗','🌸','🐟','🚀','🍔'];var ANS=POOL[Math.floor(Math.random()*POOL.length)],res=2;
   var big=el('div',null,ANS);big.style.cssText='font-size:70px;text-align:center;filter:blur(14px)';
   var msg=el('div',null,'');msg.style.cssText='text-align:center;font-size:12.5px;color:#6b7280;margin:6px 0;min-height:18px';
@@ -454,7 +454,7 @@ function buildHallucination(rw,onReset){var b=ixbox('🕵️ 真话还是编的�
   w.appendChild(card);w.appendChild(bw);w.appendChild(sc);show();return b;}
 
 function buildChainPK(onWin,onReset){var b=ixbox('🎮 词语接龙 PK','说通 2 句就赢！',onReset);var w=b._body;
-  return buildArcadeGame({title:'💬 词语能量赛',hint:'点顺口的词块，避开怪句子',good:['今天','小猫','喜欢','睡觉','天气','很好'],bad:['香蕉','桌子','倒飞','咕噜','火箭汤'],goal:12,time:19000,scoreName:'词块',goodMsg:'顺口词块！',badMsg:'这个接法怪怪的',missMsg:'漏掉一个好词',speed:.78,spawn:560},onWin,onReset);
+  return buildArcadeGame({title:'💬 词语能量赛',hint:'点顺口的词块，避开怪句子',good:['今天','小猫','喜欢','睡觉','天气','很好'],bad:['香蕉','桌子','倒飞','咕噜','火箭汤'],goal:7,time:22000,scoreName:'词块',goodMsg:'顺口词块！',badMsg:'这个接法怪怪的',missMsg:'漏掉一个好词',speed:.36,spawn:780,size:68,badRate:.24},onWin,onReset);
   var G=WC_G;
   var starts=WC_START,sent,cur,wins=0;
   var sc=el('div',null,'说通 0 / 2 句');sc.style.cssText='text-align:center;font-weight:800;color:#6d28d9';
@@ -532,7 +532,7 @@ function buildAuthorize(rw,onReset){var b=ixbox('🚦 该不该让 AI 自己做'
   w.appendChild(row);w.appendChild(bins);return b;}
 
 function buildCommander(onWin,onReset){var b=ixbox('🏭 工具流水线','倒计时内点对工具！完成 6 单，越来越快',onReset);var w=b._body;clearGame();
-  return buildArcadeGame({title:'🛠️ Agent 工具快递',hint:'点正确工具包，避开危险操作',good:['🧮','🌤️','🌐','🎨','📚'],bad:['🗑️','💸','📧','🔑'],goal:12,time:19000,scoreName:'工具',goodMsg:'工具送达！',badMsg:'危险操作要先问人',missMsg:'漏掉一个工具包',speed:.9,spawn:520,badRate:.32},onWin,onReset);
+  return buildArcadeGame({title:'🛠️ Agent 工具快递',hint:'点正确工具包，避开危险操作',good:['🧮','🌤️','🌐','🎨','📚'],bad:['🗑️','💸','📧','🔑'],goal:7,time:22000,scoreName:'工具',goodMsg:'工具送达！',badMsg:'危险操作要先问人',missMsg:'漏掉一个工具包',speed:.38,spawn:760,badRate:.24,size:64},onWin,onReset);
   var T=[{task:'算 88+57',right:'🧮'},{task:'查明天天气',right:'🌤️'},{task:'翻译"你好"',right:'🌐'},{task:'画一只小猫',right:'🎨'},{task:'查图书馆几点关',right:'📚'}],ALL=['🧮','🌤️','🌐','🎨','📚'];
   var score=0,combo=0,miss=0,goal=6,done=false,cur,timeLeft=0,dur=1;
   var hud=el('div');hud.style.cssText='display:flex;justify-content:space-between;font-weight:800;color:#6d28d9;font-size:13px;margin-bottom:6px';var scEl=el('span',null,'完成 0/6');var cbEl=el('span',null,'连击 0');hud.appendChild(scEl);hud.appendChild(cbEl);
@@ -617,7 +617,7 @@ function buildTips(rw,onReset){var b=ixbox('🎒 聪明用 AI 三锦囊','点开
   w.appendChild(row);return b;}
 
 function buildDetectiveAgency(onWin,onReset){var b=ixbox('🕵️ AI 侦探事务所','判断每个案子：用得对不对？答对 5 个结案！',onReset);var w=b._body;
-  return buildArcadeGame({title:'⚖️ 安全守卫冲刺',hint:'点靠谱做法，避开隐私和危险',good:['🔎','🔒','🧑‍✈️','✅','📚'],bad:['🔑','🏠','⚠️','🎭','❌'],goal:12,time:19000,scoreName:'靠谱',goodMsg:'靠谱选择！',badMsg:'这个有风险，要小心',missMsg:'漏掉一个靠谱做法',speed:.84,spawn:560,badRate:.36},onWin,onReset);
+  return buildArcadeGame({title:'⚖️ 安全守卫冲刺',hint:'点靠谱做法，避开隐私和危险',good:['🔎','🔒','🧑‍✈️','✅','📚'],bad:['🔑','🏠','⚠️','🎭','❌'],goal:7,time:22000,scoreName:'靠谱',goodMsg:'靠谱选择！',badMsg:'这个有风险，要小心',missMsg:'漏掉一个靠谱做法',speed:.36,spawn:780,badRate:.26,size:64},onWin,onReset);
   var C=[{s:'用 AI 查资料写读后感，自己再改',ok:1},{s:'把同学照片用 AI 恶搞发群里',ok:0},{s:'用 AI 翻译看不懂的外文说明',ok:1},{s:'全信 AI 说野果能吃就摘来吃',ok:0},{s:'用 AI 想生日会的点子',ok:1},{s:'把家里 WiFi 密码发给 AI 记着',ok:0},{s:'用 AI 练习英语对话',ok:1},{s:'让 AI 冒充老师给同学发通知',ok:0}];
   for(var _s=C.length-1;_s>0;_s--){var _j=Math.floor(Math.random()*(_s+1)),_t=C[_s];C[_s]=C[_j];C[_j]=_t;}var i=0,score=0,combo=0,miss=0,goal=6;
   var hud=el('div');hud.style.cssText='display:flex;justify-content:space-between;font-weight:900;color:#6d28d9;font-size:15px;margin-bottom:6px';var scEl=el('span',null,'结案 0/6');var cbEl=el('span',null,'连击 0');hud.appendChild(scEl);hud.appendChild(cbEl);
@@ -676,7 +676,7 @@ function buildMapPreview(rw,onReset){var b=ixbox('🗺️ 探险地图','点"启
   w.appendChild(row);w.appendChild(btn);return b;}
 
 function buildMagicDash(onWin,onReset){var b=ixbox('🎣 AI 大搜捕','点住会用 AI 的🤖别让它掉了，普通东西别碰！集齐 8 个',onReset);var w=b._body;clearGame();
-  return buildArcadeGame({title:'🚀 AI 探险开场赛',hint:'点身边的 AI，普通物品先放过',good:['📱','🗣️','📷','🔒','🤖'],bad:['🪑','📖','✏️','🍎'],goal:10,time:18000,scoreName:'AI',goodMsg:'发现一个 AI！',badMsg:'这个普通物品不是 AI',missMsg:'漏掉一个 AI',speed:.82,spawn:540,badRate:.38},onWin,onReset);
+  return buildArcadeGame({title:'🚀 AI 探险开场赛',hint:'点身边的 AI，普通物品先放过',good:['📱','🗣️','📷','🔒','🤖'],bad:['🪑','📖','✏️','🍎'],goal:5,time:22000,scoreName:'AI',goodMsg:'发现一个 AI！',badMsg:'这个普通物品不是 AI',missMsg:'漏掉一个 AI',speed:.36,spawn:780,badRate:.25,size:64},onWin,onReset);
   var TYPES=[{e:'📱',ai:1},{e:'🗣️',ai:1},{e:'📷',ai:1},{e:'🔒',ai:1},{e:'🪑',ai:0},{e:'📖',ai:0},{e:'✏️',ai:0},{e:'🍎',ai:0}];
   var score=0,combo=0,miss=0,goal=8,done=false,items=[];
   var hud=el('div');hud.style.cssText='display:flex;justify-content:space-between;font-weight:800;color:#6d28d9;font-size:13px;margin-bottom:6px';var scEl=el('span',null,'抓到 0/8');var cbEl=el('span',null,'连击 0');hud.appendChild(scEl);hud.appendChild(cbEl);
@@ -722,31 +722,32 @@ function renderSec(){
   document.getElementById('chbody').appendChild(wrap);
   wrap.scrollIntoView({behavior:'smooth',block:'start'});
 }
-function renderEnd(){var wrap=el('div','section');wrap.appendChild(el('div','section-heading','<span class="section-num">🎮</span>通关挑战'));var host=el('div');function mountG(){host.innerHTML='';host.appendChild((CH.endGame||buildChallenge)(function(e){finishChapter(e);},mountG));}mountG();wrap.appendChild(host);document.getElementById('chbody').appendChild(wrap);wrap.scrollIntoView({behavior:'smooth'});}
-function finishChapter(e){if(!ST.done[CH.id])awardCoins(50,e);if(ST.badges.indexOf(CH.badge.t)<0)ST.badges.push(CH.badge.t);ST.done[CH.id]=true;save();syncTop();
+function renderEnd(){if(document.getElementById('end-'+CH.id))return;var wrap=el('div','section');wrap.id='end-'+CH.id;wrap.appendChild(el('div','section-heading','<span class="section-num">🎮</span>通关挑战'));var host=el('div');var won=false;function mountG(){if(won||ST.done[CH.id]){host.innerHTML='';completeFeedback(host,'本章已经通关');return;}host.innerHTML='';host.appendChild((CH.endGame||buildChallenge)(function(e){if(won)return;won=true;finishChapter(e);},mountG));}mountG();wrap.appendChild(host);document.getElementById('chbody').appendChild(wrap);wrap.scrollIntoView({behavior:'smooth'});}
+function finishChapter(e){if(window._finishingChapter===CH.id)return;window._finishingChapter=CH.id;if(document.getElementById('finish-'+CH.id))return;if(!ST.done[CH.id])awardCoins(50,e);if(ST.badges.indexOf(CH.badge.t)<0)ST.badges.push(CH.badge.t);ST.done[CH.id]=true;save();syncTop();
   var wrap=el('div','section');wrap.style.textAlign='center';
+  wrap.id='finish-'+CH.id;
   wrap.appendChild(el('div',null,'<div style="font-size:20px;font-weight:900;color:#16a34a">🎉 恭喜通关「'+CH.id+'」章！</div>'));
   var drop=el('div','badge-drop','<div class="bd-emoji">'+CH.badge.e+'</div><div class="bd-t">'+CH.badge.t+'</div><div class="bd-s">'+CH.badge.s+'</div>');drop.style.cssText+=';margin:16px auto 0';wrap.appendChild(drop);
   var nw=el('div','next-wrap');var btn=el('button','next-btn','🗺️ 回地图（已解锁下一站）');btn.onclick=goMap;nw.appendChild(btn);wrap.appendChild(nw);
-  document.getElementById('chbody').appendChild(wrap);wrap.scrollIntoView({behavior:'smooth'});}
+  document.getElementById('chbody').appendChild(wrap);wrap.scrollIntoView({behavior:'smooth'});setTimeout(function(){window._finishingChapter=null;},800);}
 
 // ========== 新玩法库（浅色舞台，可复用） ==========
-function buildAICatch(onWin,onReset){return buildArcadeGame({title:'🎣 AI 大搜捕',hint:'点掉会用 AI 的🤖，普通东西别碰！抓 8 个',goal:8,scoreName:'抓到',good:['📱','🗣️','📷','🔒','🚗','🤖'],bad:['🪑','📖','✏️','🍎','🥕'],goodMsg:'是 AI！',badMsg:'那不是 AI～',missMsg:'漏了一个 AI'},onWin,onReset);}
+function buildAICatch(onWin,onReset){return buildArcadeGame({title:'🎣 AI 大搜捕',hint:'点掉会用 AI 的🤖，普通东西别碰！抓 5 个',goal:5,time:22000,spawn:760,speed:.36,size:64,badRate:.25,scoreName:'抓到',good:['📱','🗣️','📷','🔒','🚗','🤖'],bad:['🪑','📖','✏️','🍎','🥕'],goodMsg:'是 AI！',badMsg:'那不是 AI～',missMsg:'漏了一个 AI'},onWin,onReset);}
 function buildClawGame(cfg,onWin,onReset){var b=ixbox(cfg.title,cfg.hint,onReset);var w=b._body;clearGame();
   var score=0,combo=0,miss=0,goal=cfg.goal||6,done=false,cx=50,dir=1,state='move',dropY=0,grabbed=null,items=[];
   var hud=el('div','game-hud');var scEl=el('span',null,(cfg.scoreName||'抓到')+' 0/'+goal);var cbEl=el('span',null,'连击 0');hud.appendChild(scEl);hud.appendChild(cbEl);
   var stage=el('div','game-stage-light');stage.style.height='200px';
   var rope=el('div');rope.style.cssText='position:absolute;top:0;width:3px;background:#c4b5fd;transform:translateX(-50%)';var claw=el('div',null,'🦾');claw.style.cssText='position:absolute;top:0;font-size:24px;transform:translateX(-50%);z-index:3';stage.appendChild(rope);stage.appendChild(claw);
-  function addItem(){var o=cfg.pool[Math.floor(Math.random()*cfg.pool.length)];var x=8+Math.random()*84;var d=el('div',null,o.e);d.style.cssText='position:absolute;bottom:6px;left:'+x+'%;transform:translateX(-50%);width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-size:22px;background:'+(o.good?'#ecfdf5':'#fffbeb')+';border:2px solid '+(o.good?'#bbf7d0':'#fde68a');stage.appendChild(d);items.push({good:o.good,x:x,el:d});}
+  function addItem(){var o=cfg.pool[Math.floor(Math.random()*cfg.pool.length)];var x=8+Math.random()*84;var d=el('div',null,o.e);d.style.cssText='position:absolute;bottom:6px;left:'+x+'%;transform:translateX(-50%);width:54px;height:54px;border-radius:14px;display:grid;place-items:center;font-size:28px;background:'+(o.good?'#ecfdf5':'#fffbeb')+';border:2px solid '+(o.good?'#bbf7d0':'#fde68a');stage.appendChild(d);items.push({good:o.good,x:x,el:d});}
   for(var i=0;i<5;i++)addItem();
   var btn=el('button','btn btn-primary','⬇️ 抓！');btn.style.cssText+=';display:block;margin:10px auto 0';
   function pos(){claw.style.left=cx+'%';rope.style.left=cx+'%';claw.style.top=dropY+'px';rope.style.height=(dropY+8)+'px';}
   function end(e){done=true;clearGame();toast(starOf(miss)+' 通关!',true);lineFeedback(w,true,cfg.doneMsg||'抓满啦！');setTimeout(function(){onWin(e||{});},380);}
-  function grab(){var hit=-1,best=9;items.forEach(function(o,idx){if(!o.el.parentElement)return;var d=Math.abs(o.x-cx);if(d<best){best=d;hit=idx;}});if(hit>=0){var o=items[hit];grabbed=o.el;if(o.good){score++;combo++;var r=stage.getBoundingClientRect();spark(r.left+r.width*cx/100,r.bottom-40);scEl.textContent=(cfg.scoreName||'抓到')+' '+score+'/'+goal;cbEl.textContent='连击 '+combo+(combo>=3?' 🔥':'');lineFeedback(w,true,cfg.goodMsg||'+1');}else{miss++;combo=0;cbEl.textContent='连击 0';lineFeedback(w,false,cfg.badMsg||'抓到脏的了！');}items.splice(hit,1);}}
-  function loop(){if(done)return;if(state==='move'){cx+=dir*0.7;if(cx>92){cx=92;dir=-1;}if(cx<8){cx=8;dir=1;}}else if(state==='drop'){dropY+=5;if(dropY>=148){grab();state='up';}}else if(state==='up'){dropY-=6;if(dropY<=0){dropY=0;if(grabbed){grabbed.remove();grabbed=null;addItem();}if(score>=goal){end({});return;}state='move';}}pos();window._gR=requestAnimationFrame(loop);}
+  function grab(){var hit=-1,best=13;items.forEach(function(o,idx){if(!o.el.parentElement)return;var d=Math.abs(o.x-cx);if(d<best){best=d;hit=idx;}});if(hit>=0){var o=items[hit];grabbed=o.el;if(o.good){score++;combo++;var r=stage.getBoundingClientRect();spark(r.left+r.width*cx/100,r.bottom-40);scEl.textContent=(cfg.scoreName||'抓到')+' '+score+'/'+goal;cbEl.textContent='连击 '+combo+(combo>=3?' 🔥':'');lineFeedback(w,true,cfg.goodMsg||'+1');}else{miss++;combo=0;cbEl.textContent='连击 0';lineFeedback(w,false,cfg.badMsg||'抓到脏的了！');}items.splice(hit,1);}}
+  function loop(){if(done)return;if(state==='move'){cx+=dir*0.42;if(cx>92){cx=92;dir=-1;}if(cx<8){cx=8;dir=1;}}else if(state==='drop'){dropY+=5;if(dropY>=148){grab();state='up';}}else if(state==='up'){dropY-=6;if(dropY<=0){dropY=0;if(grabbed){grabbed.remove();grabbed=null;addItem();}if(score>=goal){end({});return;}state='move';}}pos();window._gR=requestAnimationFrame(loop);}
   btn.onclick=function(){if(state==='move')state='drop';};pos();window._gR=requestAnimationFrame(loop);
   w.appendChild(hud);w.appendChild(stage);w.appendChild(btn);return b;}
-function buildTrainClaw(onWin,onReset){return buildClawGame({title:'🕹️ 数据抓娃娃机',hint:'用抓钩只抓干净数据🐱，别抓脏数据💩！抓 6 个',goal:6,scoreName:'抓到',pool:[{e:'🐱',good:1},{e:'🐈‍⬛',good:1},{e:'🐈',good:1},{e:'💩',good:0},{e:'🐶',good:0},{e:'🌫️',good:0}],goodMsg:'干净数据 +1',badMsg:'抓到脏数据了！',doneMsg:'训练数据抓满！'},onWin,onReset);}
+function buildTrainClaw(onWin,onReset){return buildClawGame({title:'🕹️ 数据抓娃娃机',hint:'用抓钩只抓干净数据🐱，别抓脏数据💩！抓 4 个',goal:4,scoreName:'抓到',pool:[{e:'🐱',good:1},{e:'🐈‍⬛',good:1},{e:'🐈',good:1},{e:'💩',good:0},{e:'🐶',good:0},{e:'🌫️',good:0}],goodMsg:'干净数据 +1',badMsg:'抓到脏数据了！',doneMsg:'训练数据抓满！'},onWin,onReset);}
 function buildTimingGame(cfg,onWin,onReset){var b=ixbox(cfg.title,cfg.hint,onReset);var w=b._body;clearGame();
   var score=0,combo=0,miss=0,goal=cfg.goal||6,done=false,p=0,dir=1,speed=cfg.speed||1.1,zw=22,zx=40;
   var hud=el('div','game-hud');var scEl=el('span',null,(cfg.scoreName||'命中')+' 0/'+goal);var cbEl=el('span',null,'连击 0');hud.appendChild(scEl);hud.appendChild(cbEl);
