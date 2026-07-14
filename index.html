@@ -59,6 +59,8 @@
 function el(t,c,h){var e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;}
 function spark(x,y){var E=['✨','⭐','🎉','💫','🌟'];for(var i=0;i<10;i++){var s=el('div','spark',E[i%5]);s.style.left=x+'px';s.style.top=y+'px';var a=Math.PI*2*i/10;s.style.setProperty('--dx',Math.cos(a)*70+'px');s.style.setProperty('--dy',(Math.sin(a)*70-26)+'px');document.body.appendChild(s);(function(z){setTimeout(function(){z.remove();},900);})(s);}}
 function toast(txt,ok){var f=el('div','toastbig',txt);f.style.color=ok?'#16a34a':'#d99a12';document.body.appendChild(f);setTimeout(function(){f.remove();},800);if(ok)spark(innerWidth/2,innerHeight*0.32);}
+function clearGame(){if(window._gT){clearInterval(window._gT);window._gT=null;}if(window._gR){cancelAnimationFrame(window._gR);window._gR=null;}}
+function starOf(miss){return miss===0?'⭐⭐⭐':miss<=2?'⭐⭐':'⭐';}
 
 // ========== 存档 + 金币 ==========
 var ST;try{ST=JSON.parse(localStorage.getItem('ai-explorer-2')||'null');}catch(e){ST=null;}
@@ -85,7 +87,7 @@ function parseP(text,terms){var e=el('div','p');var re=/\[\[([^\]]+)\]\]/g,last=
 // ========== 地图 ==========
 var STATIONS=[{id:'序',emoji:'🎬',name:'是魔法吗',hue:'--st0'},{id:'看',emoji:'👁️',name:'怎么看',hue:'--st1'},{id:'学',emoji:'🧠',name:'怎么学会',hue:'--st2'},{id:'说',emoji:'💬',name:'听懂人话',hue:'--st3'},{id:'做',emoji:'🛠️',name:'会做事',hue:'--st5'},{id:'信',emoji:'⚖️',name:'该信吗',hue:'--st4'}];
 function renderMap(){var mp=document.getElementById('mappath');mp.innerHTML='';var firstUndone=-1;STATIONS.forEach(function(st,i){if(firstUndone<0&&CHAPTERS[st.id]&&!ST.done[st.id])firstUndone=i;});STATIONS.forEach(function(st,i){if(i>0)mp.appendChild(el('div','map-connector'));var done=ST.done[st.id],playable=!!CHAPTERS[st.id],locked=!playable&&!done;var s=el('div','station'+(i===firstUndone?' current':'')+(locked?' locked':''));s.style.setProperty('--_h','var('+st.hue+')');s.innerHTML='<div class="st-orb">'+st.emoji+'</div><span class="st-name">'+st.id+' · '+st.name+'</span>'+(done?'<span class="st-done">✓</span>':'');if(playable){s.querySelector('.st-orb').style.cursor='pointer';s.querySelector('.st-orb').onclick=function(){enterChapter(st.id);};}mp.appendChild(s);});}
-function goMap(){if(window._chT){clearInterval(window._chT);window._chT=null;}if(window._waveRaf){cancelAnimationFrame(window._waveRaf);window._waveRaf=null;}show('scr-map');renderMap();syncTop();}
+function goMap(){if(window._chT){clearInterval(window._chT);window._chT=null;}if(window._waveRaf){cancelAnimationFrame(window._waveRaf);window._waveRaf=null;}clearGame();show('scr-map');renderMap();syncTop();}
 function show(id){document.querySelectorAll('.screen').forEach(function(x){x.classList.remove('on');});document.getElementById(id).classList.add('on');window.scrollTo(0,0);}
 
 // ========== 共享：词语接龙图（更丰富，句子更长更多变） ==========
@@ -444,12 +446,17 @@ function buildAuthorize(rw,onReset){var b=ixbox('🚦 该不该让 AI 自己做'
   [['✅ 可以自己做',1],['🙋 得先问我',0]].forEach(function(x){var bn=el('div',null,x[0]);bn.style.cssText='flex:1;padding:12px;border-radius:12px;border:2.5px dashed #b7abdf;text-align:center;font-weight:800;color:#6d28d9;cursor:pointer;font-size:13px';bn.onclick=function(e){if(!sel)return;if(sel.a===x[1]){spark(e.clientX,e.clientY);sel.d.style.transition='.25s';sel.d.style.transform='scale(0)';var dd=sel.d;setTimeout(function(){dd.remove();},250);left--;sel=null;if(!got){got=true;rw(e);}if(left===0)toast('全分对！懂授权 ✓',true);}else{bn.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}],{duration:300});}};bins.appendChild(bn);});
   w.appendChild(row);w.appendChild(bins);return b;}
 
-function buildCommander(onWin,onReset){var b=ixbox('🎮 小小指挥官','派任务、选对工具，答对 4 个通关！',onReset);var w=b._body;var T=[{task:'算 88+57',right:'🧮'},{task:'查明天天气',right:'🌤️'},{task:'翻译"你好"',right:'🌐'},{task:'画一只小猫',right:'🎨'},{task:'查图书馆几点关',right:'📚'}],ALL=['🧮','🌤️','🌐','🎨','📚'],score=0,goal=4,cur;
-  var sc=el('div',null,'0 / 4');sc.style.cssText='text-align:center;font-weight:900;color:#6d28d9;font-size:18px';
-  var tk=el('div');tk.style.cssText='text-align:center;font-weight:800;margin:6px 0';
+function buildCommander(onWin,onReset){var b=ixbox('🏭 工具流水线','倒计时内点对工具！完成 6 单，越来越快',onReset);var w=b._body;clearGame();
+  var T=[{task:'算 88+57',right:'🧮'},{task:'查明天天气',right:'🌤️'},{task:'翻译"你好"',right:'🌐'},{task:'画一只小猫',right:'🎨'},{task:'查图书馆几点关',right:'📚'}],ALL=['🧮','🌤️','🌐','🎨','📚'];
+  var score=0,combo=0,miss=0,goal=6,done=false,cur,timeLeft=0,dur=1;
+  var hud=el('div');hud.style.cssText='display:flex;justify-content:space-between;font-weight:800;color:#6d28d9;font-size:13px;margin-bottom:6px';var scEl=el('span',null,'完成 0/6');var cbEl=el('span',null,'连击 0');hud.appendChild(scEl);hud.appendChild(cbEl);
+  var bar=el('div');bar.style.cssText='height:8px;border-radius:6px;background:#e6e9f2;overflow:hidden;margin-bottom:10px';var fill=el('div');fill.style.cssText='height:100%;width:100%;background:linear-gradient(90deg,#22c55e,#fbbf24,#fb7185)';bar.appendChild(fill);
+  var tk=el('div');tk.style.cssText='text-align:center;font-weight:800;font-size:15px;margin-bottom:10px';
   var tools=el('div');tools.style.cssText='display:flex;gap:8px;justify-content:center;flex-wrap:wrap';
-  function show(){cur=T[Math.floor(Math.random()*T.length)];tk.textContent='任务：'+cur.task;tools.innerHTML='';ALL.forEach(function(t){var bn=el('button','btn btn-ghost',t);bn.style.cssText+=';font-size:22px;padding:8px 12px';bn.onclick=function(e){if(t===cur.right){score++;spark(e.clientX,e.clientY);sc.textContent=score+' / '+goal;if(score>=goal){onWin(e);return;}show();}else{toast('工具不对～',false);}};tools.appendChild(bn);});}
-  w.appendChild(sc);w.appendChild(tk);w.appendChild(tools);show();return b;}
+  function win(e){done=true;clearGame();toast(starOf(miss)+' 通关!',true);setTimeout(function(){onWin(e);},350);}
+  function next(){cur=T[Math.floor(Math.random()*T.length)];tk.textContent='任务：'+cur.task;tools.innerHTML='';ALL.forEach(function(t){var bn=el('button','btn btn-ghost',t);bn.style.cssText+=';font-size:22px;padding:6px 10px';bn.onclick=function(e){if(done)return;if(t===cur.right){score++;combo++;spark(e.clientX,e.clientY);scEl.textContent='完成 '+score+'/'+goal;cbEl.textContent='连击 '+combo;if(score>=goal)win(e);else next();}else{combo=0;miss++;cbEl.textContent='连击 0';toast('工具不对～',false);}};tools.appendChild(bn);});dur=Math.max(1400,2800-score*230);timeLeft=dur;}
+  window._gT=setInterval(function(){if(done)return;timeLeft-=50;fill.style.width=Math.max(0,timeLeft/dur*100)+'%';if(timeLeft<=0){combo=0;miss++;cbEl.textContent='连击 0';toast('超时啦！',false);next();}},50);
+  next();w.appendChild(hud);w.appendChild(bar);w.appendChild(tk);w.appendChild(tools);return b;}
 
 // —— 「做」章内容(6 节) ——
 CHAPTERS['做']={id:'做',title:'🛠️ 做 · AI 会自己动手做事',badge:{e:'🏅',t:'AI 指挥官',s:'你学会了怎么让 AI 帮你做事'},endGame:buildCommander,sections:[
@@ -525,13 +532,13 @@ function buildTips(rw,onReset){var b=ixbox('🎒 聪明用 AI 三锦囊','点开
 
 function buildDetectiveAgency(onWin,onReset){var b=ixbox('🕵️ AI 侦探事务所','判断每个案子：用得对不对？答对 5 个结案！',onReset);var w=b._body;
   var C=[{s:'用 AI 查资料写读后感，自己再改',ok:1},{s:'把同学照片用 AI 恶搞发群里',ok:0},{s:'用 AI 翻译看不懂的外文说明',ok:1},{s:'全信 AI 说野果能吃就摘来吃',ok:0},{s:'用 AI 想生日会的点子',ok:1},{s:'把家里 WiFi 密码发给 AI 记着',ok:0},{s:'用 AI 练习英语对话',ok:1},{s:'让 AI 冒充老师给同学发通知',ok:0}];
-  for(var _s=C.length-1;_s>0;_s--){var _j=Math.floor(Math.random()*(_s+1)),_t=C[_s];C[_s]=C[_j];C[_j]=_t;}var i=0,score=0,goal=5;
-  var sc=el('div',null,'结案 0 / 5');sc.style.cssText='text-align:center;font-weight:900;color:#6d28d9;font-size:16px';
+  for(var _s=C.length-1;_s>0;_s--){var _j=Math.floor(Math.random()*(_s+1)),_t=C[_s];C[_s]=C[_j];C[_j]=_t;}var i=0,score=0,combo=0,miss=0,goal=6;
+  var hud=el('div');hud.style.cssText='display:flex;justify-content:space-between;font-weight:900;color:#6d28d9;font-size:15px;margin-bottom:6px';var scEl=el('span',null,'结案 0/6');var cbEl=el('span',null,'连击 0');hud.appendChild(scEl);hud.appendChild(cbEl);
   var card=el('div');card.style.cssText='text-align:center;font-weight:700;font-size:14.5px;color:#1e1b3a;min-height:46px;display:grid;place-items:center;padding:6px';
   var bw=el('div');bw.style.cssText='display:flex;gap:12px;justify-content:center;margin-top:8px';
   function show(){card.textContent='案子：'+C[i%C.length].s;}
-  [['✅ 合理',1],['⚠️ 有问题',0]].forEach(function(x){var bn=el('button','btn btn-ghost',x[0]);bn.onclick=function(e){if(C[i%C.length].ok===x[1]){score++;spark(e.clientX,e.clientY);sc.textContent='结案 '+score+' / '+goal;if(score>=goal){onWin(e);return;}}else{toast('这个判断再想想～',false);}i++;show();};bw.appendChild(bn);});
-  w.appendChild(sc);w.appendChild(card);w.appendChild(bw);show();return b;}
+  [['✅ 合理',1],['⚠️ 有问题',0]].forEach(function(x){var bn=el('button','btn btn-ghost',x[0]);bn.onclick=function(e){if(C[i%C.length].ok===x[1]){score++;combo++;spark(e.clientX,e.clientY);scEl.textContent='结案 '+score+'/'+goal;cbEl.textContent='连击 '+combo+(combo>=3?' 🔥':'');if(score>=goal){toast(starOf(miss)+' 结案!',true);setTimeout(function(){onWin(e);},350);return;}}else{combo=0;miss++;cbEl.textContent='连击 0';toast('这个判断再想想～',false);}i++;show();};bw.appendChild(bn);});
+  w.appendChild(hud);w.appendChild(card);w.appendChild(bw);show();return b;}
 
 // —— 「信」章内容(6 节) ——
 CHAPTERS['信']={id:'信',title:'⚖️ 信 · AI 说的都对吗？该信它吗？',badge:{e:'🏅',t:'AI 明白人',s:'你学会了聪明、负责地看待和使用 AI'},endGame:buildDetectiveAgency,sections:[
@@ -581,15 +588,16 @@ function buildMapPreview(rw,onReset){var b=ixbox('🗺️ 探险地图','点"启
   btn.onclick=function(e){cells.forEach(function(d,i){setTimeout(function(){d.style.filter='none';d.style.opacity='1';d.style.background='#f5f3ff';},i*200);});btn.style.display='none';setTimeout(function(){toast('🚀 出发!',true);if(!got){got=true;rw(e);}},1000);};
   w.appendChild(row);w.appendChild(btn);return b;}
 
-function buildMagicDash(onWin,onReset){var b=ixbox('🎮 魔法大搜捕','快判！答对 5 个就毕业启程',onReset);var w=b._body;
-  var Q=[{t:'刷视频给你推荐内容',ai:1},{t:'尺子量长度',ai:0},{t:'人脸解锁手机',ai:1},{t:'风扇转起来',ai:0},{t:'翻译软件翻句子',ai:1},{t:'手电筒发光',ai:0},{t:'拍照自动美颜',ai:1}];
-  for(var _s=Q.length-1;_s>0;_s--){var _j=Math.floor(Math.random()*(_s+1)),_t=Q[_s];Q[_s]=Q[_j];Q[_j]=_t;}var i=0,score=0,goal=5;
-  var sc=el('div',null,'0 / 5');sc.style.cssText='text-align:center;font-weight:900;color:#6d28d9;font-size:18px';
-  var card=el('div');card.style.cssText='text-align:center;font-weight:700;font-size:15px;color:#1e1b3a;min-height:44px;display:grid;place-items:center;padding:6px';
-  var bw=el('div');bw.style.cssText='display:flex;gap:12px;justify-content:center;margin-top:8px';
-  function show(){card.textContent=Q[i%Q.length].t;}
-  [['🤖 AI 的',1],['⚙️ 不是',0]].forEach(function(x){var bn=el('button','btn btn-ghost',x[0]);bn.onclick=function(e){if(Q[i%Q.length].ai===x[1]){score++;spark(e.clientX,e.clientY);sc.textContent=score+' / '+goal;if(score>=goal){onWin(e);return;}}else{toast('再想想～',false);}i++;show();};bw.appendChild(bn);});
-  w.appendChild(sc);w.appendChild(card);w.appendChild(bw);show();return b;}
+function buildMagicDash(onWin,onReset){var b=ixbox('🎣 AI 大搜捕','点住会用 AI 的🤖别让它掉了，普通东西别碰！集齐 8 个',onReset);var w=b._body;clearGame();
+  var TYPES=[{e:'📱',ai:1},{e:'🗣️',ai:1},{e:'📷',ai:1},{e:'🔒',ai:1},{e:'🪑',ai:0},{e:'📖',ai:0},{e:'✏️',ai:0},{e:'🍎',ai:0}];
+  var score=0,combo=0,miss=0,goal=8,done=false,items=[];
+  var hud=el('div');hud.style.cssText='display:flex;justify-content:space-between;font-weight:800;color:#6d28d9;font-size:13px;margin-bottom:6px';var scEl=el('span',null,'抓到 0/8');var cbEl=el('span',null,'连击 0');hud.appendChild(scEl);hud.appendChild(cbEl);
+  var stage=el('div');stage.style.cssText='position:relative;height:220px;background:linear-gradient(#1b1145,#0a0620);border-radius:10px;overflow:hidden';
+  function win(e){done=true;clearGame();toast(starOf(miss)+' 通关!',true);setTimeout(function(){onWin(e);},350);}
+  function spawn(){if(done)return;var t=TYPES[Math.floor(Math.random()*TYPES.length)];var d=el('div',null,t.e);d.ai=t.ai;var x=6+Math.random()*82;d.style.cssText='position:absolute;left:'+x+'%;top:-12%;font-size:30px;cursor:pointer';d.y=-12;d.spd=0.55+Math.random()*0.5+score*0.05;d.onclick=function(e){if(d.dead||done)return;d.dead=1;if(d.ai){score++;combo++;spark(e.clientX,e.clientY);scEl.textContent='抓到 '+score+'/'+goal;cbEl.textContent='连击 '+combo;d.remove();if(score>=goal)win(e);}else{combo=0;miss++;cbEl.textContent='连击 0';d.style.opacity='.3';setTimeout(function(){if(d.parentElement)d.remove();},150);}};stage.appendChild(d);items.push(d);}
+  function loop(){if(done)return;for(var k=items.length-1;k>=0;k--){var d=items[k];if(d.dead){items.splice(k,1);continue;}d.y+=d.spd;d.style.top=d.y+'%';if(d.y>104){if(d.ai){combo=0;cbEl.textContent='连击 0';}if(d.parentElement)d.remove();items.splice(k,1);}}window._gR=requestAnimationFrame(loop);}
+  window._gT=setInterval(spawn,720);loop();
+  w.appendChild(hud);w.appendChild(stage);return b;}
 
 // —— 「序」章内容(3 节) ——
 CHAPTERS['序']={id:'序',title:'🎬 序 · AI 到底是不是魔法？',badge:{e:'🏅',t:'启程者',s:'你踏上了 AI 探险之旅'},endGame:buildMagicDash,sections:[
