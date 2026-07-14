@@ -24,8 +24,8 @@
   --gentle:#fbbf24;  --gentle-d:#d99a12;   /* 答错用暖色鼓励，绝不刺眼红 */
   --gold:#ffd66d; --gold-d:#eab308;
 
-  /* 五站主题色（序/看/学/说/信） */
-  --st0:#fbbf24; --st1:#38bdf8; --st2:#8b5cf6; --st3:#2dd4bf; --st4:#fb7185;
+  /* 六站主题色（序/看/学/说/做/信） */
+  --st0:#fbbf24; --st1:#38bdf8; --st2:#8b5cf6; --st3:#2dd4bf; --st4:#fb7185; --st5:#fb923c;
 
   /* 圆角 */
   --r-xl:28px; --r-lg:20px; --r-md:14px; --r-sm:10px; --r-pill:999px;
