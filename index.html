@@ -21,6 +21,21 @@
   .peg{display:inline-block;margin-top:8px;font-size:13px;background:#f5f3ff;color:#6d28d9;padding:4px 10px;border-radius:999px;font-weight:700;}
   .apo{font-weight:800;color:#6d28d9;}
   .term-card .tp-pro{margin-top:10px;padding-top:10px;border-top:1px dashed #e6e9f2;font-size:13px;color:#8b5cf6;line-height:1.65;}
+  .adv-wrap{max-width:840px;margin:10px auto 46px;padding:0 14px;}
+  .adv-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(167,139,250,.35),transparent);margin:26px 0 20px;}
+  .adv-title{color:#e9d5ff;font-size:19px;text-align:center;margin:0 0 4px;}
+  .adv-sub{color:#8b83b8;font-size:12.5px;text-align:center;margin-bottom:18px;}
+  .adv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;}
+  .adv-card{background:linear-gradient(160deg,rgba(45,32,90,.7),rgba(20,14,48,.82));border:1px solid rgba(167,139,250,.25);border-radius:16px;padding:14px 12px;cursor:pointer;transition:transform .18s,box-shadow .18s;}
+  .adv-card:hover{transform:translateY(-4px);box-shadow:0 0 22px rgba(139,92,246,.45);}
+  .adv-card .ae{font-size:30px;} .adv-card .at{color:#fff;font-weight:800;font-size:14px;margin:6px 0 3px;line-height:1.3;}
+  .adv-card .ac{font-size:10.5px;color:#b4aede;} .adv-card .an{font-size:10.5px;color:#8b83b8;margin-top:5px;}
+  .adv-pop{position:fixed;inset:0;display:none;place-items:center;z-index:80;background:rgba(10,6,32,.6);backdrop-filter:blur(3px);padding:16px;}
+  .adv-pop.open{display:grid;}
+  .adv-card2{background:#fff;border-radius:18px;padding:22px 24px;max-width:360px;width:100%;max-height:80vh;overflow:auto;box-shadow:0 20px 50px rgba(0,0,0,.5);border-top:6px solid var(--violet);animation:popIn .3s var(--ease-bounce,ease);}
+  .adv-card2 .cat{font-size:12px;color:#8b5cf6;font-weight:800;} .adv-card2 h3{margin:2px 0 0;font-size:20px;color:#1e1b3a;}
+  .adv-card2 .badge{display:inline-block;font-size:11px;background:#f5f3ff;color:#6d28d9;padding:3px 10px;border-radius:999px;margin:10px 0;font-weight:700;}
+  .adv-card2 ul{margin:6px 0 0;padding-left:20px;} .adv-card2 li{font-size:14px;color:#4b4869;line-height:1.8;}
   .ixr{margin-left:auto;border:none;background:#ede9fe;color:#6d28d9;width:24px;height:24px;border-radius:7px;font-weight:900;cursor:pointer;font-size:13px;}
   .ixr:hover{background:#ddd6fe;}
   .coin{position:fixed;pointer-events:none;z-index:60;font-weight:900;color:#eab308;font-size:19px;will-change:transform,opacity;}
@@ -40,6 +55,12 @@
     </div>
     <div class="map-title"><h1>🌌 AI 星球探险</h1><p>一台机器，怎么一步步变聪明的？</p></div>
     <div class="map"><div class="map-path" id="mappath"></div></div>
+    <div class="adv-wrap">
+      <div class="adv-divider"></div>
+      <h2 class="adv-title">🎓 进阶课程</h2>
+      <div class="adv-sub">相互独立 · 挑战更硬核 · 点开看知识点</div>
+      <div class="adv-grid" id="advgrid"></div>
+    </div>
   </section>
   <section id="scr-ch" class="screen">
     <div class="workbench">
@@ -53,6 +74,7 @@
   </section>
 </div>
 <div class="term-pop" id="termpop"><div class="term-card"><h4 id="tpT"></h4><p id="tpD"></p><p id="tpP" class="tp-pro"></p></div></div>
+<div class="adv-pop" id="advpop"><div class="adv-card2"><div class="cat" id="apCat"></div><h3 id="apT"></h3><div class="badge">进阶课程 · 即将推出</div><ul id="apList"></ul></div></div>
 
 <script>
 // ========== 工具 ==========
@@ -642,8 +664,31 @@ function finishChapter(e){if(!ST.done[CH.id])awardCoins(50,e);if(ST.badges.index
   var nw=el('div','next-wrap');var btn=el('button','next-btn','🗺️ 回地图（已解锁下一站）');btn.onclick=goMap;nw.appendChild(btn);wrap.appendChild(nw);
   document.getElementById('chbody').appendChild(wrap);wrap.scrollIntoView({behavior:'smooth'});}
 
+// ========== 进阶课程（独立平铺） ==========
+var ADV=[
+ {e:'🧠',t:'神经网络在算什么',c:'🏗️ 架构探秘',p:['权重与"加权和"','激活函数=要不要"点火"','一层一层堆起来','用梯度下降调参数']},
+ {e:'👁️',t:'卷积网络 CNN 深入',c:'🏗️ 架构探秘',p:['卷积核滑动找特征','特征图是什么','参数共享省一大半','经典网络 LeNet→ResNet']},
+ {e:'🔁',t:'RNN 与记忆',c:'🏗️ 架构探秘',p:['隐藏状态 = 记忆','一步步读序列','太长会"忘"（梯度消失）','LSTM 的三道门']},
+ {e:'🔗',t:'注意力的数学',c:'🏗️ 架构探秘',p:['Query-Key-Value 三兄弟','点积算相关度','缩放 ÷√d','softmax 变成权重']},
+ {e:'🤖',t:'Transformer 全貌',c:'🏗️ 架构探秘',p:['多头注意力','位置编码','编码器-解码器','残差 + 层归一','为什么它赢了']},
+ {e:'🏋️',t:'大模型训练三部曲',c:'🏗️ 架构探秘',p:['预训练：读全网','微调：学专长','RLHF：学听话','能力"涌现"']},
+ {e:'🎨',t:'扩散模型怎么画画',c:'🏗️ 架构探秘',p:['从噪点到图','加噪 → 学去噪','用文字引导生成','U-Net 结构']},
+ {e:'🕹️',t:'强化学习',c:'🏗️ 架构探秘',p:['奖励与惩罚','试错学策略','探索 vs 利用','AlphaGo 与游戏 AI']},
+ {e:'📜',t:'苦涩的教训',c:'🌌 AI 大观',p:['手写规则 vs 让它学','算力的胜利','通用方法赢在长期','对我们的启示']},
+ {e:'📈',t:'规模法则 Scaling Law',c:'🌌 AI 大观',p:['越大越强','能力"涌现"','数据/参数/算力','会不会到头']},
+ {e:'🕰️',t:'AI 简史',c:'🌌 AI 大观',p:['符号主义','专家系统的兴衰','深度学习复兴（2012）','大模型时代']},
+ {e:'🌍',t:'AI 与社会',c:'🌌 AI 大观',p:['会取代哪些工作','创作与版权','偏见与公平','假信息与深度伪造']},
+ {e:'🧭',t:'AGI 与对齐',c:'🌌 AI 大观',p:['什么是通用人工智能','对齐问题','AI 安全','我们该担心吗']},
+ {e:'⚙️',t:'Agent 运行原理',c:'🛠️ 动手实践',p:['工具调用循环','ReAct：想→做→看','记忆与上下文窗口','多智能体协作']},
+ {e:'🔧',t:'自己搭个 AI 助手',c:'🛠️ 动手实践',p:['什么是 API','拿 Key 调模型','OpenCode 上手','让它读你的文件']},
+ {e:'💬',t:'提示词工程',c:'🛠️ 动手实践',p:['把话说清楚','给例子（few-shot）','让它一步步想','常见技巧']}
+];
+function renderAdv(){var g=document.getElementById('advgrid');if(!g)return;g.innerHTML='';ADV.forEach(function(a){var d=el('div','adv-card');d.innerHTML='<div class="ae">'+a.e+'</div><div class="at">'+a.t+'</div><div class="ac">'+a.c+'</div><div class="an">'+a.p.length+' 个知识点 ›</div>';d.onclick=function(){showAdv(a);};g.appendChild(d);});}
+function showAdv(a){document.getElementById('apCat').textContent=a.c;document.getElementById('apT').textContent=a.e+' '+a.t;var ul=document.getElementById('apList');ul.innerHTML='';a.p.forEach(function(p){ul.appendChild(el('li',null,p));});document.getElementById('advpop').classList.add('open');}
+document.getElementById('advpop').onclick=function(e){if(e.target===this)this.classList.remove('open');};
+
 // ========== 启动 ==========
-syncTop();goMap();
+syncTop();renderAdv();goMap();
 </script>
 </body>
 </html>
