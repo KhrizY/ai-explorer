@@ -706,7 +706,7 @@ CHAPTERS['序']={id:'序',title:'🎬 序 · AI 到底是不是魔法？',badge:
 
 // ========== 章节渲染 ==========
 var curSec=0;
-function enterChapter(id){CH=CHAPTERS[id];show('scr-ch');document.getElementById('chtitle').textContent=CH.title;curSec=ST.done[id]?CH.sections.length:0;document.getElementById('chbody').innerHTML='';syncTop();renderSec();}
+function enterChapter(id){CH=CHAPTERS[id];show('scr-ch');document.getElementById('chtitle').textContent=CH.title;curSec=(ST.done[id]&&id.indexOf('adv:')!==0)?CH.sections.length:0;document.getElementById('chbody').innerHTML='';syncTop();renderSec();}
 function renderSec(){
   if(curSec>=CH.sections.length){renderEnd();return;}
   var sec=CH.sections[curSec];
