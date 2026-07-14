@@ -75,7 +75,7 @@ body { margin:0; font-family:var(--font); -webkit-font-smoothing:antialiased; co
 .tb-xp i { display:block; height:100%; width:62%; border-radius:var(--r-pill);
   background:linear-gradient(90deg,var(--violet),var(--cyan)); box-shadow:var(--sh-glow-cyan);
   background-size:200% 100%; animation:flow 2.4s linear infinite; }
-@keyframes flow { to{background-position:200% 0} }
+@keyframes flow { to{background-position:-200% 0} }
 .tb-gem { font-size:14px; font-weight:800; color:var(--gold); }
 
 /* ============ ③ 探险地图 + 站点节点 ============ */
