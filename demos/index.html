@@ -45,6 +45,31 @@
   .flowline { stroke:#3b2f6b; stroke-width:0.7; }
   .flowline.fire { stroke:#22d3ee; stroke-width:1.2; stroke-dasharray:4 4; animation:dashmove .5s linear infinite; }
   @keyframes dashmove { to { stroke-dashoffset:-8; } }
+  .adv-note { margin:0 14px 12px; padding:8px 10px; border-radius:10px; background:#f5f3ff; color:#6d28d9; font-size:12px; font-weight:800; line-height:1.45; }
+  .noise-lab { display:grid; grid-template-columns:auto 1fr; gap:14px; align-items:center; width:100%; max-width:440px; }
+  .noise-canvas { width:178px; height:178px; border-radius:16px; image-rendering:pixelated; background:#111827; box-shadow:0 0 0 3px rgba(255,255,255,.08), inset 0 0 24px rgba(34,211,238,.12); }
+  .noise-panel { display:grid; gap:9px; min-width:0; }
+  .noise-step { display:flex; align-items:center; gap:8px; color:#d8d4f5; font-size:12px; font-weight:800; }
+  .noise-step b { width:22px; height:22px; border-radius:8px; display:grid; place-items:center; background:#2a1f52; color:#c4b5fd; flex:none; }
+  .noise-step.on b { background:#58cc02; color:#fff; }
+  .noise-meter { height:12px; border-radius:999px; background:rgba(255,255,255,.12); overflow:hidden; }
+  .noise-meter i { display:block; height:100%; width:100%; border-radius:999px; background:linear-gradient(90deg,#fb7185,#fbbf24); transition:width .25s; }
+  .trail-top { display:flex; justify-content:space-between; gap:10px; align-items:center; width:100%; max-width:360px; margin-bottom:10px; color:#d8d4f5; font-size:12px; font-weight:800; }
+  .trail-board { display:grid; grid-template-columns:repeat(5,48px); gap:7px; justify-content:center; }
+  .trail-cell { width:48px; height:48px; border-radius:12px; background:#211744; border:2px solid #3b2f6b; color:#e9d5ff; display:grid; place-items:center; font-size:21px; font-weight:900; cursor:pointer; transition:transform .12s, background .12s, border-color .12s; }
+  .trail-cell:hover { transform:translateY(-2px); }
+  .trail-cell.start { background:#0f766e; border-color:#2dd4bf; }
+  .trail-cell.goal { background:#14532d; border-color:#58cc02; }
+  .trail-cell.step { background:#1d4ed8; border-color:#93c5fd; }
+  .trail-cell.pit { background:#78350f; border-color:#fbbf24; }
+  .trail-cell.lock { opacity:.42; cursor:default; }
+  .trail-actions { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:10px; }
+  .trail-legend { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; color:#aeb6d8; font-size:11px; font-weight:800; margin-top:8px; }
+  @media (max-width:520px) {
+    .noise-lab { grid-template-columns:1fr; justify-items:center; }
+    .trail-board { grid-template-columns:repeat(5,40px); gap:6px; }
+    .trail-cell { width:40px; height:40px; border-radius:10px; font-size:18px; }
+  }
 </style>
 </head>
 <body>
@@ -316,16 +341,80 @@ demo({id:'neuron',cat:'e',title:'神经元·会不会激活',teach:'输入够强
   s.appendChild(core);s.appendChild(sumbar);s.appendChild(slider('输入1',function(){return x1;},function(v){x1=v;}));s.appendChild(slider('输入2',function(){return x2;},function(v){x2=v;}));s.appendChild(lbl);upd();
 }});
 
-demo({id:'diffusion',cat:'v',title:'扩散生成·从噪点到图',teach:'AI 画画=从一团噪点一步步"去噪"',mount:function(s){
-  var N=10,cells=[],step=0;
-  var heart=[[0,1,1,0,0,0,0,1,1,0],[1,1,1,1,0,0,1,1,1,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1],[0,1,1,1,1,1,1,1,1,0],[0,0,1,1,1,1,1,1,0,0],[0,0,0,1,1,1,1,0,0,0],[0,0,0,0,1,1,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0]];
-  var grid=el('div');grid.style.cssText='display:grid;grid-template-columns:repeat('+N+',18px);gap:2px';
-  function rndc(){return 'hsl('+Math.floor(Math.random()*360)+',60%,60%)';}
-  for(var r=0;r<N;r++)for(var c=0;c<N;c++){var d=el('div');d.style.cssText='width:18px;height:18px;border-radius:3px;transition:background .3s';cells.push({el:d,r:r,c:c,done:false});grid.appendChild(d);}
-  cells.forEach(function(o){o.el.style.background=rndc();});
-  var msg=el('div','stg-msg','一团噪点…点「去噪一步」');var btn=el('button','stg-btn v','✨ 去噪一步');
-  btn.onclick=function(){step++;var rev=0;cells.forEach(function(o){if(!o.done&&Math.random()<0.45){o.done=true;o.el.style.background=heart[o.r][o.c]?'#fb7185':'#160f33';}if(o.done)rev++;});msg.textContent='去噪第 '+step+' 步…';if(rev===cells.length){bigFlash(s,'❤️ 画好了!',true);msg.textContent='噪点变成一颗心！AI 画画就是这样';}};
-  s.appendChild(grid);s.appendChild(msg);s.appendChild(btn);
+demo({id:'diffusion',cat:'v',title:'扩散去噪画室',teach:'进阶「扩散模型」——从噪点一步步擦出图案',mount:function(s){
+  var note=el('div','adv-note','进阶课：扩散模型怎么画画 · 核心动作 = 反复去噪，不是一笔画完');
+  var wrap=el('div','noise-lab'),cv=document.createElement('canvas'),ctx=cv.getContext('2d');
+  cv.className='noise-canvas';cv.width=28;cv.height=28;
+  var panel=el('div','noise-panel');
+  var meter=el('div','noise-meter','<i></i>');
+  var msg=el('div','stg-msg','噪声 100% · 点一下去噪一步');
+  var steps=el('div');
+  ['乱点','轮廓','颜色','完成'].forEach(function(t,i){steps.appendChild(el('div','noise-step'+(i===0?' on':''),'<b>'+(i+1)+'</b><span>'+t+'</span>'));});
+  var btn=el('button','stg-btn v','✨ 去噪一步');
+  panel.appendChild(steps);panel.appendChild(meter);panel.appendChild(msg);panel.appendChild(btn);
+  wrap.appendChild(cv);wrap.appendChild(panel);
+  var step=0,N=28;
+  function target(x,y){
+    var dx=x-14,dy=y-14,d=Math.sqrt(dx*dx+dy*dy);
+    if(d<8 && y>5 && y<22) return [255,214,109];
+    if(Math.abs(dx)<2 && y>=18) return [120,72,35];
+    if(d<5 && y<12) return [88,204,2];
+    if(Math.abs(dx)>4 && Math.abs(dx)<8 && y>9 && y<15) return [251,113,133];
+    return [18,24,38];
+  }
+  function draw(){
+    var noise=Math.max(0,1-step/7),img=ctx.createImageData(N,N);
+    for(var y=0;y<N;y++)for(var x=0;x<N;x++){
+      var t=target(x,y),k=(y*N+x)*4,mix=1-noise;
+      img.data[k]=t[0]*mix+Math.random()*255*noise;
+      img.data[k+1]=t[1]*mix+Math.random()*255*noise;
+      img.data[k+2]=t[2]*mix+Math.random()*255*noise;
+      img.data[k+3]=255;
+    }
+    ctx.putImageData(img,0,0);
+    meter.querySelector('i').style.width=Math.round(noise*100)+'%';
+    msg.textContent=noise>0?'噪声 '+Math.round(noise*100)+'% · 继续去噪':'完成：噪点里长出图案';
+    steps.querySelectorAll('.noise-step').forEach(function(n,i){n.classList.toggle('on',i<=Math.min(3,Math.floor(step/2)));});
+  }
+  btn.onclick=function(e){if(step<7){step++;draw();}if(step>=7){bigFlash(s,'画好了!',true);spark(e.clientX,e.clientY);}};
+  s.appendChild(note);s.appendChild(wrap);draw();
+}});
+
+demo({id:'rltrail',cat:'g',title:'强化学习·踩格子探路',teach:'进阶「强化学习」——靠踩坑和奖励找出正确路线',mount:function(s){
+  var note=el('div','adv-note','进阶课：强化学习 · 核心动作 = 先试错，再把有奖励的路线记下来');
+  var board=el('div','trail-board'),top=el('div','trail-top'),msg=el('div','stg-msg','从起点出发，只能点相邻格。踩坑没关系，它会告诉你别走这里。');
+  var actions=el('div','trail-actions'),legend=el('div','trail-legend','<span>🤖 当前位置</span><span>⭐ 奖励</span><span>🟦 走过</span><span>⚠️ 坑</span>');
+  var reward=0,tries=1,pos=20,goal=4,path={20:1,21:1,16:1,11:1,12:1,13:1,8:1,3:1,4:1},pit={15:1,22:1,17:1,10:1,7:1,18:1,2:1},seen={},route=[20],won=false;
+  top.innerHTML='<span id="trailTry">第 1 次探路</span><span id="trailReward">奖励 0</span>';
+  function near(a,b){var ax=a%5,ay=Math.floor(a/5),bx=b%5,by=Math.floor(b/5);return Math.abs(ax-bx)+Math.abs(ay-by)===1;}
+  function paint(){
+    board.innerHTML='';
+    for(var i=0;i<25;i++){
+      var cls='trail-cell',txt='';
+      if(i===20){cls+=' start';txt='起';}
+      if(i===goal){cls+=' goal';txt='⭐';}
+      if(seen[i]&&path[i]&&i!==20&&i!==goal){cls+=' step';txt='✓';}
+      if(seen[i]&&pit[i]){cls+=' pit';txt='⚠';}
+      if(i===pos)txt='🤖';
+      var d=el('button',cls,txt);d.dataset.i=i;
+      d.onclick=function(e){stepTo(+this.dataset.i,e);};
+      board.appendChild(d);
+    }
+    document.getElementById('trailTry').textContent='第 '+tries+' 次探路';
+    document.getElementById('trailReward').textContent='奖励 '+reward;
+  }
+  function resetPos(){pos=20;route=[20];tries++;msg.textContent='从起点再试一次。刚才的坑已经记住了。';paint();}
+  function stepTo(i,e){
+    if(won||!near(pos,i)){msg.textContent='只能踩相邻格，一步一步试。';return;}
+    pos=i;seen[i]=1;route.push(i);
+    if(pit[i]){reward=Math.max(0,reward-1);bigFlash(s,'踩坑了',false);msg.textContent='踩坑：这格以后少走。强化学习就是用惩罚修正路线。';setTimeout(resetPos,650);}
+    else if(i===goal){reward+=10;won=true;paint();bigFlash(s,'找到路线!',true);msg.textContent='拿到奖励！这条路线会被记得更牢：'+route.map(function(x){return x===20?'起':x===4?'终':x;}).join(' → ');}
+    else if(path[i]){reward+=1;msg.textContent='走对一格，奖励 +1。继续沿着好信号探路。';paint();spark(e.clientX,e.clientY);}
+    else{reward=Math.max(0,reward-1);msg.textContent='走偏了，奖励 -1。可以退回起点重新试。';paint();}
+  }
+  var rb=el('button','stg-btn v','从起点重试');rb.onclick=function(){resetPos();};
+  actions.appendChild(rb);
+  s.appendChild(note);s.appendChild(top);s.appendChild(board);s.appendChild(actions);s.appendChild(legend);s.appendChild(msg);seen[20]=1;paint();
 }});
 
 demo({id:'overfit',cat:'e',title:'过拟合·死记 vs 真学会',teach:'太用力记每个点，反而学不到规律',mount:function(s){
