@@ -704,7 +704,7 @@ CHAPTERS['序']={id:'序',title:'🎬 序 · AI 到底是不是魔法？',badge:
 
 // ========== 章节渲染 ==========
 var curSec=0;
-function enterChapter(id){CH=CHAPTERS[id];show('scr-ch');document.getElementById('chtitle').textContent=CH.title;curSec=0;document.getElementById('chbody').innerHTML='';syncTop();renderSec();}
+function enterChapter(id){CH=CHAPTERS[id];show('scr-ch');document.getElementById('chtitle').textContent=CH.title;curSec=ST.done[id]?CH.sections.length:0;document.getElementById('chbody').innerHTML='';syncTop();renderSec();}
 function renderSec(){
   if(curSec>=CH.sections.length){renderEnd();return;}
   var sec=CH.sections[curSec];
@@ -724,13 +724,13 @@ function renderSec(){
   document.getElementById('chbody').appendChild(wrap);
   wrap.scrollIntoView({behavior:'smooth',block:'start'});
 }
-function renderEnd(){if(document.getElementById('end-'+CH.id))return;var wrap=el('div','section');wrap.id='end-'+CH.id;wrap.appendChild(el('div','section-heading','<span class="section-num">🎮</span>通关挑战'));var host=el('div');var won=false;function mountG(){if(won||ST.done[CH.id]){host.innerHTML='';completeFeedback(host,'本章已经通关');return;}host.innerHTML='';host.appendChild((CH.endGame||buildChallenge)(function(e){if(won)return;won=true;finishChapter(e);},mountG));}mountG();wrap.appendChild(host);document.getElementById('chbody').appendChild(wrap);wrap.scrollIntoView({behavior:document.body.classList.contains('debug-end')?'auto':'smooth'});}
-function finishChapter(e){if(window._finishingChapter===CH.id)return;window._finishingChapter=CH.id;if(document.getElementById('finish-'+CH.id))return;if(!ST.done[CH.id])awardCoins(50,e);if(ST.badges.indexOf(CH.badge.t)<0)ST.badges.push(CH.badge.t);ST.done[CH.id]=true;save();syncTop();
+function renderEnd(){if(document.getElementById('end-'+CH.id))return;var wrap=el('div','section');wrap.id='end-'+CH.id;wrap.appendChild(el('div','section-heading','<span class="section-num">🎮</span>通关挑战'));var host=el('div');var won=false;function mountG(){won=false;var old=document.getElementById('finish-'+CH.id);if(old)old.remove();host.innerHTML='';host.appendChild((CH.endGame||buildChallenge)(function(e){if(won)return;won=true;finishChapter(e);},mountG));}mountG();wrap.appendChild(host);var back=el('div','next-wrap');var backBtn=el('button','next-btn','🗺️ 返回主页面');backBtn.onclick=goMap;back.appendChild(backBtn);wrap.appendChild(back);document.getElementById('chbody').appendChild(wrap);wrap.scrollIntoView({behavior:document.body.classList.contains('debug-end')?'auto':'smooth'});}
+function finishChapter(e){if(window._finishingChapter===CH.id||document.getElementById('finish-'+CH.id))return;window._finishingChapter=CH.id;if(!ST.done[CH.id])awardCoins(50,e);if(ST.badges.indexOf(CH.badge.t)<0)ST.badges.push(CH.badge.t);ST.done[CH.id]=true;save();syncTop();
   var wrap=el('div','section');wrap.style.textAlign='center';
   wrap.id='finish-'+CH.id;
   wrap.appendChild(el('div',null,'<div style="font-size:20px;font-weight:900;color:#16a34a">🎉 恭喜通关「'+CH.id+'」章！</div>'));
   var drop=el('div','badge-drop','<div class="bd-emoji">'+CH.badge.e+'</div><div class="bd-t">'+CH.badge.t+'</div><div class="bd-s">'+CH.badge.s+'</div>');drop.style.cssText+=';margin:16px auto 0';wrap.appendChild(drop);
-  var nw=el('div','next-wrap');var btn=el('button','next-btn','🗺️ 回地图（已解锁下一站）');btn.onclick=goMap;nw.appendChild(btn);wrap.appendChild(nw);
+  var nw=el('div','next-wrap');var btn=el('button','next-btn','🗺️ 返回主页面');btn.onclick=goMap;nw.appendChild(btn);wrap.appendChild(nw);
   document.getElementById('chbody').appendChild(wrap);wrap.scrollIntoView({behavior:'smooth'});setTimeout(function(){window._finishingChapter=null;},800);}
 
 // ========== 新玩法库（浅色舞台，可复用） ==========
