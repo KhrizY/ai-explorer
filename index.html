@@ -832,6 +832,92 @@ function renderAdv(){var g=document.getElementById('advgrid');if(!g)return;g.inn
 function showAdv(a){document.getElementById('apCat').textContent=a.c;document.getElementById('apT').textContent=a.e+' '+a.t;var ul=document.getElementById('apList');ul.innerHTML='';a.p.forEach(function(p){ul.appendChild(el('li',null,p));});document.getElementById('advpop').classList.add('open');}
 document.getElementById('advpop').onclick=function(e){if(e.target===this)this.classList.remove('open');};
 
+// ========== 进阶课并入主阅读器（复用 renderSec/术语/金币/通关，UI 一致） ==========
+// —— 神经网络课·5 个交互构件（浅色舞台，均 return b，签名同主线）——
+function buildNeuronFire(rw,onReset){var b=ixbox('🔬 神经元实验台','拖滑块让总和越过门槛线，点亮神经元⚡',onReset);var w=b._body;
+  var cfg=[{n:'输入①',v:3,wt:1},{n:'输入②',v:2,wt:1},{n:'输入③',v:1,wt:1}],THR=6,fired=false;
+  var rows=el('div');rows.style.cssText='display:flex;flex-direction:column;gap:8px';
+  cfg.forEach(function(c){var row=el('div');row.style.cssText='display:flex;align-items:center;gap:8px';
+    row.appendChild(el('span',null,c.n)).style.cssText='font-size:12px;width:50px;color:#4b4869;font-weight:700';
+    var iv=el('input');iv.type='range';iv.min=0;iv.max=5;iv.step=1;iv.value=c.v;iv.style.cssText='flex:1;accent-color:#8b5cf6';
+    var iw=el('input');iw.type='range';iw.min=0;iw.max=2;iw.step=0.1;iw.value=c.wt;iw.style.cssText='width:60px;accent-color:#22d3ee';
+    var lab=el('span',null,'w1.0');lab.style.cssText='font-size:11px;color:#6d28d9;font-weight:800;width:38px;text-align:right';
+    iv.oninput=iw.oninput=function(){c.v=+iv.value;c.wt=+iw.value;lab.textContent='w'+c.wt.toFixed(1);calc();};
+    row.appendChild(iv);row.appendChild(iw);row.appendChild(lab);rows.appendChild(row);});
+  var barWrap=el('div');barWrap.style.cssText='position:relative;height:14px;border-radius:99px;background:#e6e9f2;margin:14px 0 4px';
+  var bar=el('i');bar.style.cssText='display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#8b5cf6,#22d3ee);transition:width .1s';barWrap.appendChild(bar);
+  var thr=el('div');thr.style.cssText='position:absolute;top:-4px;bottom:-4px;width:3px;border-radius:2px;background:#d99a12;left:'+(THR/10*100)+'%';barWrap.appendChild(thr);
+  var core=el('div',null,'😴');core.style.cssText='font-size:42px;text-align:center;margin-top:4px;transition:.15s';
+  var txt=el('div');txt.style.cssText='text-align:center;font-size:12px;color:#4b4869;font-weight:700;margin-top:2px';
+  function calc(){var s=0;cfg.forEach(function(c){s+=c.v*c.wt;});bar.style.width=Math.min(100,s/10*100)+'%';txt.textContent='加权总和 '+s.toFixed(1)+'  ／  门槛 '+THR;
+    if(s>=THR){core.textContent='⚡';core.style.transform='scale(1.12)';if(!fired){fired=true;var r=core.getBoundingClientRect();var ev={clientX:r.left+r.width/2,clientY:r.top};spark(ev.clientX,ev.clientY);rw(ev);}}
+    else{core.textContent='😴';core.style.transform='scale(1)';}}
+  w.appendChild(rows);w.appendChild(barWrap);w.appendChild(core);w.appendChild(txt);calc();return b;}
+
+function _propNet(w,reverse,rw){var layers=[3,4,4,2],cols=[];
+  var net=el('div');net.style.cssText='display:flex;justify-content:space-around;align-items:center;min-height:118px;gap:6px';
+  layers.forEach(function(cnt){var l=el('div');l.style.cssText='display:flex;flex-direction:column;gap:12px';var nodes=[];for(var i=0;i<cnt;i++){var nd=el('div');nd.style.cssText='width:26px;height:26px;border-radius:50%;background:#fff;border:2.5px solid #a78bfa;transition:.2s';l.appendChild(nd);nodes.push(nd);}net.appendChild(l);cols.push(nodes);});
+  var order=reverse?cols.slice().reverse():cols,lit=reverse?'#22d3ee':'#ffd66d',ring=reverse?'#0891b2':'#eab308',playing=false,done=false;
+  var btn=el('button','next-btn',reverse?'⬅️ 从输出往回追责':'▶️ 输入信号，逐层点亮');btn.style.cssText+=';margin-top:12px';
+  btn.onclick=function(e){if(playing)return;playing=true;cols.forEach(function(c){c.forEach(function(n){n.style.background='#fff';n.style.borderColor='#a78bfa';n.style.transform='none';});});
+    order.forEach(function(col,ci){setTimeout(function(){col.forEach(function(n){n.style.background=lit;n.style.borderColor=ring;n.style.transform='scale(1.16)';});if(ci===order.length-1){playing=false;if(!done){done=true;rw(e);}}},ci*360);});};
+  var bw=el('div');bw.style.textAlign='center';bw.appendChild(btn);w.appendChild(net);w.appendChild(bw);}
+function buildForwardProp(rw,onReset){var b=ixbox('➡️ 前向传播','点按钮，看信号一层层点亮到输出',onReset);_propNet(b._body,false,rw);return b;}
+function buildBackprop(rw,onReset){var b=ixbox('🔁 反向传播','点按钮，看误差从输出倒着传回输入',onReset);_propNet(b._body,true,rw);return b;}
+
+function buildLossCurve(rw,onReset){var b=ixbox('📉 损失曲线','反复点"训练一步"，把损失降到 20 以下',onReset);var w=b._body;
+  var loss=100,step=0,done=false;
+  var chart=el('div');chart.style.cssText='display:flex;align-items:flex-end;gap:3px;height:108px;padding:8px;background:#fff;border-radius:12px;border:1.5px solid #e6e9f2;overflow:hidden';
+  var info=el('div');info.style.cssText='text-align:center;font-size:12px;color:#4b4869;font-weight:700;margin:8px 0';
+  var btn=el('button','next-btn','⚙️ 训练一步');
+  function redraw(){info.textContent='步数 '+step+' ｜ 损失 '+Math.round(loss)+' ｜ 准确率 '+Math.round(100-loss*0.9)+'%';}
+  btn.onclick=function(e){if(loss<=6)return;step++;loss=Math.max(4,loss-Math.max(2.5,loss*0.18));var bar=el('div');bar.style.cssText='width:12px;border-radius:3px 3px 0 0;background:linear-gradient(#8b5cf6,#22d3ee);height:'+loss+'%';chart.appendChild(bar);if(chart.children.length>18)chart.removeChild(chart.firstChild);redraw();if(loss<=20&&!done){done=true;spark(e.clientX,e.clientY);rw(e);}};
+  var bw=el('div');bw.style.textAlign='center';bw.appendChild(btn);w.appendChild(chart);w.appendChild(info);w.appendChild(bw);redraw();return b;}
+
+function buildGradDesc(rw,onReset){var b=ixbox('⛰️ 梯度下降下山','选好步子大小，点"走一步"，把小球送到谷底',onReset);var w=b._body;
+  var N=11,valley=[],lr=2,pos=1,done=false;for(var i=0;i<N;i++)valley.push(Math.pow(i-5,2));
+  var track=el('div');track.style.cssText='display:flex;align-items:flex-end;justify-content:center;gap:4px;height:112px';
+  function draw(){track.innerHTML='';for(var i=0;i<N;i++){var h=94-valley[i]*3.2;if(h<10)h=10;var col=el('div');col.style.cssText='width:15px;border-radius:4px 4px 0 0;background:#ede9fe;height:'+h+'px;position:relative';if(i===Math.round(pos)){var ball=el('div',null,'🟡');ball.style.cssText='position:absolute;top:-21px;left:-3px;font-size:18px';col.appendChild(ball);}track.appendChild(col);}}
+  var lab=el('span',null,'步子：中');lab.style.cssText='font-size:12px;color:#6d28d9;font-weight:800';
+  var rng=el('input');rng.type='range';rng.min=1;rng.max=4;rng.step=1;rng.value=2;rng.style.cssText='width:72%;accent-color:#8b5cf6;display:block;margin:8px auto 4px';
+  rng.oninput=function(){lr=+rng.value;lab.textContent='步子：'+['','小','中','大','超大'][lr];};
+  var btn=el('button','next-btn','👣 走一步');
+  btn.onclick=function(e){pos=Math.max(0,Math.min(N-1,pos-(pos-5)*0.16*lr));draw();if(Math.abs(pos-5)<0.45&&!done){done=true;spark(e.clientX,e.clientY);rw(e);}};
+  var labWrap=el('div');labWrap.style.textAlign='center';labWrap.appendChild(lab);
+  var bw=el('div');bw.style.cssText='text-align:center;margin-top:6px';bw.appendChild(btn);
+  w.appendChild(track);w.appendChild(rng);w.appendChild(labWrap);w.appendChild(bw);draw();return b;}
+
+// —— 注册：🧠 神经网络在算什么（5 节 + 通关挑战）——
+CHAPTERS['adv:nn']={id:'adv:nn',title:'🧠 神经网络在算什么',badge:{e:'🧠',t:'神经网络拆解师',s:'你亲手拆开了神经网络，看清它只是在"调数字"'},endGame:buildChallenge,sections:[
+ {n:1,heading:'神经元：会打分、会点火',hook:'<span class="apo">阿波：</span>别被"神经网络"这名字唬住！我拆开给你看——里面全是会算账的小格子。拖一拖，把我点亮⚡',build:buildNeuronFire,
+  paras:['一个[[神经元]]，就是个会算账的小格子：几个数字进来，它吐一个数字出去。','每个输入有个[[权重]]＝它多重要，还有个[[偏置]]＝点火的门槛。把"输入×权重"全加起来（[[加权和]]），就是它的总分。','总分够高，就过[[激活函数]]这道关"点火"⚡；不够就熄火😴。几千几万个小格子连起来，就是神经网络。'],
+  terms:{'神经元':{s:'网络里最小的计算单元：几个数字进来，吐一个数字出去。'},'权重':{s:'每个输入有多重要。',pro:'训练时被不断微调的数字，是网络"学到的东西"的载体。'},'偏置':{s:'让神经元更容易或更难"点火"的门槛。',pro:'给加权和加上的一个可调常数，相当于点火的起跑线。'},'加权和':{s:'输入乘以权重再相加。',pro:'深度学习里最基础、最高频的运算，AI 一秒要做上亿次。'},'激活函数':{s:'决定神经元输出强弱的一道"开关"。',pro:'如 ReLU、Sigmoid，给网络带来非线性，是它能学复杂规律的关键。'}},
+  peg:'🔧 它只是在打分、点火',close:'看——没有魔法，一个神经元就是"加权求和 + 要不要点火"。',nextHint:'一个小格子太笨了…它们怎么合作？'},
+ {n:2,heading:'一层层堆：前向传播',hook:'<span class="apo">阿波：</span>单个神经元很笨，但排成一层层就厉害了！点一下，看信号怎么流过我的"大脑"👇',build:buildForwardProp,
+  paras:['把神经元排成一层一层，前一层的输出喂给后一层，一路算到答案——这叫[[前向传播]]。','底层看细节（线条、边缘），高层看整体（这是猫还是狗）。','"深度学习"的[[深度]]，说的就是层数多。'],
+  terms:{'前向传播':{s:'信号从输入层一层层算到输出层。',pro:'网络"做出一次预测"的完整过程。'},'深度':{s:'网络有多少层。',pro:'层越深越能表达复杂函数，但也越难训练。'}},
+  peg:'🪜 一层层往上，越来越懂',close:'我做出一次判断，就是让信号这样从头流到尾。',nextHint:'万一它猜错了呢？怎么知道错多少？'},
+ {n:3,heading:'损失：错了多少',hook:'<span class="apo">阿波：</span>我刚"出生"时猜得可离谱了。怎么让我知道"错得有多离谱"？用一个数字！点"训练一步"看它掉下去📉',build:buildLossCurve,
+  paras:['把我的答案和正确答案一比，用一个数字记下差距，这个数字叫[[损失]]。','损失越大＝错得越离谱；训练的唯一目标，就是把它变小。','你看，练得越多，损失越低、准确率越高。'],
+  terms:{'损失':{s:'预测和正确答案差多少的一个数。',pro:'训练时要最小化的目标函数，越小代表越准。'}},
+  peg:'🎯 训练＝把"错误分"降下去',close:'所以"AI 在学习"，说白了就是在拼命让这个损失数字变小。',nextHint:'知道错多少了，那具体该怎么改？'},
+ {n:4,heading:'梯度下降：往误差更低处走',hook:'<span class="apo">阿波：</span>把我所有的数字想成一座山，损失是高度。我要走到最低的谷底！选好步子，送我下山👣',build:buildGradDesc,
+  paras:['想象损失是一片山地，我要走到最低点。每一步都朝"最陡的下坡"挪一点点——这叫[[梯度下降]]。','一步迈多大，叫[[学习率]]：太大容易冲过头，太小又走得慢。'],
+  terms:{'梯度下降':{s:'顺着"误差变小"的方向一点点调参数。',pro:'训练神经网络的核心优化方法。'},'学习率':{s:'每一步调多大。',pro:'太大发散、太小太慢，是最重要的超参数之一。'}},
+  peg:'⛰️ 顺着下坡，一步步到谷底',close:'把几百万个数字，一点点朝"损失更小"的方向调——这就是我"学"的动作。',nextHint:'几百万个数字…你怎么知道每个该往哪调？'},
+ {n:5,heading:'反向传播：把责任往回传',hook:'<span class="apo">阿波：</span>这是我最聪明的绝招！猜错了，我从结果倒着追责，算出每个数字该背多少锅。点一下看信号往回流👇',build:buildBackprop,
+  paras:['一次猜错了，[[反向传播]]会从输出的错误出发，倒着一层层算：告诉每个权重"你该往哪个方向、改多少"。','它和梯度下降是黄金搭档：一个算出"每个数字怎么改"，一个真的去改。再深的网络也能高效地一起调。'],
+  terms:{'反向传播':{s:'从输出的误差往回，算出每个权重该怎么改。',pro:'用链式法则高效计算梯度，是深度学习能训练起来的关键。'}},
+  peg:'🔧 全是在调数字，没有魔法',close:'神经网络的全部秘密就一句话：<b>前向传播猜答案 → 损失量错误 → 反向传播＋梯度下降把几百万个数字一点点调好</b>。',nextHint:null}
+]};
+
+// —— 把进阶卡接进阅读器：给对应卡挂 chapter，覆盖 showAdv/renderAdv/goMap ——
+ADV.forEach(function(a){if(a.t==='神经网络在算什么')a.chapter='adv:nn';});
+showAdv=function(a){if(a.chapter&&CHAPTERS[a.chapter]){var pop=document.getElementById('advpop');if(pop)pop.classList.remove('open');enterChapter(a.chapter);return;}
+  document.getElementById('apCat').textContent=a.c;document.getElementById('apT').textContent=a.e+' '+a.t;var ul=document.getElementById('apList');ul.innerHTML='';a.p.forEach(function(p){ul.appendChild(el('li',null,p));});document.getElementById('advpop').classList.add('open');};
+renderAdv=function(){var g=document.getElementById('advgrid');if(!g)return;g.innerHTML='';ADV.forEach(function(a){var playable=a.chapter&&CHAPTERS[a.chapter],done=playable&&ST.done[a.chapter];var d=el('div','adv-card');var foot=done?'✓ 已通关 · 点击重温':playable?'▶ 开始探索 · '+a.p.length+' 个知识点':a.p.length+' 个知识点 ›';d.innerHTML='<div class="ae">'+a.e+'</div><div class="at">'+a.t+'</div><div class="ac">'+a.c+'</div><div class="an"'+(playable?' style="color:#a78bfa;font-weight:800"':'')+'>'+foot+'</div>';d.onclick=function(){showAdv(a);};g.appendChild(d);});};
+var _goMap0=goMap;goMap=function(){_goMap0();renderAdv();};
+
 // ========== 启动 ==========
 syncTop();renderAdv();goMap();
 (function debugEndRoute(){var p=new URLSearchParams(location.search),id=p.get('end');if(id&&CHAPTERS[id]){document.body.classList.add('debug-end');ST={xp:0,done:{},badges:[],collected:{}};save();setTimeout(function(){CH=CHAPTERS[id];show('scr-ch');document.getElementById('chtitle').textContent=CH.title;curSec=CH.sections.length;document.getElementById('chbody').innerHTML='';syncTop();renderSec();},80);}})();
