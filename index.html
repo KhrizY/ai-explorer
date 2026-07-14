@@ -285,6 +285,107 @@ CHAPTERS['看']={id:'看',title:'👁️ 看 · AI 怎么看和听？',badge:{e:
   terms:{'波形':{s:'声音是空气的振动，画出来就是一条上下起伏的线。',pro:'电脑每秒在这条线上采样上万个点、记成数字，就能存储和处理声音了。'}},peg:'🧲 声音也=数字',close:'不管是图还是声音，到我这儿都变成了数字——这就是我"看"和"听"的秘密。',nextHint:null}
 ]};
 
+// —— 「说」章交互构件 ——
+function buildWordChain(rw,onReset){var b=ixbox('🔮 接龙预言家','点词接下去（接顺能走，怪的会提示）',onReset);var w=b._body;
+  var G={'小猫':[{w:'在',ok:1},{w:'苹果',ok:0}],'在':[{w:'沙发上',ok:1},{w:'开心',ok:0}],'沙发上':[{w:'睡觉',ok:1,end:1},{w:'跳来跳去',ok:1,end:1}],'今天':[{w:'天气',ok:1},{w:'桌子',ok:0}],'天气':[{w:'真好',ok:1,end:1},{w:'吃饭',ok:0}]};
+  var starts=['小猫','今天'],sent,cur,done,got=false;
+  var view=el('div');view.style.cssText='font-size:20px;font-weight:700;color:#1e1b3a;min-height:34px;text-align:center';
+  var cand=el('div');cand.style.cssText='display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:12px';
+  var msg=el('div',null,'');msg.style.cssText='text-align:center;font-size:12.5px;color:#6b7280;margin-top:8px';
+  function start(){sent=[starts[Math.floor(Math.random()*starts.length)]];cur=sent[0];done=false;draw();}
+  function draw(){view.textContent=sent.join('');cand.innerHTML='';if(done){msg.innerHTML='📝 说通了一句！点 ↻ 再来';return;}msg.textContent='点词接下去';(G[cur]||[]).forEach(function(o){var bn=el('button','btn'+(o.ok?' btn-glow':' btn-ghost'),o.w);bn.style.cssText+=';padding:7px 14px;font-size:14px';bn.onclick=function(e){if(!o.ok){toast('🤔 这么接怪怪的',false);return;}sent.push(o.w);spark(e.clientX,e.clientY);if(!got){got=true;rw(e);}if(o.end){done=true;toast('✓ 说通了!',true);}else cur=o.w;draw();};cand.appendChild(bn);});}
+  w.appendChild(view);w.appendChild(cand);w.appendChild(msg);start();return b;}
+
+function buildTokenize(rw,onReset){var b=ixbox('✂️ 把句子切成小块','点"分词"，看它切成 token',onReset);var w=b._body;var SENT=['小猫','喜欢','在','沙发','上','睡觉'],colors=['#c4b5fd','#93c5fd','#6ee7b7','#fcd34d','#fca5a5','#f0abfc'],split=false,got=false;
+  var view=el('div');view.style.cssText='font-size:20px;font-weight:700;color:#1e1b3a;min-height:34px;display:flex;flex-wrap:wrap;gap:3px;justify-content:center;align-items:center';
+  function whole(){view.innerHTML='';view.appendChild(el('span',null,SENT.join('')));}
+  var msg=el('div',null,'这是一句话，点按钮切成 token');msg.style.cssText='text-align:center;font-size:12.5px;color:#6b7280;margin-top:8px';
+  var btn=el('button','btn btn-glow','✂️ 分词');btn.style.cssText+=';display:block;margin:10px auto 0';
+  btn.onclick=function(e){split=!split;view.innerHTML='';if(split){SENT.forEach(function(x,i){var c=el('span',null,x);c.style.cssText='padding:4px 9px;border-radius:8px;background:'+colors[i%colors.length]+';animation:popIn .3s '+(i*0.06)+'s both';view.appendChild(c);});msg.innerHTML='切成了 <b>'+SENT.length+'</b> 个 token —— 我一块块地读';btn.textContent='🔗 合起来';if(!got){got=true;rw(e);}}else{whole();msg.textContent='合回一句话';btn.textContent='✂️ 分词';}};
+  whole();w.appendChild(view);w.appendChild(msg);w.appendChild(btn);return b;}
+
+function buildSeqVsParallel(rw,onReset){var b=ixbox('🐢 旧办法 vs 🚀 新办法','两个都点点，看谁读得快',onReset);var w=b._body;var got=0;var WORDS=['今','天','天','气','真','好'];
+  function row(label){var wrap=el('div');wrap.style.cssText='margin:8px 0';var lb=el('div',null,label);lb.style.cssText='font-size:12px;color:#6b7280;margin-bottom:4px';var line=el('div');line.style.cssText='display:flex;gap:4px;justify-content:center';var cells=WORDS.map(function(ch){var c=el('div',null,ch);c.style.cssText='width:30px;height:30px;border-radius:6px;background:#e6e9f2;color:#9aa1ac;display:grid;place-items:center;font-weight:800;transition:.2s';line.appendChild(c);return c;});wrap.appendChild(lb);wrap.appendChild(line);wrap._cells=cells;return wrap;}
+  var oldR=row('🐢 旧办法：一个字一个字排队读'),newR=row('🚀 新办法：一眼看完整句');
+  function lit(c){c.style.background='#a78bfa';c.style.color='#fff';}
+  function rst(cells){cells.forEach(function(c){c.style.background='#e6e9f2';c.style.color='#9aa1ac';});}
+  var b1=el('button','btn btn-ghost','▶ 旧办法读'),b2=el('button','btn btn-glow','▶ 新办法读');
+  var bw=el('div');bw.style.cssText='display:flex;gap:10px;justify-content:center;margin-top:10px';bw.appendChild(b1);bw.appendChild(b2);
+  b1.onclick=function(e){rst(oldR._cells);oldR._cells.forEach(function(c,i){setTimeout(function(){lit(c);},i*350);});got|=1;if(got===3)rw(e);};
+  b2.onclick=function(e){rst(newR._cells);newR._cells.forEach(function(c){lit(c);});toast('🚀 一下全读完!',true);got|=2;if(got===3)rw(e);};
+  w.appendChild(oldR);w.appendChild(newR);w.appendChild(bw);return b;}
+
+function buildAttention(rw,onReset){var b=ixbox('🔗 注意力：词在互相"看"','点一个词，看它在关注谁',onReset);var w=b._body;var W=['小猫','在','沙发','上','睡觉'],LINK={0:[2,4],2:[0,3],4:[0]},got=false;
+  var wrap=el('div');wrap.style.cssText='position:relative;display:flex;gap:12px;justify-content:center;padding:26px 0;flex-wrap:wrap';
+  var svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.style.cssText='position:absolute;inset:0;width:100%;height:100%;pointer-events:none';wrap.appendChild(svg);
+  var chips=[];W.forEach(function(word,i){var c=el('div',null,word);c.style.cssText='position:relative;z-index:2;padding:8px 12px;border-radius:10px;background:#ede9fe;color:#4b4869;font-weight:800;cursor:pointer';c.onclick=function(e){draw(i);if(!got){got=true;rw(e);}};wrap.appendChild(c);chips.push(c);});
+  var msg=el('div',null,'👆 点词看连线；"我打你"≠"你打我"，位置也重要');msg.style.cssText='text-align:center;font-size:12px;color:#6b7280;margin-top:4px';
+  function draw(i){svg.innerHTML='';chips.forEach(function(c){c.style.background='#ede9fe';c.style.color='#4b4869';});chips[i].style.background='#a78bfa';chips[i].style.color='#fff';var a=chips[i].getBoundingClientRect(),wr=wrap.getBoundingClientRect();(LINK[i]||[]).forEach(function(j){chips[j].style.background='#c4b5fd';var br=chips[j].getBoundingClientRect();var ln=document.createElementNS('http://www.w3.org/2000/svg','line');ln.setAttribute('x1',a.left-wr.left+a.width/2);ln.setAttribute('y1',a.top-wr.top+a.height/2);ln.setAttribute('x2',br.left-wr.left+br.width/2);ln.setAttribute('y2',br.top-wr.top+br.height/2);ln.setAttribute('stroke','#8b5cf6');ln.setAttribute('stroke-width','3');ln.setAttribute('opacity','.6');svg.appendChild(ln);});}
+  w.appendChild(wrap);w.appendChild(msg);setTimeout(function(){draw(0);},90);return b;}
+
+function buildDataScale(rw,onReset){var b=ixbox('📚 读得越多，越聪明','点"多读一座图书馆"，看阿波变强',onReset);var w=b._body;var n=0,got=false;
+  var stack=el('div');stack.style.cssText='text-align:center;font-size:22px;min-height:34px;word-break:break-all';
+  var face=el('div');face.style.cssText='text-align:center;font-size:40px;margin:4px 0';
+  var lbl=el('div',null,'');lbl.style.cssText='text-align:center;font-size:12.5px;color:#6b7280;min-height:18px';
+  var btn=el('button','btn btn-glow','📖 多读一座图书馆');btn.style.cssText+=';display:block;margin:10px auto 0';
+  function upd(){var k=Math.min(n,12);stack.textContent=k>0?Array(k+1).join('📚'):'';face.textContent=n<2?'🙂':n<5?'😃':n<9?'🤓':'🧠';lbl.textContent=n===0?'点一下开始…':'读了 '+n+' 座图书馆的书…'+(n>=9?' 变超级聪明了！':'');}
+  btn.onclick=function(e){n++;upd();if(n>=9){toast('🧠 越大越聪明!',true);btn.style.display='none';if(!got){got=true;rw(e);}}};
+  w.appendChild(stack);w.appendChild(face);w.appendChild(lbl);w.appendChild(btn);upd();return b;}
+
+function buildTemperature(rw,onReset){var b=ixbox('🎲 温度：AI 有多"放飞"','拖温度，点生成看它多大胆',onReset);var w=b._body;var SAFE=['今天天气很好','我喜欢吃苹果','小猫在睡觉'],WILD=['今天天空在跳舞','苹果唱起了歌','小猫开火箭上月球','彩虹掉进了汤里'],t=30,got=false;
+  var out=el('div');out.style.cssText='font-size:18px;font-weight:700;color:#6d28d9;min-height:46px;display:grid;place-items:center;text-align:center;padding:6px';
+  var rng=el('input');rng.type='range';rng.min=0;rng.max=100;rng.value=30;rng.style.cssText='width:100%;accent-color:#8b5cf6';
+  var lbl=el('div',null,'');lbl.style.cssText='text-align:center;font-size:12.5px;color:#6b7280;margin-top:4px';
+  var btn=el('button','btn btn-glow','🎲 生成一句');btn.style.cssText+=';display:block;margin:8px auto 0';
+  function gen(){var pool=t<45?SAFE:t<80?SAFE.concat(WILD):WILD;out.textContent='「'+pool[Math.floor(Math.random()*pool.length)]+'」';}
+  rng.oninput=function(){t=+rng.value;lbl.innerHTML='温度 '+t+'% —— '+(t<45?'安全稳妥':t<80?'有点创意':'<b style="color:#dc2626">放飞自我</b>');};
+  btn.onclick=function(e){gen();if(!got){got=true;rw(e);}};
+  w.appendChild(out);w.appendChild(rng);w.appendChild(lbl);w.appendChild(btn);rng.oninput();gen();return b;}
+
+function buildHallucination(rw,onReset){var b=ixbox('🕵️ 真话还是编的？','AI 会自信地说错——你能分辨吗',onReset);var w=b._body;
+  var Q=[{t:'太阳从东边升起',real:1},{t:'企鹅住在北极',real:0},{t:'水在 100℃ 会沸腾',real:1},{t:'长颈鹿没有脖子',real:0},{t:'月亮发光是反射太阳',real:1}],i=0,score=0,got=false;
+  var card=el('div');card.style.cssText='font-size:17px;font-weight:700;color:#1e1b3a;text-align:center;min-height:50px;display:grid;place-items:center;padding:8px';
+  var sc=el('div',null,'');sc.style.cssText='text-align:center;font-size:12px;color:#8b5cf6;font-weight:800';
+  var bw=el('div');bw.style.cssText='display:flex;gap:12px;justify-content:center;margin-top:8px';
+  function show(){card.textContent='AI 说：「'+Q[i%Q.length].t+'」';}
+  [['✅ 真的',1],['❌ 编的',0]].forEach(function(x){var bn=el('button','btn btn-ghost',x[0]);bn.onclick=function(e){var ok=Q[i%Q.length].real===x[1];if(ok){score++;spark(e.clientX,e.clientY);}else{toast('这条它说错了～',false);}sc.textContent='答对 '+score+' 条';if(!got){got=true;rw(e);}i++;show();};bw.appendChild(bn);});
+  w.appendChild(card);w.appendChild(bw);w.appendChild(sc);show();return b;}
+
+function buildChainPK(onWin,onReset){var b=ixbox('🎮 词语接龙 PK','说通 2 句就赢！',onReset);var w=b._body;
+  var G={'小猫':[{w:'在',ok:1},{w:'苹果',ok:0}],'在':[{w:'沙发上',ok:1},{w:'开心',ok:0}],'沙发上':[{w:'睡觉',ok:1,end:1},{w:'跳来跳去',ok:1,end:1}],'今天':[{w:'天气',ok:1},{w:'桌子',ok:0}],'天气':[{w:'真好',ok:1,end:1},{w:'吃饭',ok:0}]};
+  var starts=['小猫','今天'],sent,cur,wins=0;
+  var sc=el('div',null,'说通 0 / 2 句');sc.style.cssText='text-align:center;font-weight:800;color:#6d28d9';
+  var view=el('div');view.style.cssText='font-size:20px;font-weight:700;color:#1e1b3a;min-height:34px;text-align:center;margin-top:6px';
+  var cand=el('div');cand.style.cssText='display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:10px';
+  function start(){sent=[starts[Math.floor(Math.random()*starts.length)]];cur=sent[0];draw();}
+  function draw(){view.textContent=sent.join('');cand.innerHTML='';(G[cur]||[]).forEach(function(o){var bn=el('button','btn'+(o.ok?' btn-glow':' btn-ghost'),o.w);bn.style.cssText+=';padding:7px 14px;font-size:14px';bn.onclick=function(e){if(!o.ok){toast('接不顺～',false);return;}sent.push(o.w);spark(e.clientX,e.clientY);if(o.end){wins++;sc.textContent='说通 '+wins+' / 2 句';if(wins>=2){onWin(e);return;}toast('✓ 一句!',true);start();}else{cur=o.w;draw();}};cand.appendChild(bn);});}
+  w.appendChild(sc);w.appendChild(view);w.appendChild(cand);start();return b;}
+
+// —— 「说」章内容(7 节) ——
+CHAPTERS['说']={id:'说',title:'💬 说 · AI 怎么听懂人话？',badge:{e:'🏅',t:'语言大师',s:'你搞懂了 AI 是怎么理解和生成语言的'},endGame:buildChainPK,sections:[
+ {n:1,heading:'核心：一直猜下一个词',hook:'<span class="apo">阿波：</span>你手机打字才打"今天天"，它就猜出"气"——我和 ChatGPT 用的是同一个把戏！玩玩接龙👇',build:buildWordChain,
+  paras:['像 ChatGPT 这样的[[大语言模型]]，一辈子只练一件事：猜下一个词。','你给半句话，它就想"接下来最可能是哪个词"，接上去。','一个接一个，就成了一整段话。'],
+  terms:{'大语言模型':{s:'读过海量文字、专门练"猜下一个词"的 AI，ChatGPT、DeepSeek 都是。',pro:'英文叫 LLM（Large Language Model）；它其实不"懂"意思，只是根据见过的海量句子猜最可能的接法。'}},peg:'🎭 它在猜，不在懂',close:'所以它不是"懂"你，只是猜——只不过见得太多，猜得很准。',nextHint:'它读句子之前，先要把句子怎么处理一下？'},
+ {n:2,heading:'先把句子切成小块',hook:'<span class="apo">阿波：</span>我读句子前，会先把它"咔嚓"切成一小块一小块。点点看👇',build:buildTokenize,
+  paras:['我读文字前，先把句子切成一小块一小块，每块叫一个[[token]]。','然后一块一块地读、一块一块地猜。'],
+  terms:{'token':{s:'AI 把句子切成的一小块，可能是一个词或一个字。',pro:'中文叫"词元"；模型不是按整句处理，而是把文字都换成一个个 token 再计算。'}},peg:'',close:'切成 token，是我读懂文字的第一步。',nextHint:'那我是一个字一个字慢慢读，还是有更快的办法？'},
+ {n:3,heading:'排队读 vs 一眼看',hook:'<span class="apo">阿波：</span>旧办法一个字一个字排队读，慢；新办法一眼看完整句，快！点两个按钮比比👇',build:buildSeqVsParallel,
+  paras:['旧办法（叫 [[RNN]]）像排队：读完一个字才读下一个，句子长了就慢、还容易忘前面。','新办法像一眼扫完整句，所有字一起看——又快又不会忘。'],
+  terms:{'RNN':{s:'一种"排队读"的老式 AI：读完一个字才读下一个。',pro:'全称循环神经网络（Recurrent Neural Network）；句子一长就慢、还容易忘掉前面，后来被更快的新办法取代。'}},peg:'',close:'新办法又快又记得牢，这是现在大模型能这么强的关键一步。',nextHint:'"一起看整句"——它具体是怎么看的？'},
+ {n:4,heading:'注意力 + 知道位置',hook:'<span class="apo">阿波：</span>一起看整句时，每个词会去"看"和它有关的词——比如"它"指的是谁。点词看连线👇',build:buildAttention,
+  paras:['读句子时，每个词会去"关注"句子里和它有关的词，这叫[[注意力机制]]。','靠这个，我能搞清"小猫在沙发上睡觉"里是谁在睡觉。','另外，"我打你"和"你打我"不一样——所以我还得知道每个词排在第几位。'],
+  terms:{'注意力机制':{s:'读句子时，每个词会去"关注"和它有关的词。'},'Transformer':{s:'用注意力、能"一眼看整句"的新式 AI 结构。',pro:'如今几乎所有大模型都建在 Transformer 上；它 2017 年被提出，彻底改变了 AI。'}},peg:'',close:'这套"注意力 + 知道位置"的新结构，叫[[Transformer]]——现在的大模型几乎都用它。',nextHint:'这么厉害的本事，它是怎么学会的？'},
+ {n:5,heading:'读遍互联网，越大越聪明',hook:'<span class="apo">阿波：</span>我的本事哪来的？我读了几乎整个互联网的文字！而且书读得越多、脑子越大，我就越聪明。点点看👇',build:buildDataScale,
+  paras:['我先把几乎整个互联网的文字都"读"一遍，这一步叫[[预训练]]。','有意思的是：与其一条条教我规则，不如给我更多文字、更大的脑子——我自己就会更强。','这条"越大越聪明"的规律，是 AI 这些年最重要的发现之一。'],
+  terms:{'预训练':{s:'让 AI 先把海量文字读一遍、打好底子的过程。'}},peg:'🧲 多喂数据，真的管用',close:'这就是为什么 AI 越做越大——因为"多喂数据、多给算力"真的管用。',nextHint:'读了这么多，它说话是死板还是会变花样？'},
+ {n:6,heading:'温度：有多"放飞"',hook:'<span class="apo">阿波：</span>同一个问题，我能答得很稳，也能答得很放飞——由一个叫"温度"的旋钮控制。拖拖看👇',build:buildTemperature,
+  paras:['有个叫[[温度]]的设置，决定我说话有多大胆。','温度低，我只挑最稳的词，答得规矩；温度高，我敢挑冷门词，有创意甚至离谱。'],
+  terms:{'温度':{s:'控制 AI 说话有多"随机大胆"的一个设置。'}},peg:'',close:'所以同一个 AI，调调温度，可以很规矩、也可以很有想象力。',nextHint:'它这么能说，说的都是真的吗？'},
+ {n:7,heading:'它会一本正经地胡说',hook:'<span class="apo">阿波：</span>我坦白——我有时会一本正经地胡说，还特别自信！你能分辨吗？来判断👇',build:buildHallucination,
+  paras:['我不是故意骗人，但有时会把假的说得像真的一样——这叫[[幻觉]]。','因为我只是在"猜最像的接法"，并不真的知道对错。','所以我说的话，重要的一定要自己再核实。'],
+  terms:{'幻觉':{s:'AI 一本正经地说出错误、编造的内容。',pro:'它并非故意撒谎，而是因为只在"猜最可能的词"，压根没有"知道对错"这回事。'}},peg:'🎭 很会说≠说得对',close:'记住：我很会说，但不等于我说的都对。',nextHint:null}
+]};
+
 // ========== 章节渲染 ==========
 var curSec=0;
 function enterChapter(id){CH=CHAPTERS[id];CH.sections.forEach(function(s){s._rw=false;});show('scr-ch');document.getElementById('chtitle').textContent=CH.title;curSec=0;document.getElementById('chbody').innerHTML='';syncTop();renderSec();}
