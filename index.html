@@ -221,19 +221,19 @@ function buildData(rw,onReset){var b=ixbox('🧺 选数据喂给 AI，再训练'
   POOL.forEach(function(o,i){var d=el('div');d.style.cssText='padding:8px 4px;border-radius:10px;background:#fff;border:2px solid #e6e9f2;text-align:center;cursor:pointer';d.innerHTML='<div style="font-size:24px">'+o.e+'</div><div style="font-size:10px;color:#8b90a6">'+o.t+'</div>';d.onclick=function(){if(phase!=='pick')return;sel[i]=!sel[i];d.style.borderColor=sel[i]?'#8b5cf6':'#e6e9f2';d.style.background=sel[i]?'#f5f3ff':'#fff';};grid.appendChild(d);});
   var btn=el('button','btn btn-glow','🚀 开始训练');btn.style.cssText+=';display:block;margin:0 auto';
   var res=el('div');res.style.cssText='text-align:center;margin-top:8px;font-size:13px;color:#4b4869';
-  btn.onclick=function(e){if(phase==='done')return;var p=Object.keys(sel).filter(function(k){return sel[k];}).map(function(k){return POOL[+k];});if(p.length<2){lineFeedback(w,false,'至少选 2 个数据，AI 才能开始学');toast('至少选 2 个',false);return;}phase='done';var g=p.filter(function(x){return x.good;}).length,bd=p.filter(function(x){return x.bad;}).length;var acc=Math.max(10,Math.min(95,30+g*16-bd*22));var v;if(bd>0){v='<b style="color:#b45309">混了坏数据，AI 学偏了 😵</b>';lineFeedback(w,false,'失败示范：坏数据会把 AI 教歪');toast('😵 学偏了!',false);}else if(g>=3){v='<b style="color:#16a34a">好数据！AI 学得棒 👍</b>';lineFeedback(w,true,'成功：清晰又多样的数据最好用');toast('👍 学得好!',true);}else{v='<b style="color:#b45309">数据太单一，一般般 🤔</b>';lineFeedback(w,false,'还差一点：数据太少或太像了');}res.innerHTML='准确率 <b style="font-size:18px;color:#6d28d9">'+acc+'%</b> · '+v;rw(e);};
+  btn.onclick=function(e){if(phase==='done')return;var p=Object.keys(sel).filter(function(k){return sel[k];}).map(function(k){return POOL[+k];});if(p.length<3){lineFeedback(w,false,'至少选 3 个数据，先多喂一点再训练');toast('至少选 3 个',false);return;}phase='done';var g=p.filter(function(x){return x.good;}).length,bd=p.filter(function(x){return x.bad;}).length;var acc=Math.max(10,Math.min(95,30+g*16-bd*22));var v;if(bd>0){v='<b style="color:#b45309">混了坏数据，AI 学偏了 😵</b>';lineFeedback(w,false,'失败示范：坏数据会把 AI 教歪');toast('😵 学偏了!',false);}else if(g>=3){v='<b style="color:#16a34a">好数据！AI 学得棒 👍</b>';lineFeedback(w,true,'成功：清晰又多样的数据最好用');toast('👍 学得好!',true);}else{v='<b style="color:#b45309">数据太单一，一般般 🤔</b>';lineFeedback(w,false,'还差一点：数据太少或太像了');}res.innerHTML='准确率 <b style="font-size:18px;color:#6d28d9">'+acc+'%</b> · '+v;rw(e);};
   w.appendChild(grid);w.appendChild(btn);w.appendChild(res);return b;}
 
 // —— S5 死记 vs 举一反三(过拟合) ——
-function buildOverfit(rw,onReset){var b=ixbox('📉 拖一拖：死记还是抓规律','拖到绿色"刚刚好"',onReset);var w=b._body;
+function buildOverfit(rw,onReset){var b=ixbox('📉 拖一拖：死记还是抓规律','先试试两边，再拖到绿色"刚刚好"',onReset);var w=b._body;
   var cv=document.createElement('canvas');cv.width=280;cv.height=120;cv.style.cssText='width:100%;background:#160f33;border-radius:8px';var ctx=cv.getContext('2d');
-  var P=[];for(var i=0;i<11;i++){var x=14+i*25,y=38+i*3+(Math.random()*48-24);P.push({x:x,y:Math.max(12,Math.min(108,y))});}var c=0.12,got=false;
+  var P=[];for(var i=0;i<11;i++){var x=14+i*25,y=38+i*3+(Math.random()*48-24);P.push({x:x,y:Math.max(12,Math.min(108,y))});}var c=0.12,got=false,lowSeen=false,highSeen=false;
   function sY(x){var a=P[0],z=P[P.length-1];return a.y+(z.y-a.y)*(x-a.x)/(z.x-a.x);}
   function zY(x){for(var i=0;i<P.length-1;i++){if(x>=P[i].x&&x<=P[i+1].x){var t=(x-P[i].x)/(P[i+1].x-P[i].x);return P[i].y+(P[i+1].y-P[i].y)*t;}}return P[P.length-1].y;}
   function draw(){ctx.clearRect(0,0,280,120);ctx.strokeStyle='#22d3ee';ctx.lineWidth=2.5;ctx.beginPath();for(var x=P[0].x;x<=P[P.length-1].x;x++){var y=sY(x)*(1-c)+zY(x)*c;x===P[0].x?ctx.moveTo(x,y):ctx.lineTo(x,y);}ctx.stroke();P.forEach(function(p){ctx.beginPath();ctx.arc(p.x,p.y,4,0,7);ctx.fillStyle='#ffe066';ctx.fill();ctx.lineWidth=1.5;ctx.strokeStyle='#160f33';ctx.stroke();});}
   var lbl=el('div',null,'');lbl.style.cssText='text-align:center;font-size:12.5px;color:#4b4869;margin:6px 0';
   var rng=el('input');rng.type='range';rng.min=0;rng.max=100;rng.value=12;rng.style.cssText='width:100%;accent-color:#8b5cf6';
-  function upd(e){c=+rng.value/100;draw();lbl.innerHTML=c<0.3?'线太直——<b>没抓到规律</b>':c<0.72?'<b style="color:#16a34a">刚刚好！抓住了大趋势</b>':'线太扭——<b style="color:#dc2626">死记每个点</b>';if(c>=0.3&&c<0.72&&e&&!got){got=true;rw(e);}}
+  function upd(e){c=+rng.value/100;draw();if(e&&c<0.3)lowSeen=true;if(e&&c>=0.72)highSeen=true;lbl.innerHTML=c<0.3?'线太直——<b>没抓到规律</b>':c<0.72?'<b style="color:#16a34a">刚刚好！抓住了大趋势</b>':'线太扭——<b style="color:#dc2626">死记每个点</b>';if(c>=0.3&&c<0.72&&lowSeen&&highSeen&&e&&!got){got=true;rw(e);}else if(c>=0.3&&c<0.72&&e&&!got){lineFeedback(w,false,'先把滑块拖到两边看看，再回到刚刚好');}}
   rng.oninput=upd;w.appendChild(cv);w.appendChild(rng);w.appendChild(lbl);draw();upd();return b;}
 
 // —— S6 骗过 AI ——
@@ -248,9 +248,9 @@ function buildFool(rw,onReset){var b=ixbox('🕵️ 试试骗过 AI','按步骤�
   w.appendChild(view);w.appendChild(step);w.appendChild(say);w.appendChild(bw);return b;}
 
 // —— S7 决策树 ——
-function buildTree(rw,onReset){var b=ixbox('🌲 AI 用问题一层层猜','点问号展开它的判断',onReset);var w=b._body;w.style.textAlign='left';var got=false;
+function buildTree(rw,onReset){var b=ixbox('🌲 AI 用问题一层层猜','至少展开两层判断',onReset);var w=b._body;w.style.textAlign='left';var got=false,opened=0;
   var T={q:'会汪汪叫吗？',y:{q:'体型大吗？',y:{r:'🐕 大狗'},n:{r:'🐩 小狗'}},n:{q:'会喵喵叫吗？',y:{r:'🐱 猫'},n:{r:'🐣 别的'}}};
-  function node(t,dep){var box=el('div');box.style.marginLeft=(dep*14)+'px';if(t.r){var o=el('div',null,t.r);o.style.cssText='display:inline-block;margin:4px 0;padding:5px 11px;border-radius:8px;background:#dcfce7;color:#15803d;font-weight:800';box.appendChild(o);return box;}var q=el('div',null,'❓ '+t.q+' <span style="color:#8b5cf6">▼</span>');q.style.cssText='display:inline-block;margin:4px 0;padding:5px 11px;border-radius:8px;background:#ede9fe;color:#6d28d9;font-weight:800;cursor:pointer';var kids=el('div');kids.style.display='none';var op=false;q.onclick=function(e){op=!op;kids.style.display=op?'block':'none';q.innerHTML='❓ '+t.q+' <span style="color:#8b5cf6">'+(op?'▲':'▼')+'</span>';if(op&&!kids.hasChildNodes()){var y=el('div',null,'<span style="color:#16a34a;font-size:12px;font-weight:800">是→</span>');y.style.marginLeft=(dep*14+14)+'px';y.appendChild(node(t.y,dep+1));var n=el('div',null,'<span style="color:#dc2626;font-size:12px;font-weight:800">否→</span>');n.style.marginLeft=(dep*14+14)+'px';n.appendChild(node(t.n,dep+1));kids.appendChild(y);kids.appendChild(n);}if(op&&!got){got=true;rw(e);}};box.appendChild(q);box.appendChild(kids);return box;}
+  function node(t,dep){var box=el('div');box.style.marginLeft=(dep*14)+'px';if(t.r){var o=el('div',null,t.r);o.style.cssText='display:inline-block;margin:4px 0;padding:5px 11px;border-radius:8px;background:#dcfce7;color:#15803d;font-weight:800';box.appendChild(o);return box;}var q=el('div',null,'❓ '+t.q+' <span style="color:#8b5cf6">▼</span>');q.style.cssText='display:inline-block;margin:4px 0;padding:5px 11px;border-radius:8px;background:#ede9fe;color:#6d28d9;font-weight:800;cursor:pointer';var kids=el('div');kids.style.display='none';var op=false,counted=false;q.onclick=function(e){op=!op;kids.style.display=op?'block':'none';q.innerHTML='❓ '+t.q+' <span style="color:#8b5cf6">'+(op?'▲':'▼')+'</span>';if(op&&!kids.hasChildNodes()){var y=el('div',null,'<span style="color:#16a34a;font-size:12px;font-weight:800">是→</span>');y.style.marginLeft=(dep*14+14)+'px';y.appendChild(node(t.y,dep+1));var n=el('div',null,'<span style="color:#dc2626;font-size:12px;font-weight:800">否→</span>');n.style.marginLeft=(dep*14+14)+'px';n.appendChild(node(t.n,dep+1));kids.appendChild(y);kids.appendChild(n);}if(op&&!counted){counted=true;opened++;lineFeedback(w,true,'展开 '+opened+' / 2 层判断');}if(op&&opened>=2&&!got){got=true;rw(e);}};box.appendChild(q);box.appendChild(kids);return box;}
   w.appendChild(node(T,0));return b;}
 
 // —— 章末挑战(自动节奏) ——
@@ -293,10 +293,10 @@ CHAPTERS['学']={id:'学',title:'🧠 学 · AI 怎么自己学会？',badge:{e:
 ]};
 
 // —— 「看」章交互构件 ——
-function buildPixel(rw,onReset){var b=ixbox('🔍 像素放大镜','点一个格子看它的数字',onReset);var w=b._body;var N=8,COL=[[124,192,255],[255,214,109],[251,113,133],[88,204,2]],got=false;
+function buildPixel(rw,onReset){var b=ixbox('🔍 像素放大镜','点 3 个不同格子看数字',onReset);var w=b._body;var N=8,COL=[[124,192,255],[255,214,109],[251,113,133],[88,204,2]],got=false,seen={};
   var grid=el('div');grid.style.cssText='display:grid;grid-template-columns:repeat('+N+',26px);gap:1px;justify-content:center';
   var info=el('div',null,'点一个格子看看👆');info.style.cssText='text-align:center;font-size:13px;color:#4b4869;margin-top:8px;min-height:20px';
-  for(var r=0;r<N;r++)for(var c=0;c<N;c++){var col=COL[(r+c)%4];var d=el('div');d.style.cssText='width:26px;height:26px;border-radius:3px;cursor:pointer;background:rgb('+col[0]+','+col[1]+','+col[2]+')';d.dataset.rgb=col.join(', ');d.onclick=function(e){info.innerHTML='这格 = <b style="color:#6d28d9">RGB('+e.target.dataset.rgb+')</b> —— 三个数字！';e.target.style.outline='3px solid #1e1b3a';var t=e.target;setTimeout(function(){t.style.outline='';},600);if(!got){got=true;rw(e);}};grid.appendChild(d);}
+  for(var r=0;r<N;r++)for(var c=0;c<N;c++){var col=COL[(r+c)%4];var d=el('div');d.style.cssText='width:26px;height:26px;border-radius:3px;cursor:pointer;background:rgb('+col[0]+','+col[1]+','+col[2]+')';d.dataset.rgb=col.join(', ');d.dataset.pos=r+'-'+c;d.onclick=function(e){seen[e.target.dataset.pos]=1;var n=Object.keys(seen).length;info.innerHTML='这格 = <b style="color:#6d28d9">RGB('+e.target.dataset.rgb+')</b> —— 已看 '+n+' / 3 格';e.target.style.outline='3px solid #1e1b3a';var t=e.target;setTimeout(function(){t.style.outline='';},600);if(n>=3&&!got){got=true;rw(e);}};grid.appendChild(d);}
   w.appendChild(grid);w.appendChild(info);return b;}
 
 function buildRGB(rw,onReset){var b=ixbox('🎨 调出橙色','拖三个滑块，混出接近🍊的颜色',onReset);var w=b._body;var TR=[240,140,20],v=[80,80,80],got=false;
@@ -309,13 +309,13 @@ function buildRGB(rw,onReset){var b=ixbox('🎨 调出橙色','拖三个滑块�
   w.appendChild(sw);['R','G','B'].forEach(function(nm,i){var cc=['#ef4444','#22c55e','#3b82f6'][i];var wrap=el('div');wrap.style.cssText='display:flex;align-items:center;gap:8px;width:90%;max-width:280px;margin:4px auto;font-size:12px';var t=el('span',null,nm);t.style.cssText='width:16px;color:'+cc+';font-weight:800';var r=el('input');r.type='range';r.min=0;r.max=255;r.value=v[i];r.style.cssText='flex:1;accent-color:'+cc;r.oninput=function(e){v[i]=+r.value;upd(e);};wrap.appendChild(t);wrap.appendChild(r);w.appendChild(wrap);});
   w.appendChild(lbl);upd();return b;}
 
-function buildConv(rw,onReset){var b=ixbox('🔦 边缘探测滑窗','用方向键移动黄框，扫到边缘变绿',onReset);var w=b._body;var N=6,IMG=[];for(var r=0;r<N;r++){IMG.push([]);for(var c=0;c<N;c++)IMG[r].push(c<3?0:1);}var wx=0,wy=0,got=false;
+function buildConv(rw,onReset){var b=ixbox('🔦 边缘探测滑窗','移动黄框，扫到 2 次边缘',onReset);var w=b._body;var N=6,IMG=[];for(var r=0;r<N;r++){IMG.push([]);for(var c=0;c<N;c++)IMG[r].push(c<3?0:1);}var wx=0,wy=0,got=false,edgeSeen={};
   var gw=el('div');gw.style.cssText='position:relative;display:grid;grid-template-columns:repeat('+N+',26px);gap:2px;width:max-content;margin:0 auto';
   for(var r=0;r<N;r++)for(var c=0;c<N;c++){var d=el('div');d.style.cssText='width:26px;height:26px;border-radius:4px;background:'+(IMG[r][c]?'#1e1b3a':'#dbe3ef');gw.appendChild(d);}
   var win=el('div');win.style.cssText='position:absolute;width:82px;height:82px;border:3px solid #f59e0b;border-radius:6px;pointer-events:none;transition:all .12s;box-shadow:0 0 12px #f59e0b;left:0;top:0';gw.appendChild(win);
   var msg=el('div',null,'');msg.style.cssText='text-align:center;font-size:12.5px;color:#6b7280;margin:8px 0';
   var ctrl=el('div');ctrl.style.cssText='display:flex;gap:6px;justify-content:center';
-  function upd(e){win.style.left=(wx*28)+'px';win.style.top=(wy*28)+'px';var edge=false;for(var i=0;i<3;i++)for(var j=0;j<3;j++){if(IMG[wy+i][wx+j]!==IMG[wy+i][wx])edge=true;}win.style.borderColor=edge?'#22c55e':'#f59e0b';win.style.boxShadow='0 0 14px '+(edge?'#22c55e':'#f59e0b');msg.textContent=edge?'⚡ 发现边缘！这里明暗在交界':'平坦区，没什么特征…';if(edge&&!got){got=true;toast('⚡ 找到边缘!',true);rw(e||{});}}
+  function upd(e){win.style.left=(wx*28)+'px';win.style.top=(wy*28)+'px';var edge=false;for(var i=0;i<3;i++)for(var j=0;j<3;j++){if(IMG[wy+i][wx+j]!==IMG[wy+i][wx])edge=true;}win.style.borderColor=edge?'#22c55e':'#f59e0b';win.style.boxShadow='0 0 14px '+(edge?'#22c55e':'#f59e0b');if(edge&&e)edgeSeen[wx+'-'+wy]=1;var n=Object.keys(edgeSeen).length;msg.textContent=edge?'⚡ 发现边缘！已扫到 '+n+' / 2 次':'平坦区，没什么特征…';if(n>=2&&!got){got=true;toast('⚡ 找到边缘!',true);rw(e||{});}}
   [['◀',-1,0],['▶',1,0],['▲',0,-1],['▼',0,1]].forEach(function(bt){var bn=el('button','btn btn-ghost',bt[0]);bn.style.cssText+=';padding:8px 12px;font-size:14px';bn.onclick=function(e){wx=Math.max(0,Math.min(N-3,wx+bt[1]));wy=Math.max(0,Math.min(N-3,wy+bt[2]));upd(e);};ctrl.appendChild(bn);});
   w.appendChild(gw);w.appendChild(msg);w.appendChild(ctrl);upd();return b;}
 
@@ -329,7 +329,7 @@ function buildLayers(rw,onReset){var b=ixbox('🧅 一层层看得更懂','点"�
   btn.onclick=function(e){if(i<L.length-1){i++;show(e);}};
   w.appendChild(icon);w.appendChild(tt);w.appendChild(ds);w.appendChild(btn);show();return b;}
 
-function buildPool(rw,onReset){var b=ixbox('🗜️ 池化：一层层缩小','点"压缩一层"，8→4→2→1',onReset);var w=b._body;
+function buildPool(rw,onReset){var b=ixbox('🗜️ 池化：一层层缩小','一直压到 1×1 才完成',onReset);var w=b._body;
   function rnd(n){var m=[];for(var r=0;r<n;r++){m.push([]);for(var c=0;c<n;c++)m[r].push(Math.floor(Math.random()*10));}return m;}
   var stages=[rnd(8)],got=false;
   var wrap=el('div');wrap.style.cssText='display:flex;gap:8px;align-items:center;overflow-x:auto;padding:4px;justify-content:center';
@@ -338,17 +338,17 @@ function buildPool(rw,onReset){var b=ixbox('🗜️ 池化：一层层缩小','�
   function mkgrid(m){var sz=Math.max(11,Math.min(24,96/m.length));var g=el('div');g.style.cssText='flex:none;display:grid;grid-template-columns:repeat('+m.length+','+sz+'px);gap:2px';m.forEach(function(row){row.forEach(function(v){var d=el('div',null,m.length<=4?v:'');d.style.cssText='width:'+sz+'px;height:'+sz+'px;border-radius:3px;background:hsl(258,60%,'+(88-v*6)+'%);color:'+(v>5?'#fff':'#333')+';display:grid;place-items:center;font-size:11px;font-weight:800';g.appendChild(d);});});return g;}
   function pool(m){var n=m.length/2,r=[];for(var i=0;i<n;i++){r.push([]);for(var j=0;j<n;j++)r[i].push(Math.max(m[2*i][2*j],m[2*i][2*j+1],m[2*i+1][2*j],m[2*i+1][2*j+1]));}return r;}
   function draw(){wrap.innerHTML='';stages.forEach(function(m,i){if(i>0){var ar=el('div',null,'→');ar.style.cssText='flex:none;font-size:18px;color:#8b5cf6';wrap.appendChild(ar);}wrap.appendChild(mkgrid(m));});}
-  btn.onclick=function(e){var last=stages[stages.length-1];if(last.length<=1){msg.textContent='已缩到 1×1！';return;}stages.push(pool(last));draw();if(!got){got=true;rw(e);}if(stages[stages.length-1].length===1){msg.textContent='缩到 1×1——只剩最强信号！';toast('🗜️ 缩到最小!',true);}};
+  btn.onclick=function(e){var last=stages[stages.length-1];if(last.length<=1){msg.textContent='已缩到 1×1！';return;}stages.push(pool(last));draw();msg.textContent='已压缩 '+(stages.length-1)+' / 3 层';if(stages[stages.length-1].length===1){msg.textContent='缩到 1×1——只剩最强信号！';toast('🗜️ 缩到最小!',true);if(!got){got=true;rw(e);}}};
   w.appendChild(wrap);w.appendChild(msg);w.appendChild(btn);draw();return b;}
 
-function buildWave(rw,onReset){var b=ixbox('🔊 声音是波形数字','拖"音量"滑块，看波形变化',onReset);var w=b._body;
+function buildWave(rw,onReset){var b=ixbox('🔊 声音是波形数字','拖到低音量和高音量各看一次',onReset);var w=b._body;
   var cv=document.createElement('canvas');cv.width=280;cv.height=88;cv.style.cssText='width:100%;background:#160f33;border-radius:8px';var ctx=cv.getContext('2d');
-  var amp=26,t=0,got=false;
+  var amp=26,t=0,got=false,low=false,high=false;
   if(window._waveRaf){cancelAnimationFrame(window._waveRaf);window._waveRaf=null;}
   function draw(){ctx.clearRect(0,0,280,88);ctx.strokeStyle='#22d3ee';ctx.lineWidth=2;ctx.beginPath();for(var x=0;x<280;x++){var y=44+Math.sin((x+t)/12)*amp*Math.sin(x/60);x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}ctx.stroke();t+=2;window._waveRaf=requestAnimationFrame(draw);}
   var rng=el('input');rng.type='range';rng.min=0;rng.max=38;rng.value=26;rng.style.cssText='width:100%;accent-color:#8b5cf6;margin-top:8px';
   var lbl=el('div',null,'这条上下跳的线，就是声音在电脑里的样子');lbl.style.cssText='text-align:center;font-size:12.5px;color:#6b7280;margin-top:6px';
-  rng.oninput=function(e){amp=+rng.value;if(!got){got=true;rw(e);}};
+  rng.oninput=function(e){amp=+rng.value;if(amp<=8)low=true;if(amp>=32)high=true;lbl.textContent='音量 '+amp+' —— '+(low&&high?'低高都看过了':'试试拖到最小和最大');if(low&&high&&!got){got=true;rw(e);}};
   w.appendChild(cv);w.appendChild(rng);w.appendChild(lbl);draw();return b;}
 
 function buildDetective(onWin,onReset){var b=ixbox('🕵️ 像素侦探','点"看清楚点"，再猜是什么',onReset);var w=b._body;
