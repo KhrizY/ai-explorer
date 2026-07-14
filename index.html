@@ -84,7 +84,7 @@ function parseP(text,terms){var e=el('div','p');var re=/\[\[([^\]]+)\]\]/g,last=
 
 // ========== 地图 ==========
 var STATIONS=[{id:'序',emoji:'🎬',name:'是魔法吗',hue:'--st0'},{id:'看',emoji:'👁️',name:'怎么看',hue:'--st1'},{id:'学',emoji:'🧠',name:'怎么学会',hue:'--st2'},{id:'说',emoji:'💬',name:'听懂人话',hue:'--st3'},{id:'做',emoji:'🛠️',name:'会做事',hue:'--st5'},{id:'信',emoji:'⚖️',name:'该信吗',hue:'--st4'}];
-function renderMap(){var mp=document.getElementById('mappath');mp.innerHTML='';STATIONS.forEach(function(st,i){if(i>0)mp.appendChild(el('div','map-connector'));var done=ST.done[st.id],playable=!!CHAPTERS[st.id],locked=!playable&&!done;var s=el('div','station'+(playable&&!done?' current':'')+(locked?' locked':''));s.style.setProperty('--_h','var('+st.hue+')');s.innerHTML='<div class="st-orb">'+st.emoji+'</div><span class="st-name">'+st.id+' · '+st.name+'</span>'+(done?'<span class="st-done">✓</span>':'');if(playable){s.querySelector('.st-orb').style.cursor='pointer';s.querySelector('.st-orb').onclick=function(){enterChapter(st.id);};}mp.appendChild(s);});}
+function renderMap(){var mp=document.getElementById('mappath');mp.innerHTML='';var firstUndone=-1;STATIONS.forEach(function(st,i){if(firstUndone<0&&CHAPTERS[st.id]&&!ST.done[st.id])firstUndone=i;});STATIONS.forEach(function(st,i){if(i>0)mp.appendChild(el('div','map-connector'));var done=ST.done[st.id],playable=!!CHAPTERS[st.id],locked=!playable&&!done;var s=el('div','station'+(i===firstUndone?' current':'')+(locked?' locked':''));s.style.setProperty('--_h','var('+st.hue+')');s.innerHTML='<div class="st-orb">'+st.emoji+'</div><span class="st-name">'+st.id+' · '+st.name+'</span>'+(done?'<span class="st-done">✓</span>':'');if(playable){s.querySelector('.st-orb').style.cursor='pointer';s.querySelector('.st-orb').onclick=function(){enterChapter(st.id);};}mp.appendChild(s);});}
 function goMap(){if(window._chT){clearInterval(window._chT);window._chT=null;}if(window._waveRaf){cancelAnimationFrame(window._waveRaf);window._waveRaf=null;}show('scr-map');renderMap();syncTop();}
 function show(id){document.querySelectorAll('.screen').forEach(function(x){x.classList.remove('on');});document.getElementById(id).classList.add('on');window.scrollTo(0,0);}
 
@@ -471,6 +471,137 @@ CHAPTERS['做']={id:'做',title:'🛠️ 做 · AI 会自己动手做事',badge:
  {n:6,heading:'越能干，越要小心',hook:'<span class="apo">阿波：</span>我能自己做事是好事，但也得小心！有些事我能自己做，有些得先问你。分分看👇',build:buildAuthorize,
   paras:['我越能干，越要想清楚：哪些事能放心交给我，哪些得先问过你。','查资料、写草稿可以让我做；花钱、删东西、替你发消息，这些一定要先问你。'],
   terms:{},peg:'⚖️ 越能干，越要小心授权',close:'把力量交给 AI 之前，先想想：万一它做错了，要紧吗？',nextHint:null}
+]};
+
+// —— 「信」章交互构件 ——
+function buildBias(rw,onReset){var b=ixbox('⚖️ 只见过橘猫的裁判','点每张图，看 AI 判得公不公平',onReset);var w=b._body;var got=false,tested=0,wrong=0;
+  var note=el('div',null,'📚 它训练时<b>只看过橘猫</b>。来测测别的猫：');note.style.cssText='text-align:center;font-size:13px;color:#4b4869;margin-bottom:8px';
+  var TEST=[{e:'🐱',o:1},{e:'🐈‍⬛',o:0},{e:'🐈',o:0},{e:'🐱',o:1}];
+  var grid=el('div');grid.style.cssText='display:flex;gap:10px;justify-content:center;flex-wrap:wrap';
+  var msg=el('div',null,'');msg.style.cssText='text-align:center;font-size:12.5px;color:#6b7280;margin-top:8px;min-height:16px';
+  TEST.forEach(function(o){var d=el('div');d.style.cssText='width:58px;border-radius:10px;background:#fff;border:2px solid #e6e9f2;padding:6px 0;text-align:center;cursor:pointer';d.innerHTML='<div style="font-size:26px">'+o.e+'</div><div style="font-size:10px;color:#8b90a6">点它</div>';d.onclick=function(e){if(d.dataset.done)return;d.dataset.done=1;d.innerHTML='<div style="font-size:26px">'+o.e+'</div><div style="font-size:10px;font-weight:800;color:'+(o.o?'#16a34a':'#dc2626')+'">'+(o.o?'是猫✓':'不是猫✗')+'</div>';d.style.borderColor=o.o?'#22c55e':'#fb7185';if(!o.o)wrong++;tested++;if(tested===TEST.length){msg.innerHTML='它把 <b style="color:#dc2626">'+wrong+' 只猫</b>判成了"不是猫"——只因它只见过橘猫，就<b>偏心</b>了！';if(!got){got=true;rw(e);}}};grid.appendChild(d);});
+  w.appendChild(note);w.appendChild(grid);w.appendChild(msg);return b;}
+
+function buildTrust(rw,onReset){var b=ixbox('🤔 该照做还是先查证？','AI 说的不一定对，你来判断',onReset);var w=b._body;
+  var Q=[{s:'这个野蘑菇能吃',safe:0},{s:'1 加 1 等于 2',safe:1},{s:'这瓶蓝色液体可以喝',safe:0},{s:'企鹅生活在南极',safe:1},{s:'把金属插进插座试试',safe:0},{s:'太阳又大又热',safe:1}];
+  for(var _s=Q.length-1;_s>0;_s--){var _j=Math.floor(Math.random()*(_s+1)),_t=Q[_s];Q[_s]=Q[_j];Q[_j]=_t;}var i=0,score=0,got=false;
+  var card=el('div');card.style.cssText='text-align:center;font-weight:700;font-size:15px;color:#1e1b3a;min-height:44px;display:grid;place-items:center;padding:6px';
+  var sc=el('div',null,'答对 0');sc.style.cssText='text-align:center;font-size:12px;color:#8b5cf6;font-weight:800';
+  var bw=el('div');bw.style.cssText='display:flex;gap:12px;justify-content:center;margin-top:8px';
+  function show(){card.textContent='AI 说：「'+Q[i%Q.length].s+'」';}
+  [['✅ 照做',1],['🔎 先查证',0]].forEach(function(x){var bn=el('button','btn btn-ghost',x[0]);bn.onclick=function(e){var right=(Q[i%Q.length].safe===x[1]);if(right){score++;spark(e.clientX,e.clientY);}else{toast(Q[i%Q.length].safe?'这个其实挺安全～':'⚠️ 危险的事要先查证！',false);}sc.textContent='答对 '+score;if(!got){got=true;rw(e);}i++;show();};bw.appendChild(bn);});
+  w.appendChild(card);w.appendChild(sc);w.appendChild(bw);show();return b;}
+
+function buildGuessing(rw,onReset){var b=ixbox('🎲 它其实在"猜"','同一个问题问几次，看答案变不变',onReset);var w=b._body;var A=['大概是 3 只吧？','应该有 5 只！','我猜…4 只？','说不好，也许 6 只'],i=0,got=false;
+  var q=el('div',null,'你问：「天上有几只鸟？」');q.style.cssText='text-align:center;font-weight:800;color:#1e1b3a;margin-bottom:8px';
+  var ans=el('div',null,'点下面问问看👇');ans.style.cssText='text-align:center;font-size:16px;color:#6d28d9;font-weight:700;min-height:40px;display:grid;place-items:center';
+  var btn=el('button','btn btn-glow','🙋 再问一次');btn.style.cssText+=';display:block;margin:6px auto 0';
+  btn.onclick=function(e){ans.textContent='AI：「'+A[i%A.length]+'」';i++;if(i>=3&&!got){got=true;toast('🎲 每次都不一样!',true);rw(e);}};
+  var tip=el('div',null,'它没有"标准答案"，只是每次挑一个像样的——所以别全信');tip.style.cssText='text-align:center;font-size:11.5px;color:#9aa1ac;margin-top:6px';
+  w.appendChild(q);w.appendChild(ans);w.appendChild(btn);w.appendChild(tip);return b;}
+
+function buildPrivacy(rw,onReset){var b=ixbox('🔒 隐私守卫','点信息，再点它能不能告诉 AI',onReset);var w=b._body;var DATA=[{e:'📚 数学题怎么做',a:1},{e:'🏠 我家住址',a:0},{e:'🐱 我喜欢猫',a:1},{e:'🔑 我家密码',a:0},{e:'🎨 想个画画点子',a:1},{e:'📱 爸妈电话号',a:0}],sel=null,left=DATA.length,got=false;
+  var row=el('div');row.style.cssText='display:flex;gap:8px;flex-wrap:wrap;justify-content:center;min-height:44px;margin-bottom:10px';
+  DATA.forEach(function(f){var d=el('div',null,f.e);d.style.cssText='padding:7px 10px;border-radius:10px;background:#fff;border:2px solid #e6e9f2;font-size:13px;cursor:pointer';d.onclick=function(){if(sel&&sel.d===d){d.style.borderColor='#e6e9f2';sel=null;return;}row.querySelectorAll('div').forEach(function(x){x.style.borderColor='#e6e9f2';});d.style.borderColor='#ffd66d';sel={d:d,a:f.a};};row.appendChild(d);});
+  var bins=el('div');bins.style.cssText='display:flex;gap:10px';
+  [['✅ 能告诉 AI',1],['🔒 不能说',0]].forEach(function(x){var bn=el('div',null,x[0]);bn.style.cssText='flex:1;padding:12px;border-radius:12px;border:2.5px dashed #b7abdf;text-align:center;font-weight:800;color:#6d28d9;cursor:pointer;font-size:13px';bn.onclick=function(e){if(!sel)return;if(sel.a===x[1]){spark(e.clientX,e.clientY);sel.d.style.transition='.25s';sel.d.style.transform='scale(0)';var dd=sel.d;setTimeout(function(){dd.remove();},250);left--;sel=null;if(!got){got=true;rw(e);}if(left===0)toast('全分对！隐私守得好 ✓',true);}else{bn.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}],{duration:300});}};bins.appendChild(bn);});
+  w.appendChild(row);w.appendChild(bins);return b;}
+
+function buildDoubleEdge(rw,onReset){var b=ixbox('⚔️ 好用途 or 坏用途？','同样的 AI 本领，用对还是用坏？',onReset);var w=b._body;
+  var Q=[{s:'用 AI 换脸做搞笑视频逗朋友',good:1},{s:'用 AI 换脸假装别人骗钱',good:0},{s:'用 AI 帮你列作业提纲再自己写',good:1},{s:'用 AI 直接生成作业交上去',good:0},{s:'用 AI 帮盲人读出文字',good:1},{s:'用 AI 编假新闻骗人',good:0}];
+  for(var _s=Q.length-1;_s>0;_s--){var _j=Math.floor(Math.random()*(_s+1)),_t=Q[_s];Q[_s]=Q[_j];Q[_j]=_t;}var i=0,score=0,got=false;
+  var card=el('div');card.style.cssText='text-align:center;font-weight:700;font-size:14.5px;color:#1e1b3a;min-height:46px;display:grid;place-items:center;padding:6px';
+  var sc=el('div',null,'答对 0');sc.style.cssText='text-align:center;font-size:12px;color:#8b5cf6;font-weight:800';
+  var bw=el('div');bw.style.cssText='display:flex;gap:12px;justify-content:center;margin-top:8px';
+  function show(){card.textContent=Q[i%Q.length].s;}
+  [['✅ 好用途',1],['❌ 坏用途',0]].forEach(function(x){var bn=el('button','btn btn-ghost',x[0]);bn.onclick=function(e){if(Q[i%Q.length].good===x[1]){score++;spark(e.clientX,e.clientY);}else{toast('再想想这样对不对～',false);}sc.textContent='答对 '+score;if(!got){got=true;rw(e);}i++;show();};bw.appendChild(bn);});
+  w.appendChild(card);w.appendChild(sc);w.appendChild(bw);show();return b;}
+
+function buildTips(rw,onReset){var b=ixbox('🎒 聪明用 AI 三锦囊','点开三张卡，收下秘诀',onReset);var w=b._body;var seen={},got=false;
+  var C=[['🔎','多核实','重要的事别全信 AI，自己再查一遍'],['🔒','护隐私','别把住址、密码这些告诉 AI'],['🧑‍✈️','你做主','AI 是帮手不是老板，主意你来拿']];
+  var row=el('div');row.style.cssText='display:flex;gap:8px';
+  C.forEach(function(c,i){var card=el('div');card.style.cssText='flex:1;padding:12px 8px;border-radius:12px;background:#fff;border:2px solid #e6e9f2;text-align:center;cursor:pointer;min-height:100px';card.innerHTML='<div style="font-size:28px">'+c[0]+'</div><div style="font-size:11px;color:#8b90a6;margin-top:6px">点开</div>';card.onclick=function(e){card.innerHTML='<div style="font-size:24px">'+c[0]+'</div><div style="font-weight:800;margin:3px 0;font-size:13px">'+c[1]+'</div><div style="font-size:11px;color:#4b4869;line-height:1.4">'+c[2]+'</div>';card.style.borderColor='#8b5cf6';card.style.background='#f5f3ff';seen[i]=1;spark(e.clientX,e.clientY);if(Object.keys(seen).length===3&&!got){got=true;rw(e);}};row.appendChild(card);});
+  w.appendChild(row);return b;}
+
+function buildDetectiveAgency(onWin,onReset){var b=ixbox('🕵️ AI 侦探事务所','判断每个案子：用得对不对？答对 5 个结案！',onReset);var w=b._body;
+  var C=[{s:'用 AI 查资料写读后感，自己再改',ok:1},{s:'把同学照片用 AI 恶搞发群里',ok:0},{s:'用 AI 翻译看不懂的外文说明',ok:1},{s:'全信 AI 说野果能吃就摘来吃',ok:0},{s:'用 AI 想生日会的点子',ok:1},{s:'把家里 WiFi 密码发给 AI 记着',ok:0},{s:'用 AI 练习英语对话',ok:1},{s:'让 AI 冒充老师给同学发通知',ok:0}];
+  for(var _s=C.length-1;_s>0;_s--){var _j=Math.floor(Math.random()*(_s+1)),_t=C[_s];C[_s]=C[_j];C[_j]=_t;}var i=0,score=0,goal=5;
+  var sc=el('div',null,'结案 0 / 5');sc.style.cssText='text-align:center;font-weight:900;color:#6d28d9;font-size:16px';
+  var card=el('div');card.style.cssText='text-align:center;font-weight:700;font-size:14.5px;color:#1e1b3a;min-height:46px;display:grid;place-items:center;padding:6px';
+  var bw=el('div');bw.style.cssText='display:flex;gap:12px;justify-content:center;margin-top:8px';
+  function show(){card.textContent='案子：'+C[i%C.length].s;}
+  [['✅ 合理',1],['⚠️ 有问题',0]].forEach(function(x){var bn=el('button','btn btn-ghost',x[0]);bn.onclick=function(e){if(C[i%C.length].ok===x[1]){score++;spark(e.clientX,e.clientY);sc.textContent='结案 '+score+' / '+goal;if(score>=goal){onWin(e);return;}}else{toast('这个判断再想想～',false);}i++;show();};bw.appendChild(bn);});
+  w.appendChild(sc);w.appendChild(card);w.appendChild(bw);show();return b;}
+
+// —— 「信」章内容(6 节) ——
+CHAPTERS['信']={id:'信',title:'⚖️ 信 · AI 说的都对吗？该信它吗？',badge:{e:'🏅',t:'AI 明白人',s:'你学会了聪明、负责地看待和使用 AI'},endGame:buildDetectiveAgency,sections:[
+ {n:1,heading:'AI 会"偏心"',hook:'<span class="apo">阿波：</span>提醒你件事——如果喂我的例子太单一，我会变得很"偏心"！来测个只见过橘猫的裁判👇',build:buildBias,
+  paras:['要是训练时我只见过一种样子，遇到没见过的，我就会判错、还很不公平。','这种因为数据太单一造成的不公平，叫[[偏见]]。'],
+  terms:{'偏见':{s:'AI 因为见过的数据太单一或有倾向，做出不公平的判断。'}},peg:'🍎 数据偏，AI 就偏心',close:'所以别怪 AI 坏——是喂它的数据有偏，它才偏心。',nextHint:'那我说的话，是不是也不能全信？'},
+ {n:2,heading:'别盲目相信 AI',hook:'<span class="apo">阿波：</span>我很会说，但不代表我说的都对！有些事听我的很危险。你来判断👇',build:buildTrust,
+  paras:['我可能把错的说得很自信，尤其是危险的事——照做可能出事。','所以：重要的、危险的事，别光听我的，一定要先查证或问大人。'],
+  terms:{},peg:'⚖️ 危险的事，先查证',close:'记住：我是参考，不是命令。',nextHint:'它为什么会一本正经地说错呢？'},
+ {n:3,heading:'它在猜，不知道对错',hook:'<span class="apo">阿波：</span>跟你说个秘密——同一个问题，我每次答的可能都不一样！因为我在猜。再问几次看👇',build:buildGuessing,
+  paras:['我没有一本真正的"标准答案书"，只是根据见过的东西，每次挑一个最像样的答案。','所以我会变、会错——因为我在配对和猜，不是真的"知道"。'],
+  terms:{},peg:'🎭 它在猜，不在懂',close:'越是我不确定的事，你越要自己核实。',nextHint:'那我用 AI 的时候，有什么该保护好的？'},
+ {n:4,heading:'守好你的隐私',hook:'<span class="apo">阿波：</span>有些话可以告诉我，有些千万别！比如你家密码。来当隐私守卫，分分看👇',build:buildPrivacy,
+  paras:['作业问题、兴趣爱好，这些告诉我没问题。','但家庭住址、密码、爸妈电话这些[[隐私]]，绝对不能告诉我或任何 AI。'],
+  terms:{'隐私':{s:'只属于你和家人的私密信息，比如住址、密码、电话。'}},peg:'⚖️ 隐私要守好',close:'保护好隐私，是聪明用 AI 的第一课。',nextHint:'同一个 AI 本领，会不会有人拿去做坏事？'},
+ {n:5,heading:'AI 是把双刃剑',hook:'<span class="apo">阿波：</span>我的本领是把双刃剑——同样的能力，能帮人，也能害人。你来判判👇',build:buildDoubleEdge,
+  paras:['同一个 AI 能力，用对了帮大忙，用歪了会害人。','关键不在 AI，在用它的人怎么选择。'],
+  terms:{},peg:'⚖️ 工具无好坏，用法有对错',close:'做个善良的使用者，让 AI 的力量用在好地方。',nextHint:'那到底怎么才算聪明、负责地用 AI？'},
+ {n:6,heading:'聪明用 AI 三锦囊',hook:'<span class="apo">阿波：</span>最后送你三个锦囊，学会了你就是聪明的 AI 小主人！点开收下👇',build:buildTips,
+  paras:['聪明用 AI 三件事：重要信息多核实、隐私守好、你自己拿主意。','把我当成得力小助手，但方向盘，永远握在你手里。'],
+  terms:{},peg:'⚖️ 你才是主人',close:'恭喜你——现在你已经懂 AI、也会聪明地用 AI 了！',nextHint:null}
+]};
+
+// —— 「序」章交互构件 ——
+function buildMagicOrLearn(rw,onReset){var b=ixbox('🔮 魔法还是学来的？','点每件事，猜是 AI 学的还是人写死的',onReset);var w=b._body;
+  var Q=[{t:'手机认出照片里的猫',ai:1},{t:'计算器算 1+1',ai:0},{t:'AI 下棋赢世界冠军',ai:1},{t:'闹钟准点响',ai:0},{t:'语音助手听懂你说话',ai:1},{t:'电灯按开关就亮',ai:0}];
+  for(var _s=Q.length-1;_s>0;_s--){var _j=Math.floor(Math.random()*(_s+1)),_t=Q[_s];Q[_s]=Q[_j];Q[_j]=_t;}var i=0,score=0,got=false;
+  var card=el('div');card.style.cssText='text-align:center;font-weight:700;font-size:15px;color:#1e1b3a;min-height:44px;display:grid;place-items:center;padding:6px';
+  var sc=el('div',null,'答对 0');sc.style.cssText='text-align:center;font-size:12px;color:#8b5cf6;font-weight:800';
+  var bw=el('div');bw.style.cssText='display:flex;gap:12px;justify-content:center;margin-top:8px';
+  function show(){card.textContent=Q[i%Q.length].t;}
+  [['🤖 AI 学的',1],['⚙️ 人写死的',0]].forEach(function(x){var bn=el('button','btn btn-ghost',x[0]);bn.onclick=function(e){if(Q[i%Q.length].ai===x[1]){score++;spark(e.clientX,e.clientY);}else{toast('再想想～',false);}sc.textContent='答对 '+score;if(!got){got=true;rw(e);}i++;show();};bw.appendChild(bn);});
+  w.appendChild(card);w.appendChild(sc);w.appendChild(bw);show();return b;}
+
+function buildFindAI(rw,onReset){var b=ixbox('🔍 找出身边的 AI','点出用到 AI 的东西（共 4 个）',onReset);var w=b._body;
+  var ITEMS=[{e:'📱',ai:1},{e:'🪑',ai:0},{e:'🗣️',ai:1},{e:'📖',ai:0},{e:'📷',ai:1},{e:'🔒',ai:1},{e:'🍎',ai:0},{e:'✏️',ai:0}];var found=0,got=false;
+  var grid=el('div');grid.style.cssText='display:grid;grid-template-columns:repeat(4,1fr);gap:8px';
+  var msg=el('div',null,'找到 0 / 4');msg.style.cssText='text-align:center;font-size:12.5px;color:#8b5cf6;font-weight:800;margin-top:8px';
+  ITEMS.forEach(function(o){var d=el('div',null,o.e);d.style.cssText='aspect-ratio:1;border-radius:12px;background:#fff;border:2px solid #e6e9f2;display:grid;place-items:center;font-size:28px;cursor:pointer';d.onclick=function(e){if(d.dataset.done)return;if(o.ai){d.dataset.done=1;d.style.borderColor='#22c55e';d.style.background='#ecfdf5';spark(e.clientX,e.clientY);found++;msg.textContent='找到 '+found+' / 4';if(found===4&&!got){got=true;toast('🎉 全找到了!',true);rw(e);}}else{toast('这个不是 AI 哦～',false);}};grid.appendChild(d);});
+  w.appendChild(grid);w.appendChild(msg);return b;}
+
+function buildMapPreview(rw,onReset){var b=ixbox('🗺️ 探险地图','点"启程"，点亮五站',onReset);var w=b._body;var got=false;
+  var S=[['👁️','看'],['🧠','学'],['💬','说'],['🛠️','做'],['⚖️','信']];
+  var row=el('div');row.style.cssText='display:flex;gap:6px;justify-content:center;flex-wrap:wrap';
+  var cells=S.map(function(s){var d=el('div',null,s[0]+'<div style="font-size:10px">'+s[1]+'</div>');d.style.cssText='width:48px;padding:8px 0;border-radius:10px;background:#e6e9f2;text-align:center;font-size:22px;transition:.3s;filter:grayscale(1);opacity:.5';row.appendChild(d);return d;});
+  var btn=el('button','btn btn-glow','🚀 启程！');btn.style.cssText+=';display:block;margin:10px auto 0';
+  btn.onclick=function(e){cells.forEach(function(d,i){setTimeout(function(){d.style.filter='none';d.style.opacity='1';d.style.background='#f5f3ff';},i*200);});btn.style.display='none';setTimeout(function(){toast('🚀 出发!',true);if(!got){got=true;rw(e);}},1000);};
+  w.appendChild(row);w.appendChild(btn);return b;}
+
+function buildMagicDash(onWin,onReset){var b=ixbox('🎮 魔法大搜捕','快判！答对 5 个就毕业启程',onReset);var w=b._body;
+  var Q=[{t:'刷视频给你推荐内容',ai:1},{t:'尺子量长度',ai:0},{t:'人脸解锁手机',ai:1},{t:'风扇转起来',ai:0},{t:'翻译软件翻句子',ai:1},{t:'手电筒发光',ai:0},{t:'拍照自动美颜',ai:1}];
+  for(var _s=Q.length-1;_s>0;_s--){var _j=Math.floor(Math.random()*(_s+1)),_t=Q[_s];Q[_s]=Q[_j];Q[_j]=_t;}var i=0,score=0,goal=5;
+  var sc=el('div',null,'0 / 5');sc.style.cssText='text-align:center;font-weight:900;color:#6d28d9;font-size:18px';
+  var card=el('div');card.style.cssText='text-align:center;font-weight:700;font-size:15px;color:#1e1b3a;min-height:44px;display:grid;place-items:center;padding:6px';
+  var bw=el('div');bw.style.cssText='display:flex;gap:12px;justify-content:center;margin-top:8px';
+  function show(){card.textContent=Q[i%Q.length].t;}
+  [['🤖 AI 的',1],['⚙️ 不是',0]].forEach(function(x){var bn=el('button','btn btn-ghost',x[0]);bn.onclick=function(e){if(Q[i%Q.length].ai===x[1]){score++;spark(e.clientX,e.clientY);sc.textContent=score+' / '+goal;if(score>=goal){onWin(e);return;}}else{toast('再想想～',false);}i++;show();};bw.appendChild(bn);});
+  w.appendChild(sc);w.appendChild(card);w.appendChild(bw);show();return b;}
+
+// —— 「序」章内容(3 节) ——
+CHAPTERS['序']={id:'序',title:'🎬 序 · AI 到底是不是魔法？',badge:{e:'🏅',t:'启程者',s:'你踏上了 AI 探险之旅'},endGame:buildMagicDash,sections:[
+ {n:1,heading:'AI 不是魔法',hook:'<span class="apo">阿波：</span>嗨！我是阿波🤖，你的 AI 向导！先考考你——这些事，哪些是 AI"学"来的本事？👇',build:buildMagicOrLearn,
+  paras:['很多你以为很神奇的事，其实是 AI 从大量例子里"学"来的——不是魔法，也不是有人偷偷写好了答案。','这趟探险，我就带你看看这些本事到底怎么来的。'],
+  terms:{},peg:'🧲 不是魔法，是学来的',close:'记住这句话，整趟旅程都用得上：AI 不是魔法，是会从例子里学。',nextHint:'那这些 AI，都藏在哪儿呢？'},
+ {n:2,heading:'AI 就在你身边',hook:'<span class="apo">阿波：</span>AI 早就藏在你身边啦！在这些东西里，找出用到 AI 的👇',build:buildFindAI,
+  paras:['刷视频给你推荐的、语音助手、人脸解锁、拍照美颜……背后都是 AI。','它不神秘，它就在你每天的生活里。'],
+  terms:{},peg:'🧲 AI 就在身边',close:'AI 不在很远的实验室，它就在你手边。',nextHint:'准备好出发，去看看 AI 的秘密了吗？'},
+ {n:3,heading:'探险，启程！',hook:'<span class="apo">阿波：</span>我们的探险有五站：看→学→说→做→信。点亮地图，出发吧！🚀',build:buildMapPreview,
+  paras:['我们会一站站探索：AI 怎么看👁️、怎么学🧠、怎么说💬、怎么做事🛠️、该不该信⚖️。','每通关一站，你都会拿到徽章和金币。走吧，第一站见！'],
+  terms:{},peg:'',close:'探险启程——你的第一站是"看"！',nextHint:null}
 ]};
 
 // ========== 章节渲染 ==========
