@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>进阶课预览 · 神经网络在算什么</title>
+<style>
+:root{
+  --font:"PingFang SC","Microsoft YaHei",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --space-900:#0a0620; --space-800:#120a30; --space-700:#1b1145;
+  --paper:#fffdf9; --paper-2:#f2f5fb; --line:#e6e9f2;
+  --ink:#1e1b3a; --ink-2:#4b4869; --ink-dim:#8b90a6;
+  --violet:#8b5cf6; --violet-l:#a78bfa; --violet-d:#6d28d9; --violet-dd:#5b21b6;
+  --cyan:#22d3ee; --sky:#38bdf8;
+  --correct:#58cc02; --correct-d:#46a302;
+  --gentle:#fbbf24; --gentle-d:#d99a12;
+  --gold:#ffd66d; --gold-d:#eab308;
+  --st2:#8b5cf6;
+  --r-xl:28px; --r-lg:20px; --r-md:14px; --r-sm:10px; --r-pill:999px;
+  --sh-soft:0 12px 28px rgba(60,50,110,.16);
+  --sh-glow:0 0 26px rgba(139,92,246,.55);
+  --sh-glow-cyan:0 0 22px rgba(34,211,238,.6);
+  --ease:cubic-bezier(.4,0,.2,1);
+  --ease-bounce:cubic-bezier(.34,1.56,.64,1);
+}
+*{box-sizing:border-box;}
+body{margin:0;font-family:var(--font);-webkit-font-smoothing:antialiased;color:var(--ink);
+  color-scheme:light;background:var(--space-900);}
+.noselect,.noselect *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}
+
+/* 顶栏（星空） */
+.cosmos{position:relative;background:radial-gradient(130% 120% at 50% -10%,var(--space-700) 0%,var(--space-900) 62%);color:#e8e4ff;overflow:hidden;}
+.cosmos::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(1.5px 1.5px at 15% 20%,#fff8 40%,transparent),radial-gradient(1.5px 1.5px at 70% 55%,#fff6 40%,transparent),radial-gradient(2px 2px at 40% 80%,#c4b5fd88 40%,transparent),radial-gradient(1px 1px at 88% 30%,#fff7 40%,transparent);
+  animation:twinkle 4.5s ease-in-out infinite;}
+@keyframes twinkle{0%,100%{opacity:.5}50%{opacity:1}}
+.topbar{position:relative;display:flex;align-items:center;gap:14px;padding:12px 18px;z-index:2;}
+.tb-title{font-size:15px;font-weight:800;color:#e9d5ff;}
+.tb-tag{font-size:11px;font-weight:800;letter-spacing:1px;color:#0a0620;background:var(--gold);padding:3px 10px;border-radius:var(--r-pill);}
+.tb-gem{margin-left:auto;font-size:14px;font-weight:800;color:var(--gold);display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.08);padding:6px 14px;border-radius:var(--r-pill);}
+
+/* 课程头 */
+.hero{position:relative;text-align:center;padding:20px 20px 34px;z-index:2;}
+.hero .emoji{font-size:64px;animation:bob 2.6s ease-in-out infinite;}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-6px) rotate(2deg)}}
+.hero h1{font-size:26px;font-weight:900;margin:8px 0 4px;color:#fff;letter-spacing:.5px;}
+.hero .sub{font-size:13px;color:#c4b5fd;}
+.hero .hook{max-width:640px;margin:16px auto 0;background:rgba(255,255,255,.07);border:1px solid rgba(167,139,250,.3);
+  border-radius:var(--r-lg);padding:16px 20px;font-size:14.5px;line-height:1.75;color:#e8e4ff;text-align:left;}
+.hero .hook b{color:var(--gold);}
+
+/* 进度条 */
+.progress{position:sticky;top:0;z-index:20;height:6px;background:rgba(255,255,255,.08);}
+.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--violet),var(--cyan));transition:width .4s var(--ease);}
+
+/* 工作台 */
+.workbench{background:linear-gradient(180deg,var(--paper),var(--paper-2));padding:26px 16px 80px;border-radius:26px 26px 0 0;}
+.wb-inner{max-width:720px;margin:0 auto;}
+.section{background:#fff;border:1.5px solid var(--line);border-radius:var(--r-lg);padding:22px 20px;margin-bottom:20px;
+  box-shadow:0 6px 18px rgba(60,50,110,.06);}
+.section-heading{display:flex;align-items:center;gap:12px;font-size:19px;font-weight:900;margin-bottom:6px;}
+.section-num{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-size:13px;color:#fff;
+  background:linear-gradient(145deg,var(--violet),var(--violet-d));box-shadow:0 3px 0 var(--violet-dd);flex:none;}
+.conflict{font-size:12.5px;color:var(--gentle-d);background:color-mix(in srgb,var(--gentle) 16%,#fff);
+  border-radius:var(--r-sm);padding:7px 12px;margin:10px 0;font-weight:700;}
+.p{font-size:15.5px;line-height:1.85;color:var(--ink-2);margin:10px 0;}
+.term{color:var(--violet-d);font-weight:800;border-bottom:2.5px dotted var(--gold-d);cursor:pointer;padding:0 1px;}
+.term:hover{background:color-mix(in srgb,var(--gold) 40%,transparent);border-radius:4px;}
+
+/* 交互外壳 */
+.ixbox{background:linear-gradient(160deg,#faf8ff,#eef1fb);border:1.5px solid var(--line);border-radius:var(--r-lg);
+  padding:20px;margin:14px 0;position:relative;}
+.ixbox-title{font-size:14px;font-weight:800;color:var(--violet-d);margin-bottom:14px;display:flex;align-items:center;gap:6px;}
+.ix-reset{margin-left:auto;font-size:11px;font-weight:700;color:var(--ink-dim);background:#fff;border:1.5px solid var(--line);
+  border-radius:var(--r-pill);padding:4px 12px;cursor:pointer;}
+.ix-reset:hover{color:var(--violet-d);border-color:var(--violet-l);}
+.ixbox-hint{text-align:center;font-size:12.5px;color:var(--ink-dim);margin-top:10px;}
+
+.btn{font-family:var(--font);font-weight:900;border:none;cursor:pointer;border-radius:var(--r-md);}
+.btn-primary{background:var(--correct);color:#fff;padding:11px 26px;font-size:14px;box-shadow:0 5px 0 var(--correct-d);}
+.btn-primary:active{transform:translateY(4px);box-shadow:0 1px 0 var(--correct-d);}
+.btn-ghost{background:#fff;color:var(--violet-d);border:2px solid var(--violet-l);padding:9px 22px;font-size:13px;}
+
+/* 神经元 demo */
+.neuron-wrap{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center;}
+@media(max-width:560px){.neuron-wrap{grid-template-columns:1fr;}}
+.inputs{display:flex;flex-direction:column;gap:12px;}
+.inrow{display:flex;align-items:center;gap:10px;}
+.inrow label{font-size:12.5px;width:64px;color:var(--ink-2);font-weight:700;}
+.inrow input[type=range]{flex:1;accent-color:var(--violet);}
+.inrow .wv{font-size:11px;color:var(--violet-d);font-weight:800;width:54px;text-align:right;}
+.core{width:120px;height:120px;border-radius:50%;display:grid;place-items:center;font-size:44px;position:relative;
+  background:radial-gradient(circle at 35% 30%,#e9e4ff,#cbbef7);box-shadow:0 4px 14px rgba(139,92,246,.3);transition:.15s;}
+.core.fire{background:radial-gradient(circle at 35% 30%,var(--gold),var(--gold-d));box-shadow:0 0 34px var(--gold),0 0 60px var(--gold);transform:scale(1.06);}
+.summeter{margin-top:12px;}
+.sumbar{height:14px;border-radius:var(--r-pill);background:var(--line);overflow:hidden;position:relative;}
+.sumbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--violet),var(--cyan));transition:width .12s;}
+.sumbar .thr{position:absolute;top:-4px;bottom:-4px;width:3px;background:var(--gentle-d);left:60%;border-radius:2px;}
+.sumtxt{font-size:12px;color:var(--ink-2);margin-top:6px;text-align:center;font-weight:700;}
+
+/* 前向/反向传播 demo */
+.net{display:flex;justify-content:space-between;align-items:center;padding:6px 4px;min-height:150px;position:relative;}
+.layer{display:flex;flex-direction:column;gap:18px;z-index:2;}
+.node{width:34px;height:34px;border-radius:50%;background:#fff;border:2.5px solid var(--violet-l);transition:.2s;}
+.node.lit{background:var(--gold);border-color:var(--gold-d);box-shadow:0 0 16px var(--gold);transform:scale(1.15);}
+.node.lit-back{background:var(--cyan);border-color:#0891b2;box-shadow:0 0 16px var(--cyan);transform:scale(1.15);}
+.netsvg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;}
+.netsvg line{stroke:var(--line);stroke-width:2;transition:.2s;}
+.netsvg line.flow{stroke:var(--violet);stroke-width:3;}
+
+/* 损失曲线 / 梯度下降 canvas */
+.cv{width:100%;height:180px;background:#fff;border-radius:var(--r-md);border:1.5px solid var(--line);display:block;}
+.metric{display:flex;gap:18px;justify-content:center;margin-top:10px;font-size:13px;font-weight:800;}
+.metric b{color:var(--violet-d);}
+
+/* 术语弹窗 */
+.term-pop{position:fixed;inset:0;display:none;place-items:center;z-index:80;background:rgba(10,6,32,.55);backdrop-filter:blur(3px);}
+.term-pop.open{display:grid;}
+.term-card{background:#fff;border-radius:var(--r-lg);padding:22px 24px;max-width:360px;margin:16px;
+  box-shadow:0 20px 50px rgba(0,0,0,.4);animation:popIn .3s var(--ease-bounce);border-top:6px solid var(--gold);}
+@keyframes popIn{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
+.term-card h4{font-size:19px;color:var(--violet-d);margin:0 0 4px;}
+.term-card .en{font-size:12px;color:var(--ink-dim);font-weight:700;margin-bottom:10px;}
+.term-card .s{font-size:14.5px;line-height:1.7;color:var(--ink);margin:0 0 12px;}
+.term-card .pro{font-size:13.5px;line-height:1.7;color:var(--ink-2);background:var(--paper-2);border-radius:var(--r-sm);padding:10px 12px;border-left:3px solid var(--violet-l);}
+.term-card .pro b{color:var(--violet-d);}
+.term-close{margin-top:14px;width:100%;background:var(--violet);color:#fff;border:none;border-radius:var(--r-md);padding:10px;font-weight:800;cursor:pointer;font-family:var(--font);}
+
+/* 金币飞行 */
+.coin{position:fixed;font-size:26px;z-index:90;pointer-events:none;transition:all .7s cubic-bezier(.5,-0.3,.4,1.2);}
+.spark{position:fixed;pointer-events:none;font-size:18px;z-index:99;animation:sparkUp .9s ease-out forwards;}
+@keyframes sparkUp{0%{opacity:1;transform:translate(0,0) scale(.6)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.3)}}
+
+/* 收束 */
+.finale{background:linear-gradient(160deg,var(--space-800),var(--space-900));color:#e8e4ff;border-radius:var(--r-xl);
+  padding:26px 22px;text-align:center;margin-top:8px;}
+.finale h3{font-size:20px;color:#fff;margin:0 0 10px;}
+.finale p{font-size:14px;line-height:1.8;color:#c4b5fd;margin:8px 0;}
+.pegs{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px;}
+.peg{background:rgba(255,255,255,.08);border:1px solid rgba(167,139,250,.3);border-radius:var(--r-pill);padding:6px 14px;font-size:12.5px;color:#e9d5ff;font-weight:700;}
+.cheat{font-size:12px;color:var(--ink-dim);background:#fff;border:1.5px dashed var(--line);border-radius:var(--r-md);padding:14px;margin-top:18px;line-height:1.9;}
+.note{max-width:720px;margin:0 auto 18px;font-size:12px;color:#8b90a6;text-align:center;background:rgba(255,255,255,.04);border-radius:var(--r-md);padding:8px;}
+</style>
+</head>
+<body class="noselect">
+
+<div class="progress"><i id="prog"></i></div>
+
+<div class="cosmos">
+  <div class="topbar">
+    <span class="tb-tag">进阶 · 架构探秘</span>
+    <span class="tb-title">🧠 神经网络在算什么</span>
+    <span class="tb-gem">🪙 <b id="coins">0</b></span>
+  </div>
+
+  <div class="hero">
+    <div class="emoji">🧠</div>
+    <h1>神经网络在算什么</h1>
+    <div class="sub">进阶课 · 8 个知识点 · 复用 neuron / forward / grad / loss 交互</div>
+    <div class="hook">你听过"神经网络""深度学习"很唬人——但它其实只在做三件小事：<b>打分、点火、调数字</b>。这门课我们把黑箱拆开，一格一格看它到底在算什么。</div>
+  </div>
+</div>
+
+<div class="note">🔎 这是<b>进阶课内容预览页</b>（独立文件，未改动主网页 index.html）。滚动阅读，动手玩每个互动，攒金币。</div>
+
+<div class="workbench">
+  <div class="wb-inner" id="sections"></div>
+</div>
+
+<div class="term-pop" id="pop">
+  <div class="term-card">
+    <h4 id="pop-t"></h4>
+    <div class="en" id="pop-en"></div>
+    <p class="s" id="pop-s"></p>
+    <div class="pro" id="pop-pro"></div>
+    <button class="term-close" onclick="closePop()">明白啦 👍</button>
+  </div>
+</div>
+
+<script>
+/* ========== 术语字典（双段·中英） ========== */
+const TERMS={
+  neuron:{t:"神经元",en:"neuron",s:"网络里最小的计算单元：几个数字进来，吐一个数字出去。",pro:"模仿生物神经细胞的<b>接收信号→决定要不要发信号</b>。几千几万个连起来就成了神经网络。"},
+  weight:{t:"权重",en:"weight",s:"每个输入有多重要。",pro:"训练时被不断微调的数字，是网络<b>学到的东西</b>的载体。认猫时'有没有胡须'权重大，'背景颜色'权重小。"},
+  bias:{t:"偏置",en:"bias",s:"让神经元更容易或更难'点火'的门槛。",pro:"给加权和加上的一个可调常数，相当于调节点火的<b>起跑线</b>。"},
+  wsum:{t:"加权和",en:"weighted sum",s:"输入乘以权重再相加（再加偏置）。",pro:"深度学习里最基础、最高频的运算——AI 一秒要做上亿次这样的<b>乘加</b>。"},
+  act:{t:"激活函数",en:"activation function",s:"决定神经元输出强弱的一道'开关'。",pro:"如 ReLU、Sigmoid。它给网络带来<b>非线性</b>，正是这个'小弯'让网络能学会拐弯抹角的复杂规律。"},
+  forward:{t:"前向传播",en:"forward pass",s:"信号从输入层一层层算到输出层。",pro:"网络<b>做出一次预测</b>的完整过程。前一层的输出，喂给后一层。"},
+  depth:{t:"深度",en:"depth",s:"网络有多少层。",pro:"'深度学习'的'深'就指层数。层越深越能表达复杂函数，但也越<b>难训练</b>。"},
+  loss:{t:"损失",en:"loss",s:"预测和正确答案差多少的一个数。",pro:"训练时要<b>最小化</b>的目标函数，越小代表越准。像考试扣了多少分。"},
+  grad:{t:"梯度下降",en:"gradient descent",s:"顺着'误差变小'的方向一点点调参数。",pro:"训练神经网络的<b>核心优化方法</b>。把损失想成山地，每步朝最陡的下坡挪一点。"},
+  lr:{t:"学习率",en:"learning rate",s:"每一步调多大。",pro:"太大发散、太小太慢，是最重要的<b>超参数</b>之一。"},
+  backprop:{t:"反向传播",en:"backpropagation",s:"从输出的误差往回，算出每个权重该怎么改。",pro:"用<b>链式法则</b>高效计算梯度，是深度学习能训练起来的关键。它和梯度下降搭档，就是网络'学会'的全部秘密。"}
+};
+
+/* ========== 课程内容（8 知识点） ========== */
+const SECTIONS=[
+  {n:"N1",title:"什么是'神经元'",conflict:"名字吓人（'神经'），其实极简单。",
+   body:`别被'神经'两个字唬住。一个 {{neuron}}，就是个会算账的小格子：几个数字进来，它吐一个数字出去。几千几万个这样的小格子连起来，就成了神经网络。`,
+   demo:"neuron"},
+  {n:"N2",title:"权重与偏置：每个输入有多重要",conflict:"为什么同样的输入，不同神经元反应不同？",
+   body:`不是每个输入都一样重要。每个输入都有一个 {{weight}}＝它有多重要；还有一个 {{bias}}＝点火的门槛高低。<b>网络学习，本质就是在调这些数字。</b>试试上面拖动滑块，看总和怎么变。`},
+  {n:"N3",title:"加权和：把账算出来",conflict:"",
+   body:`输入1×权重1 ＋ 输入2×权重2 ＋ …… ＋ 偏置 ＝ 一个总分，这就是 {{wsum}}。就这么简单的乘加，是整个 AI 最核心的动作，只不过它一秒做上亿次。`},
+  {n:"N4",title:"激活函数：要不要'点火'",conflict:"只会加减，网络学不了复杂东西——需要一点'非线性'。",
+   body:`总分算出来后，过一道 {{act}}：够高就'点火'⚡（输出强信号），不够就'熄火'😴。正是这个小小的弯，让网络能学会拐弯抹角的复杂规律。（上面的神经元：总和超过门槛线就会点亮）`},
+  {n:"N5",title:"一层层堆成网络",conflict:"",
+   body:`单个神经元很笨，但把它们排成一层层——前一层的输出喂给后一层——就能层层加工：底层看细节，高层看整体。这个过程叫 {{forward}}。'深度学习'的 {{depth}}，就是层数多。点下面的按钮，看信号一层层点亮。`,
+   demo:"forward"},
+  {n:"N6",title:"损失：错了多少",conflict:"怎么让网络知道自己错没错、错多少？",
+   body:`网络猜完，我们用一个叫 {{loss}} 的数字告诉它错得多离谱。训练的唯一目标，就是想办法把这个数字变小。点'训练一步'，看误差曲线往下掉。`,
+   demo:"loss"},
+  {n:"N7",title:"梯度下降：往误差更小处走",conflict:"知道错了多少，具体该往哪调权重？",
+   body:`想象损失是一片山地，你要走到<b>最低点</b>。{{grad}} 就是每一步都朝'最陡的下坡'挪一点点。走太大步会滑过头，走太小又太慢——这个步子叫 {{lr}}。拖动学习率，再点'走一步'看小球滚下山。`,
+   demo:"grad"},
+  {n:"N8",title:"反向传播：把'责任'往回传",conflict:"网络有几百万个权重，怎么知道每个该改多少？",
+   body:`一次预测错了，{{backprop}} 会从结果<b>倒着</b>算：告诉每一个权重'你该往哪个方向、改多少'。像团队复盘从结果往回找每个人的责任。点按钮，看信号从输出往输入回传。`,
+   demo:"backprop"}
+];
+
+/* ========== 渲染 ========== */
+let coins=0, done={};
+const secWrap=document.getElementById('sections');
+
+function parseBody(txt){
+  return txt.replace(/\{\{(\w+)\}\}/g,(m,k)=>{
+    const d=TERMS[k]; if(!d) return m;
+    return `<span class="term" onclick="openPop('${k}')">${d.t}</span>`;
+  });
+}
+
+SECTIONS.forEach(sec=>{
+  const el=document.createElement('div');
+  el.className='section';
+  let html=`<div class="section-heading"><span class="section-num">${sec.n}</span>${sec.title}</div>`;
+  if(sec.conflict) html+=`<div class="conflict">💡 难点：${sec.conflict}</div>`;
+  html+=`<p class="p">${parseBody(sec.body)}</p>`;
+  el.innerHTML=html;
+  if(sec.demo){ el.appendChild(buildDemo(sec.demo)); }
+  secWrap.appendChild(el);
+});
+
+/* 收束卡 */
+const fin=document.createElement('div');
+fin.className='finale';
+fin.innerHTML=`<h3>🎉 你拆开了神经网络！</h3>
+  <p>神经网络 = 一堆神经元（打分＋点火）→ 堆成多层（前向传播）→ 用损失量误差 → 用梯度下降＋反向传播把几百万个数字一点点调好。</p>
+  <p><b style="color:#ffd66d">没有魔法，全是'调数字'🔧。</b></p>
+  <div class="pegs"><span class="peg">🔧 它只是在调数字</span><span class="peg">🪜 一层层往上</span><span class="peg">🧲 不是魔法</span></div>`;
+secWrap.appendChild(fin);
+
+const cheat=document.createElement('div');
+cheat.className='cheat';
+cheat.innerHTML=`📎 <b>术语中英对照小抄</b><br>神经元 neuron · 权重 weight · 偏置 bias · 加权和 weighted sum · 激活函数 activation · 前向传播 forward pass · 深度 depth · 损失 loss · 梯度下降 gradient descent · 学习率 learning rate · 反向传播 backpropagation`;
+secWrap.appendChild(cheat);
+
+/* ========== 术语弹窗 ========== */
+function openPop(k){
+  const d=TERMS[k];
+  document.getElementById('pop-t').textContent=d.t;
+  document.getElementById('pop-en').textContent=d.en;
+  document.getElementById('pop-s').textContent=d.s;
+  document.getElementById('pop-pro').innerHTML='<b>再深一层：</b>'+d.pro;
+  document.getElementById('pop').classList.add('open');
+}
+function closePop(){document.getElementById('pop').classList.remove('open');}
+document.getElementById('pop').addEventListener('click',e=>{if(e.target.id==='pop')closePop();});
+
+/* ========== 奖励 ========== */
+function reward(x,y,label){
+  const gemEl=document.getElementById('coins');
+  const r=gemEl.getBoundingClientRect();
+  const c=document.createElement('div');c.className='coin';c.textContent='🪙';
+  c.style.left=x+'px';c.style.top=y+'px';document.body.appendChild(c);
+  requestAnimationFrame(()=>{c.style.left=r.left+'px';c.style.top=r.top+'px';c.style.transform='scale(.5)';c.style.opacity='.3';});
+  setTimeout(()=>{c.remove();coins+=5;gemEl.textContent=coins;
+    for(let i=0;i<6;i++){const s=document.createElement('div');s.className='spark';s.textContent='✨';
+      s.style.left=r.left+'px';s.style.top=r.top+'px';
+      s.style.setProperty('--dx',(Math.cos(i)*40)+'px');s.style.setProperty('--dy',(Math.sin(i)*40-20)+'px');
+      document.body.appendChild(s);setTimeout(()=>s.remove(),900);}
+  },700);
+}
+function firstDone(id,x,y){ if(done[id])return; done[id]=1; reward(x,y); updateProg(); }
+function updateProg(){
+  const total=SECTIONS.filter(s=>s.demo).length+1;
+  const got=Object.keys(done).length;
+  document.getElementById('prog').style.width=Math.min(100,got/total*100)+'%';
+}
+
+/* ========== 交互 demo 构建 ========== */
+function buildDemo(kind){
+  const box=document.createElement('div');box.className='ixbox';
+  if(kind==='neuron') buildNeuron(box);
+  else if(kind==='forward') buildProp(box,false);
+  else if(kind==='backprop') buildProp(box,true);
+  else if(kind==='loss') buildLoss(box);
+  else if(kind==='grad') buildGrad(box);
+  return box;
+}
+
+/* --- 神经元：滑块→加权和→点火 --- */
+function buildNeuron(box){
+  box.innerHTML=`<div class="ixbox-title">🔬 神经元实验台
+    <button class="ix-reset">↺ 重置</button></div>
+    <div class="neuron-wrap">
+      <div style="flex:1">
+        <div class="inputs"></div>
+        <div class="summeter"><div class="sumbar"><i></i><div class="thr"></div></div>
+        <div class="sumtxt">加权总和：<span class="sv">0.0</span> ／ 门槛 6.0</div></div>
+      </div>
+      <div style="text-align:center"><div class="core">😴</div><div style="font-size:11px;color:var(--ink-dim);margin-top:8px">神经元</div></div>
+    </div>
+    <div class="ixbox-hint">👆 拖动输入和权重，让总和越过门槛线，点亮神经元</div>`;
+  const cfg=[{n:"输入①",w:1.0,v:3},{n:"输入②",w:1.0,v:2},{n:"输入③",w:1.0,v:1}];
+  const inbox=box.querySelector('.inputs');
+  const THR=6;
+  cfg.forEach((c,i)=>{
+    const row=document.createElement('div');row.className='inrow';
+    row.innerHTML=`<label>${c.n}</label>
+      <input type="range" class="iv" min="0" max="5" step="1" value="${c.v}">
+      <input type="range" class="iw" min="0" max="2" step="0.1" value="${c.w}" style="max-width:70px">
+      <span class="wv">w=${c.w.toFixed(1)}</span>`;
+    inbox.appendChild(row);
+  });
+  function recalc(){
+    let sum=0;
+    inbox.querySelectorAll('.inrow').forEach((row,i)=>{
+      const v=+row.querySelector('.iv').value, w=+row.querySelector('.iw').value;
+      row.querySelector('.wv').textContent='w='+w.toFixed(1);
+      sum+=v*w;
+    });
+    box.querySelector('.sv').textContent=sum.toFixed(1);
+    box.querySelector('.sumbar i').style.width=Math.min(100,sum/10*100)+'%';
+    const core=box.querySelector('.core');
+    if(sum>=THR){ if(!core.classList.contains('fire')){core.classList.add('fire');core.textContent='⚡';
+        const r=core.getBoundingClientRect();firstDone('neuron',r.left+r.width/2,r.top);} }
+    else{ core.classList.remove('fire');core.textContent='😴'; }
+  }
+  box.querySelectorAll('input').forEach(inp=>inp.addEventListener('input',recalc));
+  box.querySelector('.ix-reset').addEventListener('click',()=>{
+    inbox.querySelectorAll('.inrow').forEach((row,i)=>{row.querySelector('.iv').value=cfg[i].v;row.querySelector('.iw').value=cfg[i].w;});
+    recalc();
+  });
+  box.querySelector('.sumbar .thr').style.left=(THR/10*100)+'%';
+  recalc();
+}
+
+/* --- 前向 / 反向传播：脉冲逐层 --- */
+function buildProp(box,back){
+  const layers=[3,4,4,2];
+  box.innerHTML=`<div class="ixbox-title">${back?'🔁 反向传播（责任回传）':'➡️ 前向传播（信号前进）'}
+    <button class="ix-reset">↺ 重置</button></div>
+    <div class="net"><svg class="netsvg"></svg></div>
+    <div style="text-align:center;margin-top:12px">
+      <button class="btn btn-primary go">${back?'从输出往回追责 ⬅️':'输入信号，逐层点亮 ▶️'}</button></div>
+    <div class="ixbox-hint">${back?'看脉冲从输出层倒着传回输入层':'看脉冲从输入层一层层点亮到输出'}</div>`;
+  const net=box.querySelector('.net');
+  const cols=[];
+  layers.forEach(cnt=>{
+    const l=document.createElement('div');l.className='layer';
+    const nodes=[];
+    for(let i=0;i<cnt;i++){const nd=document.createElement('div');nd.className='node';l.appendChild(nd);nodes.push(nd);}
+    net.appendChild(l);cols.push(nodes);
+  });
+  const svg=box.querySelector('.netsvg');
+  function drawLines(){
+    svg.innerHTML='';
+    const nb=net.getBoundingClientRect();
+    for(let c=0;c<cols.length-1;c++){
+      cols[c].forEach(a=>{cols[c+1].forEach(b=>{
+        const ra=a.getBoundingClientRect(),rb=b.getBoundingClientRect();
+        const ln=document.createElementNS('http://www.w3.org/2000/svg','line');
+        ln.setAttribute('x1',ra.left-nb.left+ra.width/2);ln.setAttribute('y1',ra.top-nb.top+ra.height/2);
+        ln.setAttribute('x2',rb.left-nb.left+rb.width/2);ln.setAttribute('y2',rb.top-nb.top+rb.height/2);
+        svg.appendChild(ln);
+      });});
+    }
+  }
+  setTimeout(drawLines,60);window.addEventListener('resize',drawLines);
+  let playing=false;
+  box.querySelector('.go').addEventListener('click',e=>{
+    if(playing)return;playing=true;
+    reset();
+    const order=back?[...cols].reverse():cols;
+    order.forEach((col,ci)=>{
+      setTimeout(()=>{
+        col.forEach(nd=>nd.classList.add(back?'lit-back':'lit'));
+        svg.querySelectorAll('line').forEach(ln=>{/* 简化：整体流动 */});
+        if(ci<order.length){svg.querySelectorAll('line').forEach(ln=>ln.classList.add('flow'));setTimeout(()=>svg.querySelectorAll('line').forEach(ln=>ln.classList.remove('flow')),300);}
+        if(ci===order.length-1){playing=false;const r=box.querySelector('.go').getBoundingClientRect();firstDone(back?'backprop':'forward',r.left+r.width/2,r.top);}
+      },ci*420);
+    });
+  });
+  function reset(){cols.forEach(col=>col.forEach(nd=>nd.classList.remove('lit','lit-back')));}
+  box.querySelector('.ix-reset').addEventListener('click',()=>{reset();playing=false;});
+}
+
+/* --- 损失曲线：点训练一步→下降 --- */
+function buildLoss(box){
+  box.innerHTML=`<div class="ixbox-title">📉 损失曲线
+    <button class="ix-reset">↺ 重置</button></div>
+    <canvas class="cv"></canvas>
+    <div class="metric">步数 <b class="st">0</b> ｜ 损失 <b class="ls">100</b> ｜ 准确率 <b class="ac">10%</b></div>
+    <div style="text-align:center;margin-top:12px"><button class="btn btn-primary go">训练一步 ⚙️</button></div>
+    <div class="ixbox-hint">👆 反复点，看损失往下掉、准确率往上涨</div>`;
+  const cv=box.querySelector('.cv');const ctx=cv.getContext('2d');
+  let pts=[100],step=0;
+  function resize(){cv.width=cv.clientWidth*2;cv.height=cv.clientHeight*2;draw();}
+  function draw(){
+    const w=cv.width,h=cv.height;ctx.clearRect(0,0,w,h);
+    ctx.strokeStyle='#e6e9f2';ctx.lineWidth=2;
+    for(let g=0;g<=4;g++){const y=h*0.1+h*0.8*g/4;ctx.beginPath();ctx.moveTo(w*0.08,y);ctx.lineTo(w*0.96,y);ctx.stroke();}
+    ctx.strokeStyle='#8b5cf6';ctx.lineWidth=5;ctx.lineJoin='round';ctx.beginPath();
+    pts.forEach((p,i)=>{const x=w*0.08+(w*0.88)*(i/Math.max(24,pts.length-1));const y=h*0.1+h*0.8*(p/100);
+      if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);});
+    ctx.stroke();
+    const lp=pts[pts.length-1];const lx=w*0.08+(w*0.88)*((pts.length-1)/Math.max(24,pts.length-1));const ly=h*0.1+h*0.8*(lp/100);
+    ctx.fillStyle='#ffd66d';ctx.beginPath();ctx.arc(lx,ly,9,0,7);ctx.fill();ctx.strokeStyle='#eab308';ctx.lineWidth=3;ctx.stroke();
+  }
+  box.querySelector('.go').addEventListener('click',e=>{
+    if(pts[pts.length-1]<=3)return;
+    step++;const cur=pts[pts.length-1];const nv=Math.max(3,cur-Math.max(2,cur*0.18));pts.push(nv);
+    if(pts.length>25)pts.shift();
+    box.querySelector('.st').textContent=step;
+    box.querySelector('.ls').textContent=Math.round(nv);
+    box.querySelector('.ac').textContent=Math.round(100-nv*0.9)+'%';
+    draw();
+    if(nv<=20){const r=e.target.getBoundingClientRect();firstDone('loss',r.left+r.width/2,r.top);}
+  });
+  box.querySelector('.ix-reset').addEventListener('click',()=>{pts=[100];step=0;
+    box.querySelector('.st').textContent=0;box.querySelector('.ls').textContent=100;box.querySelector('.ac').textContent='10%';draw();});
+  setTimeout(resize,60);window.addEventListener('resize',resize);
+}
+
+/* --- 梯度下降：小球滚下山 --- */
+function buildGrad(box){
+  box.innerHTML=`<div class="ixbox-title">⛰️ 梯度下降下山
+    <button class="ix-reset">↺ 重置</button></div>
+    <canvas class="cv"></canvas>
+    <div class="metric">学习率 <b class="lrv">0.20</b> ｜ 位置高度（损失） <b class="hv">--</b></div>
+    <input type="range" class="lr" min="0.05" max="0.6" step="0.05" value="0.2" style="width:80%;display:block;margin:10px auto;accent-color:var(--violet)">
+    <div style="text-align:center"><button class="btn btn-primary go">走一步 👣</button></div>
+    <div class="ixbox-hint">👆 拖学习率（步子大小），点'走一步'，看小球滚向谷底。太大会来回蹦！</div>`;
+  const cv=box.querySelector('.cv');const ctx=cv.getContext('2d');
+  let x=0.12;
+  const f=t=>Math.pow((t-0.55)*2.6,2)*0.7+0.06;
+  const df=t=>2*(t-0.55)*2.6*2.6*0.7;
+  function resize(){cv.width=cv.clientWidth*2;cv.height=cv.clientHeight*2;draw();}
+  function draw(){
+    const w=cv.width,h=cv.height;ctx.clearRect(0,0,w,h);
+    ctx.strokeStyle='#a78bfa';ctx.lineWidth=5;ctx.beginPath();
+    for(let i=0;i<=100;i++){const t=i/100;const px=w*0.08+w*0.84*t;const py=h*0.12+h*0.8*Math.min(1,f(t));
+      if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);}
+    ctx.stroke();
+    const bx=w*0.08+w*0.84*x;const by=h*0.12+h*0.8*Math.min(1,f(x));
+    ctx.fillStyle='#ffd66d';ctx.beginPath();ctx.arc(bx,by-6,11,0,7);ctx.fill();ctx.strokeStyle='#eab308';ctx.lineWidth=3;ctx.stroke();
+    box.querySelector('.hv').textContent=f(x).toFixed(2);
+  }
+  box.querySelector('.lr').addEventListener('input',e=>box.querySelector('.lrv').textContent=(+e.target.value).toFixed(2));
+  box.querySelector('.go').addEventListener('click',e=>{
+    const lr=+box.querySelector('.lr').value;
+    x=x-lr*df(x)*0.12;x=Math.max(0.02,Math.min(0.98,x));draw();
+    if(Math.abs(x-0.55)<0.05){const r=e.target.getBoundingClientRect();firstDone('grad',r.left+r.width/2,r.top);}
+  });
+  box.querySelector('.ix-reset').addEventListener('click',()=>{x=0.12;draw();});
+  setTimeout(resize,60);window.addEventListener('resize',resize);
+}
+</script>
+</body>
+</html>
