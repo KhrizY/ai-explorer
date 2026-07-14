@@ -7,44 +7,44 @@
 <link rel="stylesheet" href="ui-system.css">
 <style>
   :root { color-scheme: light; }
-  body { background:#eef1f6; }
-  .wrap { max-width:1080px; margin:0 auto; padding:22px 14px 90px; }
-  h1 { font-size:22px; color:#1e1b3a; margin:0 0 4px; }
-  .sub { color:#6b7280; font-size:13px; margin-bottom:16px; }
+  body { background:linear-gradient(180deg,var(--paper),var(--paper-2)); }
+  .wrap { max-width:1080px; margin:0 auto; padding:24px 16px 90px; }
+  h1 { font-size:24px; color:#1e1b3a; margin:0 0 4px; font-weight:900; }
+  .sub { color:#6b7280; font-size:13px; margin-bottom:16px; line-height:1.65; }
   /* 可拖拽标签条 */
   .tabs { display:flex; gap:10px; overflow-x:auto; padding:6px 2px 12px; cursor:grab; scrollbar-width:none; }
   .tabs::-webkit-scrollbar { display:none; }
   .tabs.drag { cursor:grabbing; }
-  .tab { flex:none; padding:9px 18px; border-radius:999px; background:#fff; border:2px solid #e6e9f2; font-weight:800;
+  .tab { flex:none; padding:9px 18px; border-radius:999px; background:#fff; border:2px solid #e6e9f2; font-weight:900;
     font-size:14px; color:#6b7280; cursor:pointer; white-space:nowrap; transition:all .15s; user-select:none; }
-  .tab.on { background:linear-gradient(90deg,var(--violet),var(--violet-d)); color:#fff; border-color:transparent; box-shadow:0 4px 12px rgba(139,92,246,.4); }
+  .tab.on { background:linear-gradient(90deg,var(--violet),var(--violet-d)); color:#fff; border-color:transparent; box-shadow:0 4px 0 var(--violet-dd),0 8px 18px rgba(139,92,246,.28); }
   .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:18px; margin-top:8px; }
-  .demo { background:#fff; border:1.5px solid #e6e9f2; border-radius:16px; overflow:hidden; box-shadow:0 6px 18px rgba(60,50,110,.07); }
-  .demo-head { padding:11px 14px; display:flex; align-items:center; gap:8px; background:#f5f3ff; border-bottom:1px solid #eceef5; color:#1e1b3a; }
-  .demo-head .n { font-size:12px; font-weight:900; color:#fff; background:var(--violet); border-radius:6px; padding:1px 7px; }
+  .demo { background:#fff; border:1.5px solid var(--line); border-radius:16px; overflow:hidden; box-shadow:0 6px 0 #dfe4ef,0 14px 24px rgba(60,50,110,.08); }
+  .demo-head { padding:12px 14px; display:flex; align-items:center; gap:8px; background:linear-gradient(135deg,#fef9ff,#eef1fb); border-bottom:1px solid #eceef5; color:#1e1b3a; }
+  .demo-head .n { font-size:12px; font-weight:900; color:#fff; background:var(--violet); border-radius:8px; padding:2px 8px; box-shadow:0 2px 0 var(--violet-dd); }
   .demo-head b { font-size:14px; color:#1e1b3a !important; -webkit-text-fill-color:#1e1b3a; }
   .demo-head .cat { margin-left:auto; font-size:11px; font-weight:800; padding:2px 8px; border-radius:999px; }
   .cat-g { background:#dcfce7; color:#15803d !important; } .cat-v { background:#e0f2fe; color:#0369a1 !important; } .cat-e { background:#fef3c7; color:#92400e !important; }
   .demo-teach { font-size:11.5px; color:#4b4869; padding:6px 14px 0; font-weight:700; }
-  .demo-stage { position:relative; margin:12px 14px 16px; background:#0f0a26; border-radius:12px; min-height:200px; padding:14px; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; }
-  .demo-stage.light { background:#f4f6fb; }
+  .demo-stage { position:relative; margin:12px 14px 18px; background:linear-gradient(160deg,#faf8ff,#eef1fb); border:1.5px solid var(--line); border-radius:14px; min-height:200px; padding:16px; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#4b4869; }
+  .demo-stage.light { background:linear-gradient(160deg,#faf8ff,#eef1fb); }
   .stg-btn { appearance:none; -webkit-appearance:none; font-family:var(--font); font-weight:900; border:none; cursor:pointer; border-radius:12px; padding:10px 22px; font-size:14px;
     background:#58cc02 !important; color:#fff !important; box-shadow:0 4px 0 #46a302; margin-top:10px; -webkit-text-fill-color:#fff; text-shadow:0 1px 0 rgba(0,0,0,.18); }
   .stg-btn:active { transform:translateY(3px); box-shadow:0 1px 0 var(--correct-d); }
-  .stg-btn.v { background:linear-gradient(90deg,#8b5cf6,#0891b2) !important; color:#fff !important; box-shadow:0 4px 0 #4b3fb0; -webkit-text-fill-color:#fff; text-shadow:0 1px 0 rgba(0,0,0,.22); }
-  .stg-msg { color:#cbd0e6; font-size:12.5px; text-align:center; min-height:18px; margin-top:8px; }
+  .stg-btn.v { background:linear-gradient(90deg,var(--violet-l),var(--cyan)) !important; color:#08122e !important; box-shadow:0 4px 0 #6d28d9; -webkit-text-fill-color:#08122e; text-shadow:none; }
+  .stg-msg { color:#4b4869; font-size:12.5px; text-align:center; min-height:18px; margin-top:8px; font-weight:700; }
   .demo-stage.light .stg-msg { color:#4b4869; }
-  .demo-stage:not(.light) { color:#e9d5ff; }
+  .demo-stage:not(.light) { color:#4b4869; }
   .demo-stage:not(.light) .stg-msg,
   .demo-stage:not(.light) .noise-step,
   .demo-stage:not(.light) .trail-top,
-  .demo-stage:not(.light) .trail-legend { color:#e9d5ff !important; -webkit-text-fill-color:#e9d5ff; }
-  .demo-stage:not(.light) .stg-msg b { color:#ffd66d !important; -webkit-text-fill-color:#ffd66d; }
+  .demo-stage:not(.light) .trail-legend { color:#4b4869 !important; -webkit-text-fill-color:#4b4869; }
+  .demo-stage:not(.light) .stg-msg b { color:#6d28d9 !important; -webkit-text-fill-color:#6d28d9; }
   .demo-stage .reset-btn { color:#6d28d9 !important; }
   @media (forced-colors: active) {
     .stg-btn, .stg-btn.v { forced-color-adjust:none; background:#58cc02 !important; color:#fff !important; -webkit-text-fill-color:#fff; border:2px solid #fff; }
   }
-  .stg-score { position:absolute; top:8px; right:12px; color:var(--gold); font-weight:800; font-size:13px; z-index:4; }
+  .stg-score { position:absolute; top:8px; right:12px; color:#b45309; background:#fffbeb; border:1px solid #fde68a; border-radius:999px; padding:3px 9px; font-weight:900; font-size:12px; z-index:4; }
   /* 大反馈闪屏 */
   .bigflash { position:absolute; inset:0; display:grid; place-items:center; font-size:40px; font-weight:900; z-index:9; pointer-events:none;
     animation:bigF .7s ease-out forwards; }
@@ -53,29 +53,29 @@
   .shake { animation:shk .35s ease; }
   .reset-btn { margin-left:8px; width:26px; height:26px; border-radius:8px; border:none; background:#ede9fe; color:#6d28d9; font-size:15px; font-weight:900; cursor:pointer; line-height:1; flex:none; }
   .reset-btn:hover { background:#ddd6fe; }
-  .flowline { stroke:#3b2f6b; stroke-width:0.7; }
+  .flowline { stroke:#c4b5fd; stroke-width:0.7; }
   .flowline.fire { stroke:#22d3ee; stroke-width:1.2; stroke-dasharray:4 4; animation:dashmove .5s linear infinite; }
   @keyframes dashmove { to { stroke-dashoffset:-8; } }
   .adv-note { margin:0 14px 12px; padding:8px 10px; border-radius:10px; background:#f5f3ff; color:#6d28d9; font-size:12px; font-weight:800; line-height:1.45; }
   .noise-lab { display:grid; grid-template-columns:auto 1fr; gap:14px; align-items:center; width:100%; max-width:440px; }
-  .noise-canvas { width:178px; height:178px; border-radius:16px; image-rendering:pixelated; background:#111827; box-shadow:0 0 0 3px rgba(255,255,255,.08), inset 0 0 24px rgba(34,211,238,.12); }
+  .noise-canvas { width:178px; height:178px; border-radius:16px; image-rendering:pixelated; background:#eef1fb; box-shadow:0 0 0 3px #fff,0 8px 18px rgba(60,50,110,.12); }
   .noise-panel { display:grid; gap:9px; min-width:0; }
-  .noise-step { display:flex; align-items:center; gap:8px; color:#d8d4f5; font-size:12px; font-weight:800; }
-  .noise-step b { width:22px; height:22px; border-radius:8px; display:grid; place-items:center; background:#2a1f52; color:#c4b5fd; flex:none; }
+  .noise-step { display:flex; align-items:center; gap:8px; color:#4b4869; font-size:12px; font-weight:900; }
+  .noise-step b { width:22px; height:22px; border-radius:8px; display:grid; place-items:center; background:#ede9fe; color:#6d28d9; flex:none; }
   .noise-step.on b { background:#58cc02; color:#fff; }
-  .noise-meter { height:12px; border-radius:999px; background:rgba(255,255,255,.12); overflow:hidden; }
+  .noise-meter { height:12px; border-radius:999px; background:#e6e9f2; overflow:hidden; }
   .noise-meter i { display:block; height:100%; width:100%; border-radius:999px; background:linear-gradient(90deg,#fb7185,#fbbf24); transition:width .25s; }
-  .trail-top { display:flex; justify-content:space-between; gap:10px; align-items:center; width:100%; max-width:360px; margin-bottom:10px; color:#d8d4f5; font-size:12px; font-weight:800; }
+  .trail-top { display:flex; justify-content:space-between; gap:10px; align-items:center; width:100%; max-width:360px; margin-bottom:10px; color:#4b4869; font-size:12px; font-weight:900; }
   .trail-board { display:grid; grid-template-columns:repeat(5,48px); gap:7px; justify-content:center; }
-  .trail-cell { width:48px; height:48px; border-radius:12px; background:#211744; border:2px solid #3b2f6b; color:#e9d5ff; display:grid; place-items:center; font-size:21px; font-weight:900; cursor:pointer; transition:transform .12s, background .12s, border-color .12s; }
+  .trail-cell { width:48px; height:48px; border-radius:12px; background:#fff; border:2px solid #d9d6f2; color:#4b4869; display:grid; place-items:center; font-size:21px; font-weight:900; cursor:pointer; transition:transform .12s, background .12s, border-color .12s; box-shadow:0 3px 0 #dfe4ef; }
   .trail-cell:hover { transform:translateY(-2px); }
-  .trail-cell.start { background:#0f766e; border-color:#2dd4bf; }
-  .trail-cell.goal { background:#14532d; border-color:#58cc02; }
-  .trail-cell.step { background:#1d4ed8; border-color:#93c5fd; }
-  .trail-cell.pit { background:#78350f; border-color:#fbbf24; }
+  .trail-cell.start { background:#ccfbf1; border-color:#2dd4bf; }
+  .trail-cell.goal { background:#dcfce7; border-color:#58cc02; }
+  .trail-cell.step { background:#dbeafe; border-color:#93c5fd; }
+  .trail-cell.pit { background:#fef3c7; border-color:#fbbf24; }
   .trail-cell.lock { opacity:.42; cursor:default; }
   .trail-actions { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:10px; }
-  .trail-legend { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; color:#aeb6d8; font-size:11px; font-weight:800; margin-top:8px; }
+  .trail-legend { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; color:#8b90a6; font-size:11px; font-weight:800; margin-top:8px; }
   @media (max-width:520px) {
     .noise-lab { grid-template-columns:1fr; justify-items:center; }
     .trail-board { grid-template-columns:repeat(5,40px); gap:6px; }
@@ -108,7 +108,7 @@ demo({id:'sort',cat:'g',title:'拖拽分拣',teach:'教「分类」——AI 最�
   var row=el('div');row.style.cssText='display:flex;gap:10px;flex-wrap:wrap;justify-content:center;min-height:56px;margin-bottom:14px';
   var bins=el('div');bins.style.cssText='display:flex;gap:12px;width:100%';
   function mk(){row.innerHTML='';DATA.forEach(function(f,i){var d=el('div',null,f.e);d.style.cssText='width:48px;height:48px;border-radius:12px;background:#fff;display:grid;place-items:center;font-size:28px;cursor:pointer;transition:transform .15s';d.onclick=function(){row.querySelectorAll('div').forEach(function(x){x.style.transform='';x.style.boxShadow='';});d.style.transform='scale(1.25) translateY(-6px)';d.style.boxShadow='0 0 0 3px #ffd66d';sel={el:d,i:i};};row.appendChild(d);});}
-  [['🍎 苹果','1'],['🚫 不是','0']].forEach(function(b){var bn=el('div',null,b[0]);bn.style.cssText='flex:1;padding:14px;border-radius:12px;border:2.5px dashed #7c6fb0;color:#cbd0e6;text-align:center;font-weight:800;cursor:pointer';bn.onclick=function(e){if(!sel)return;var ok=(''+DATA[sel.i].a)===b[1];if(ok){score+=10;bigFlash(s,'对！✓',true);sel.el.style.transform='scale(0)';var d=sel.el;setTimeout(function(){d.remove();},250);}else{score=Math.max(0,score-5);bigFlash(s,'再想想～',false);}sc.textContent=score+' 分';sel=null;if(!row.querySelector('div'))setTimeout(mk,400);};bins.appendChild(bn);});
+  [['🍎 苹果','1'],['🚫 不是','0']].forEach(function(b){var bn=el('div',null,b[0]);bn.style.cssText='flex:1;padding:14px;border-radius:12px;border:2.5px dashed #7c6fb0;color:#4b4869;text-align:center;font-weight:800;cursor:pointer';bn.onclick=function(e){if(!sel)return;var ok=(''+DATA[sel.i].a)===b[1];if(ok){score+=10;bigFlash(s,'对！✓',true);sel.el.style.transform='scale(0)';var d=sel.el;setTimeout(function(){d.remove();},250);}else{score=Math.max(0,score-5);bigFlash(s,'再想想～',false);}sc.textContent=score+' 分';sel=null;if(!row.querySelector('div'))setTimeout(mk,400);};bins.appendChild(bn);});
   s.appendChild(row);s.appendChild(bins);mk();
 }});
 
@@ -138,11 +138,11 @@ demo({id:'qte',cat:'g',title:'计时判定 QTE',teach:'教「抓住时机」+ �
 demo({id:'fish',cat:'g',title:'长按滑条（钓鱼式）',teach:'教「平衡/调参」——用按钮把值稳在区间',mount:function(s){
   var H=180,barH=28,tgtH=48,barY=140,vy=0,hold=false,p=0,t=0,won=false;
   var wrap=el('div');wrap.style.cssText='display:flex;gap:12px;align-items:flex-start';
-  var track=el('div');track.style.cssText='position:relative;width:70px;height:'+H+'px;border-radius:12px;background:linear-gradient(#123,#012);overflow:hidden';
+  var track=el('div');track.style.cssText='position:relative;width:70px;height:'+H+'px;border-radius:12px;background:linear-gradient(#e0f2fe,#f5f3ff);overflow:hidden;border:1.5px solid #d9d6f2;box-shadow:inset 0 0 0 2px #fff';
   var tgt=el('div',null,'<div style="text-align:center;font-size:24px;line-height:48px">🐟</div>');tgt.style.cssText='position:absolute;left:6px;right:6px;height:48px;border-radius:8px;background:rgba(88,204,2,.25);border:2px solid var(--correct)';
   var bar=el('div');bar.style.cssText='position:absolute;left:6px;right:6px;height:28px;border-radius:6px;background:rgba(167,139,250,.55);border:2px solid var(--violet-l)';
   track.appendChild(tgt);track.appendChild(bar);
-  var prog=el('div');prog.style.cssText='width:12px;height:'+H+'px;border-radius:6px;background:rgba(255,255,255,.12);overflow:hidden;position:relative';
+  var prog=el('div');prog.style.cssText='width:12px;height:'+H+'px;border-radius:6px;background:#e6e9f2;overflow:hidden;position:relative';
   var pf=el('div');pf.style.cssText='position:absolute;bottom:0;left:0;right:0;height:0%;background:linear-gradient(var(--cyan),var(--correct))';prog.appendChild(pf);
   wrap.appendChild(track);wrap.appendChild(prog);
   var msg=el('div','stg-msg','按住下面的按钮收线');
@@ -172,7 +172,7 @@ demo({id:'claw',cat:'g',title:'抓娃娃机（横移+下抓）',teach:'教「抓
 demo({id:'quick',cat:'g',title:'二选一快判',teach:'教「快速判断」——WarioWare 式',mount:function(s){
   var Q=[{t:'手机认出照片里的猫',a:1},{t:'计算器算 1+1',a:0},{t:'AI 下棋赢冠军',a:1},{t:'闹钟准点响',a:0},{t:'翻译软件翻句子',a:1},{t:'电灯按开关亮',a:0}];
   var i=0,score=0;var sc=el('div','stg-score','0 分');s.appendChild(sc);
-  var card=el('div');card.style.cssText='font-size:20px;color:#fff;font-weight:800;text-align:center;min-height:60px;display:grid;place-items:center;padding:10px';
+  var card=el('div');card.style.cssText='font-size:20px;color:#1e1b3a;font-weight:800;text-align:center;min-height:60px;display:grid;place-items:center;padding:10px';
   var btns=el('div');btns.style.cssText='display:flex;gap:12px';
   var msg=el('div','stg-msg','这是 AI 学来的，还是人写死的？');
   function show(){card.textContent=Q[i%Q.length].t;}
@@ -185,14 +185,14 @@ demo({id:'match',cat:'g',title:'匹配配对',teach:'教「模式识别」——
   for(var k=cards.length-1;k>0;k--){var j=Math.floor(Math.random()*(k+1));var tmp=cards[k];cards[k]=cards[j];cards[j]=tmp;}
   var grid=el('div');grid.style.cssText='display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%;max-width:280px';
   var open=[],lock=false,done=0;var msg=el('div','stg-msg','翻开两张相同的');
-  cards.forEach(function(c){var d=el('div',null,'❓');d.style.cssText='aspect-ratio:1;border-radius:10px;background:#2a1f52;color:#fff;display:grid;place-items:center;font-size:24px;cursor:pointer';d.dataset.e=c.e;d.flip=function(o){d.textContent=o?d.dataset.e:'❓';d.style.background=o?'#4b3fb0':'#2a1f52';};d.onclick=function(){if(lock||d.textContent!=='❓')return;d.flip(1);open.push(d);if(open.length===2){lock=true;if(open[0].dataset.e===open[1].dataset.e){var r=s.getBoundingClientRect();spark(r.left+r.width/2,r.top+40);done++;open=[];lock=false;if(done===P.length){bigFlash(s,'🎉 全配对!',true);}}else{setTimeout(function(){open[0].flip(0);open[1].flip(0);open=[];lock=false;},650);}}};grid.appendChild(d);});
+  cards.forEach(function(c){var d=el('div',null,'❓');d.style.cssText='aspect-ratio:1;border-radius:10px;background:#ede9fe;color:#6d28d9;display:grid;place-items:center;font-size:24px;cursor:pointer;font-weight:900';d.dataset.e=c.e;d.flip=function(o){d.textContent=o?d.dataset.e:'❓';d.style.background=o?'#c4b5fd':'#ede9fe';d.style.color=o?'#1e1b3a':'#6d28d9';};d.onclick=function(){if(lock||d.textContent!=='❓')return;d.flip(1);open.push(d);if(open.length===2){lock=true;if(open[0].dataset.e===open[1].dataset.e){var r=s.getBoundingClientRect();spark(r.left+r.width/2,r.top+40);done++;open=[];lock=false;if(done===P.length){bigFlash(s,'🎉 全配对!',true);}}else{setTimeout(function(){open[0].flip(0);open[1].flip(0);open=[];lock=false;},650);}}};grid.appendChild(d);});
   s.appendChild(grid);s.appendChild(msg);
 }});
 
 demo({id:'wordchain',cat:'g',title:'词语接龙预言家',teach:'教「猜下一个词」——顺的能接，怪的会提示',mount:function(s){
   var G={'小猫':[{w:'在',ok:1},{w:'苹果',ok:0}],'在':[{w:'沙发上',ok:1},{w:'开心',ok:0}],'沙发上':[{w:'睡觉',ok:1,end:1},{w:'跳来跳去',ok:1,end:1}],'今天':[{w:'天气',ok:1},{w:'桌子',ok:0}],'天气':[{w:'真好',ok:1,end:1},{w:'吃饭',ok:0}]};
   var starts=['小猫','今天'],sent,cur,done;
-  var view=el('div');view.style.cssText='font-size:20px;color:#fff;font-weight:700;min-height:36px;text-align:center';
+  var view=el('div');view.style.cssText='font-size:20px;color:#1e1b3a;font-weight:700;min-height:36px;text-align:center';
   var cand=el('div');cand.style.cssText='display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:12px';
   var msg=el('div','stg-msg','');
   function start(){sent=[starts[Math.floor(Math.random()*starts.length)]];cur=sent[0];done=false;draw();}
@@ -212,7 +212,7 @@ demo({id:'tree',cat:'v',title:'决策树逐层展开',teach:'点条件，看 AI 
 demo({id:'conv',cat:'v',title:'卷积滑窗扫描',teach:'小窗口扫过图片，扫到边缘就亮',mount:function(s){
   s.classList.add('light');var N=6,IMG=[];for(var r=0;r<N;r++){IMG.push([]);for(var c=0;c<N;c++)IMG[r].push(c<3?0:1);}
   var wx=0,wy=0;var gw=el('div');gw.style.cssText='display:grid;grid-template-columns:repeat('+N+',26px);gap:2px;position:relative';
-  var cells=[];for(var r=0;r<N;r++)for(var c=0;c<N;c++){var d=el('div');d.style.cssText='width:26px;height:26px;border-radius:4px;background:'+(IMG[r][c]?'#1e1b3a':'#dbe3ef');cells.push(d);gw.appendChild(d);}
+  var cells=[];for(var r=0;r<N;r++)for(var c=0;c<N;c++){var d=el('div');d.style.cssText='width:26px;height:26px;border-radius:4px;background:'+(IMG[r][c]?'#8b5cf6':'#dbe3ef');cells.push(d);gw.appendChild(d);}
   var win=el('div');win.style.cssText='position:absolute;width:80px;height:80px;border:3px solid #f59e0b;border-radius:6px;pointer-events:none;transition:all .12s;box-shadow:0 0 12px #f59e0b';gw.appendChild(win);
   var msg=el('div','stg-msg','用方向键移动黄框');
   var ctrl=el('div');ctrl.style.cssText='display:flex;gap:6px;margin-top:10px';
@@ -235,9 +235,9 @@ demo({id:'forward',cat:'v',title:'神经网络前向传播',teach:'信号沿着�
   var svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 100 100');svg.setAttribute('preserveAspectRatio','none');svg.style.cssText='position:absolute;inset:0;width:100%;height:100%';box.appendChild(svg);
   L.forEach(function(n,li){pos[li]=[];for(var i=0;i<n;i++)pos[li].push({x:(li+0.5)*(100/L.length),y:(i+0.5)*(100/n)});});
   var lines=[];for(var li=1;li<L.length;li++){lines[li]=[];pos[li-1].forEach(function(a){pos[li].forEach(function(b){var ln=document.createElementNS('http://www.w3.org/2000/svg','line');ln.setAttribute('x1',a.x);ln.setAttribute('y1',a.y);ln.setAttribute('x2',b.x);ln.setAttribute('y2',b.y);ln.setAttribute('class','flowline');svg.appendChild(ln);lines[li].push(ln);});});}
-  L.forEach(function(n,li){pos[li].forEach(function(p){var d=el('div');d.style.cssText='position:absolute;width:18px;height:18px;border-radius:50%;background:#2a1f52;border:2px solid #6d28d9;transform:translate(-50%,-50%);left:'+p.x+'%;top:'+p.y+'%;transition:all .3s;z-index:2';d.li=li;box.appendChild(d);nodes.push(d);});});
+  L.forEach(function(n,li){pos[li].forEach(function(p){var d=el('div');d.style.cssText='position:absolute;width:18px;height:18px;border-radius:50%;background:#ede9fe;border:2px solid #6d28d9;transform:translate(-50%,-50%);left:'+p.x+'%;top:'+p.y+'%;transition:all .3s;z-index:2';d.li=li;box.appendChild(d);nodes.push(d);});});
   var msg=el('div','stg-msg','点按钮，看信号沿线流动');var btn=el('button','stg-btn v','⚡ 输入信号');
-  function clear(){nodes.forEach(function(d){d.style.background='#2a1f52';d.style.boxShadow='';});lines.forEach(function(g){if(g)g.forEach(function(l){l.classList.remove('fire');});});}
+  function clear(){nodes.forEach(function(d){d.style.background='#ede9fe';d.style.boxShadow='';});lines.forEach(function(g){if(g)g.forEach(function(l){l.classList.remove('fire');});});}
   btn.onclick=function(){clear();nodes.filter(function(d){return d.li===0;}).forEach(function(d){d.style.background='#a78bfa';d.style.boxShadow='0 0 12px #a78bfa';});for(var li=1;li<L.length;li++){(function(li){setTimeout(function(){lines[li].forEach(function(l){l.classList.add('fire');});nodes.filter(function(d){return d.li===li;}).forEach(function(d){d.style.background='#a78bfa';d.style.boxShadow='0 0 12px #a78bfa';});if(li===L.length-1)bigFlash(s,'💡 得出答案!',true);},li*550);})(li);}setTimeout(clear,L.length*550+500);};
   s.appendChild(box);s.appendChild(msg);s.appendChild(btn);
 }});
@@ -266,7 +266,7 @@ demo({id:'pool',cat:'v',title:'池化压缩（可多层）',teach:'一层层缩�
 }});
 
 demo({id:'loss',cat:'v',title:'训练误差曲线',teach:'训练越久，错误越少（loss 下降）',mount:function(s){
-  var cv=document.createElement('canvas');cv.width=300;cv.height=140;cv.style.cssText='background:#160f33;border-radius:8px;max-width:100%';var ctx=cv.getContext('2d');
+  var cv=document.createElement('canvas');cv.width=300;cv.height=140;cv.style.cssText='background:#f4f6fb;border-radius:8px;max-width:100%';var ctx=cv.getContext('2d');
   var loss=1,step=0,pts=[];
   var msg=el('div','stg-msg','点「训练一步」，看错误一路下降');var btn=el('button','stg-btn v','📉 训练一步');
   function draw(){ctx.clearRect(0,0,300,140);ctx.strokeStyle='#334';ctx.beginPath();ctx.moveTo(30,10);ctx.lineTo(30,120);ctx.lineTo(290,120);ctx.stroke();ctx.strokeStyle='#22d3ee';ctx.lineWidth=2.5;ctx.beginPath();pts.forEach(function(p,i){var x=30+i*12,y=10+p*105;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);});ctx.stroke();pts.forEach(function(p,i){ctx.fillStyle='#a78bfa';ctx.beginPath();ctx.arc(30+i*12,10+p*105,3,0,7);ctx.fill();});}
@@ -329,7 +329,7 @@ demo({id:'bias',cat:'e',title:'选数据·训练·评判',teach:'你亲手选数
 
 // ---------- 🔬🎚️ 按 viz-ux-skill 新增（第二批） ----------
 demo({id:'grad',cat:'e',title:'梯度下降·下山找最低点',teach:'AI 学习=一步步往误差更低处走',mount:function(s){
-  var cv=document.createElement('canvas');cv.width=300;cv.height=150;cv.style.cssText='background:#160f33;border-radius:8px;max-width:100%';var ctx=cv.getContext('2d');
+  var cv=document.createElement('canvas');cv.width=300;cv.height=150;cv.style.cssText='background:#f4f6fb;border-radius:8px;max-width:100%';var ctx=cv.getContext('2d');
   var cx=150,bx;
   function loss(x){return Math.min(1,Math.pow((x-cx)/120,2));}
   function sy(x){return 25+(1-loss(x))*100;}
@@ -452,7 +452,7 @@ demo({id:'rltrail',cat:'g',title:'强化学习·踩格子探路',teach:'进阶�
 }});
 
 demo({id:'overfit',cat:'e',title:'过拟合·死记 vs 真学会',teach:'太用力记每个点，反而学不到规律',mount:function(s){
-  var cv=document.createElement('canvas');cv.width=300;cv.height=150;cv.style.cssText='background:#160f33;border-radius:8px;max-width:100%';var ctx=cv.getContext('2d');
+  var cv=document.createElement('canvas');cv.width=300;cv.height=150;cv.style.cssText='background:#f4f6fb;border-radius:8px;max-width:100%';var ctx=cv.getContext('2d');
   var P=[];for(var i=0;i<9;i++){var x=25+i*31,y=90-i*4+(Math.random()*40-20);P.push({x:x,y:Math.max(20,Math.min(130,y))});}
   var c=0.3;
   function straightY(x){var a=P[0],b=P[P.length-1];return a.y+(b.y-a.y)*(x-a.x)/(b.x-a.x);}
