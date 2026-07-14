@@ -9,6 +9,7 @@
   html,body{height:100%;} html{color-scheme:light;} body{margin:0;overflow-x:hidden;-webkit-user-select:none;user-select:none;}
   #app{min-height:100vh;}
   .screen{display:none;min-height:100vh;} .screen.on{display:block;animation:fadeUp .4s ease both;}
+  body.debug-end .screen.on,body.debug-end .section,body.debug-end .ixbox-hint,body.debug-end .fbline{animation:none!important;}
   @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
   .map-title{text-align:center;color:#e9d5ff;padding:8px 0 0;}
   .map-title h1{font-size:24px;margin:0;} .map-title p{font-size:13px;color:#b4aede;margin:6px 0 0;}
@@ -723,7 +724,7 @@ function renderSec(){
   document.getElementById('chbody').appendChild(wrap);
   wrap.scrollIntoView({behavior:'smooth',block:'start'});
 }
-function renderEnd(){if(document.getElementById('end-'+CH.id))return;var wrap=el('div','section');wrap.id='end-'+CH.id;wrap.appendChild(el('div','section-heading','<span class="section-num">🎮</span>通关挑战'));var host=el('div');var won=false;function mountG(){if(won||ST.done[CH.id]){host.innerHTML='';completeFeedback(host,'本章已经通关');return;}host.innerHTML='';host.appendChild((CH.endGame||buildChallenge)(function(e){if(won)return;won=true;finishChapter(e);},mountG));}mountG();wrap.appendChild(host);document.getElementById('chbody').appendChild(wrap);wrap.scrollIntoView({behavior:'smooth'});}
+function renderEnd(){if(document.getElementById('end-'+CH.id))return;var wrap=el('div','section');wrap.id='end-'+CH.id;wrap.appendChild(el('div','section-heading','<span class="section-num">🎮</span>通关挑战'));var host=el('div');var won=false;function mountG(){if(won||ST.done[CH.id]){host.innerHTML='';completeFeedback(host,'本章已经通关');return;}host.innerHTML='';host.appendChild((CH.endGame||buildChallenge)(function(e){if(won)return;won=true;finishChapter(e);},mountG));}mountG();wrap.appendChild(host);document.getElementById('chbody').appendChild(wrap);wrap.scrollIntoView({behavior:document.body.classList.contains('debug-end')?'auto':'smooth'});}
 function finishChapter(e){if(window._finishingChapter===CH.id)return;window._finishingChapter=CH.id;if(document.getElementById('finish-'+CH.id))return;if(!ST.done[CH.id])awardCoins(50,e);if(ST.badges.indexOf(CH.badge.t)<0)ST.badges.push(CH.badge.t);ST.done[CH.id]=true;save();syncTop();
   var wrap=el('div','section');wrap.style.textAlign='center';
   wrap.id='finish-'+CH.id;
@@ -783,11 +784,13 @@ function buildHoldGame(cfg,onWin,onReset){var b=ixbox(cfg.title,cfg.hint,onReset
   function loop(){if(done)return;t+=0.024;var ty=(H-tgtH)/2+Math.sin(t)*((H-tgtH)/2-6);tgt.style.top=ty+'px';vy+=hold?-0.42:0.34;vy*=0.9;barY+=vy;if(barY<0){barY=0;vy=0;}if(barY>H-barH){barY=H-barH;vy=0;}bar.style.top=barY+'px';var ov=(barY<ty+tgtH)&&(barY+barH>ty);p+=ov?1.05:-0.28;if(p<0)p=0;if(p>100)p=100;pEl.textContent='稳定度 '+Math.round(p)+'%';tEl.textContent=ov?'罩住了！🔥':'去罩住目标';if(p>=100)end({});window._gR=requestAnimationFrame(loop);}
   loop();w.appendChild(hud);w.appendChild(track);w.appendChild(btn);return b;}
 function buildRhythmGame(cfg,onWin,onReset){var b=ixbox(cfg.title,cfg.hint,onReset);var w=b._body;clearGame();
-  var score=0,combo=0,miss=0,goal=cfg.goal||10,done=false;
+  var score=0,combo=0,miss=0,goal=cfg.goal||10,done=false,spots=[];
   var hud=el('div','game-hud');var scEl=el('span',null,'击中 0/'+goal);var cbEl=el('span',null,'连击 0');hud.appendChild(scEl);hud.appendChild(cbEl);
   var stage=el('div','game-stage-light');stage.style.height='220px';
   function end(e){done=true;clearGame();toast(starOf(miss)+' 通关!',true);lineFeedback(w,true,'手速真快！');setTimeout(function(){onWin(e||{});},380);}
-  function pop(){if(done)return;var good=Math.random()>.24;var arr=good?cfg.good:cfg.bad;var ic=arr[Math.floor(Math.random()*arr.length)];var d=el('div',null,ic);var x=6+Math.random()*72,y=6+Math.random()*66;d.style.cssText='position:absolute;left:'+x+'%;top:'+y+'%;min-width:58px;height:44px;padding:0 10px;border-radius:14px;background:#fff;border:2px solid '+(good?'#bbf7d0':'#fde68a')+';display:grid;place-items:center;font-size:20px;font-weight:900;cursor:pointer;animation:popIn .2s both;box-shadow:0 5px 12px rgba(60,50,110,.12)';var life=setTimeout(function(){if(!d.dead){if(good){miss++;combo=0;cbEl.textContent='连击 0';}if(d.parentElement)d.remove();}},cfg.life||1400);d.onclick=function(e){if(d.dead||done)return;d.dead=1;clearTimeout(life);if(good){score++;combo++;spark(e.clientX,e.clientY);scEl.textContent='击中 '+score+'/'+goal;cbEl.textContent='连击 '+combo+(combo>=4?' 🔥':'');d.remove();if(score>=goal)end(e);}else{miss++;combo=0;cbEl.textContent='连击 0';lineFeedback(w,false,cfg.badMsg||'那个别点');d.remove();}};stage.appendChild(d);}
+  function clearSpot(d){spots=spots.filter(function(s){return s.d!==d;});}
+  function pickSpot(){var x=6,y=6,ok=false;for(var i=0;i<14;i++){x=6+Math.random()*72;y=6+Math.random()*66;ok=spots.every(function(s){return Math.abs(s.x-x)>22||Math.abs(s.y-y)>20;});if(ok)break;}return{x:x,y:y};}
+  function pop(){if(done)return;var good=Math.random()>.24;var arr=good?cfg.good:cfg.bad;var ic=arr[Math.floor(Math.random()*arr.length)];var d=el('div',null,ic);var pt=pickSpot(),x=pt.x,y=pt.y;spots.push({d:d,x:x,y:y});d.style.cssText='position:absolute;left:'+x+'%;top:'+y+'%;min-width:58px;height:44px;padding:0 10px;border-radius:14px;background:#fff;border:2px solid '+(good?'#bbf7d0':'#fde68a')+';display:grid;place-items:center;font-size:20px;font-weight:900;cursor:pointer;animation:popIn .2s both;box-shadow:0 5px 12px rgba(60,50,110,.12)';var life=setTimeout(function(){if(!d.dead){if(good){miss++;combo=0;cbEl.textContent='连击 0';}clearSpot(d);if(d.parentElement)d.remove();}},cfg.life||1400);d.onclick=function(e){if(d.dead||done)return;d.dead=1;clearTimeout(life);clearSpot(d);if(good){score++;combo++;spark(e.clientX,e.clientY);scEl.textContent='击中 '+score+'/'+goal;cbEl.textContent='连击 '+combo+(combo>=4?' 🔥':'');d.remove();if(score>=goal)end(e);}else{miss++;combo=0;cbEl.textContent='连击 0';lineFeedback(w,false,cfg.badMsg||'那个别点');d.remove();}};stage.appendChild(d);}
   window._gT=setInterval(pop,cfg.rate||640);w.appendChild(hud);w.appendChild(stage);return b;}
 
 // ========== 进阶课程（独立平铺） ==========
@@ -813,7 +816,7 @@ document.getElementById('advpop').onclick=function(e){if(e.target===this)this.cl
 
 // ========== 启动 ==========
 syncTop();renderAdv();goMap();
-(function debugEndRoute(){var p=new URLSearchParams(location.search),id=p.get('end');if(id&&CHAPTERS[id]){ST={xp:0,done:{},badges:[],collected:{}};save();setTimeout(function(){CH=CHAPTERS[id];show('scr-ch');document.getElementById('chtitle').textContent=CH.title;curSec=CH.sections.length;document.getElementById('chbody').innerHTML='';syncTop();renderSec();},80);}})();
+(function debugEndRoute(){var p=new URLSearchParams(location.search),id=p.get('end');if(id&&CHAPTERS[id]){document.body.classList.add('debug-end');ST={xp:0,done:{},badges:[],collected:{}};save();setTimeout(function(){CH=CHAPTERS[id];show('scr-ch');document.getElementById('chtitle').textContent=CH.title;curSec=CH.sections.length;document.getElementById('chbody').innerHTML='';syncTop();renderSec();},80);}})();
 </script>
 </body>
 </html>
