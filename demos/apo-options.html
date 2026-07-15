@@ -69,6 +69,7 @@
   .bot .emoji-eye { width:17px; height:22px; border-radius:10px; background:#15142c; animation:blink 4s infinite; }
   .bot .emoji-eye::after { content:""; position:absolute; left:4px; top:4px; width:6px; height:6px; border-radius:4px; background:#fff; }
   .bot .stub { width:18px; height:7px; border-radius:999px; background:#c4b5fd; }
+  .bot .shine,.bot .emoji-eye,.bot .stub { display:none; }
 
   .r1 .back { left:17px; top:25px; width:88px; height:84px; background:#c4b5fd; border-radius:24px; transform:rotate(-3deg); }
   .r1 .face { left:14px; top:23px; width:92px; height:84px; border-radius:24px; }
@@ -162,13 +163,13 @@
   .r9 .side.r { right:0; top:50px; width:20px; height:42px; border-radius:11px; background:#22d3ee; }
   .r9 .topbar { left:42px; top:12px; width:36px; height:7px; border-radius:999px; background:#22d3ee; }
   .r9 .dot { left:55px; top:4px; }
-  .r9 .shine { left:28px; top:32px; }
-  .r9 .emoji-eye.l { left:38px; top:56px; }
-  .r9 .emoji-eye.r { right:38px; top:56px; }
+  .r9 .shine { display:block; left:28px; top:32px; }
+  .r9 .emoji-eye.l { display:block; left:38px; top:56px; }
+  .r9 .emoji-eye.r { display:block; right:38px; top:56px; }
   .r9 .bolt.a { left:25px; top:41px; background:#c4b5fd; }
   .r9 .bolt.b { right:25px; top:41px; background:#c4b5fd; }
-  .r9 .stub.a { left:33px; bottom:15px; }
-  .r9 .stub.b { right:33px; bottom:15px; background:#22d3ee; }
+  .r9 .stub.a { display:block; left:33px; bottom:15px; }
+  .r9 .stub.b { display:block; right:33px; bottom:15px; background:#22d3ee; }
   .r9 .panel.p1 { left:38px; bottom:7px; width:44px; background:#d8d5f2; }
 
   .r9 .visor,.r9 .eye,.r9 .mini-eye,.r9 .bar,.r9 .scan,.r9 .plate,.r9 .chip,.r9 .tab,.r9 .cheek,.r9 .panel.p2,.r9 .mouth { display:none; }
