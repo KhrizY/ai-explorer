@@ -31,18 +31,24 @@
   textarea:focus,input:focus{border-color:#8b5cf6;box-shadow:0 0 0 4px rgba(139,92,246,.12);}
   .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0;min-width:0;}
   .actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px;}
+  .edit-actions{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,.8fr);gap:8px;margin-top:10px;}
+  .check-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px;}
   .btn{height:42px;border:none;border-radius:12px;padding:0 14px;font-weight:900;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-grid;place-items:center;text-align:center;white-space:nowrap;line-height:1;color:inherit;}
   .btn:active{transform:translateY(3px);box-shadow:none}
   .primary{background:#58cc02;color:#fff;box-shadow:0 4px 0 #46a302}.violet{background:#ede9fe;color:#6d28d9;box-shadow:0 4px 0 #c4b5fd}.blue{background:#dff7ff;color:#0891b2;box-shadow:0 4px 0 #a5f3fc}.ghost{background:#f8fafc;color:#4b4869;border:2px solid #e6e9f2;}
   .file-wrap{position:relative;overflow:hidden}.file-wrap input{position:absolute;inset:0;opacity:0;cursor:pointer}
   .code{height:42px;min-width:0;flex:1;border:2px solid #dbe2ef;border-radius:12px;padding:0 10px;font-weight:900;color:#1e1b3a;background:#fff;}
   .result{border-radius:14px;padding:12px;background:#f8fafc;border:1.5px solid #e6e9f2;color:#4b4869;font-size:13px;line-height:1.7;min-height:74px;}
+  .modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(15,23,42,.36);backdrop-filter:blur(3px);z-index:20;padding:16px;}
+  .modal.open{display:grid}.modal-card{width:min(520px,100%);background:#fff;border:2px solid #e6e9f2;border-radius:20px;padding:18px;box-shadow:0 20px 50px rgba(30,27,58,.24),0 6px 0 #dfe4ef;}
+  .modal-head{display:flex;gap:10px;align-items:center;margin-bottom:10px}.modal-head h3{margin:0;font-size:19px;color:#1e1b3a}.modal-head button{margin-left:auto;border:none;background:#f5f3ff;color:#6d28d9;border-radius:10px;width:32px;height:32px;font-weight:900;cursor:pointer}
+  .modal-card p{margin:8px 0;color:#4b4869;line-height:1.65;font-size:14px}.modal-card code{background:#f5f3ff;color:#6d28d9;padding:2px 6px;border-radius:6px;font-weight:900}
   .ok{color:#16a34a;font-weight:900}.warn{color:#d99a12;font-weight:900}.bad{color:#dc2626;font-weight:900}
   .spec{display:grid;gap:8px}.spec-item{background:#f8fafc;border:1.5px solid #e6e9f2;border-radius:14px;padding:10px 12px;font-size:13px;color:#4b4869;line-height:1.55}.spec-item b{color:#6d28d9}
   .course-list{display:grid;gap:8px;margin-top:10px}.course-item{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;background:#f8fafc;border:1.5px solid #e6e9f2;border-radius:14px;padding:10px}.course-item b{color:#1e1b3a}.course-item span{display:block;color:#6b7280;font-size:12px;margin-top:2px}
   .mini{height:32px;border:none;border-radius:10px;background:#ede9fe;color:#6d28d9;font-weight:900;padding:0 10px;cursor:pointer}
-  @media(max-width:920px){.edit-layout{grid-template-columns:1fr}.flow{grid-template-columns:repeat(2,1fr)}textarea{min-height:420px}.actions{grid-template-columns:repeat(2,1fr)}}
-  @media(max-width:560px){.page{padding:14px 10px 34px}.top{align-items:flex-start}.back{height:38px;padding:0 10px}h1{font-size:21px}.guide{grid-template-columns:64px 1fr;padding:12px}.abo{transform:scale(.78);transform-origin:left bottom;width:64px}.flow{grid-template-columns:1fr}.actions{grid-template-columns:1fr}.btn{width:100%}.row{display:grid;grid-template-columns:1fr}.course-item{grid-template-columns:1fr}.mini{width:100%;height:36px}.upload-panel{padding:12px}textarea{min-height:360px;font-size:12px}.bubble{font-size:13px}}
+  @media(max-width:920px){.edit-layout{grid-template-columns:1fr}.flow{grid-template-columns:repeat(2,1fr)}textarea{min-height:420px}.actions,.check-actions{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:560px){.page{padding:14px 10px 34px}.top{align-items:flex-start}.back{height:38px;padding:0 10px}h1{font-size:21px}.guide{grid-template-columns:64px 1fr;padding:12px}.abo{transform:scale(.78);transform-origin:left bottom;width:64px}.flow{grid-template-columns:1fr}.actions,.edit-actions,.check-actions{grid-template-columns:1fr}.btn{width:100%}.row{display:grid;grid-template-columns:1fr}.course-item{grid-template-columns:1fr}.mini{width:100%;height:36px}.upload-panel{padding:12px}textarea{min-height:360px;font-size:12px}.bubble{font-size:13px}}
 </style>
 </head>
 <body>
@@ -59,7 +65,7 @@
       <div class="abo" aria-hidden="true">
         <i class="backplate"></i><i class="face"></i><i class="visor"></i><i class="eye l"></i><i class="eye r"></i><i class="side l"></i><i class="side r"></i><i class="bar"></i>
       </div>
-      <div class="bubble"><b>阿波：</b>先下载/查看创作 Skill，照着它写课程包；再把 JSON 放进左边校验。通过后保存课程码，回主站就能隐藏预览啦。</div>
+      <div class="bubble"><b>阿波：</b>先下载创作 Skill，照着它写课程包；再导入 JSON、校验、保存课程码。最后回主站输入课程码，就能隐藏预览啦。</div>
     </section>
     <section class="flow">
       <div class="step"><b>1. 下载 Skill</b><span>先确认风格、节奏、术语和 UX 规范。</span></div>
@@ -73,14 +79,7 @@
         <h2>1. 创作规范</h2>
         <div class="row">
           <a class="btn violet" href="design/crowdsourced-course-authoring-skill.md" download>下载创作 Skill</a>
-          <a class="btn ghost" href="design/crowdsourced-course-authoring-skill.md">在线查看</a>
-          <a class="btn blue" href="design/crowdsourced-course-pipeline.md">工程方案</a>
-        </div>
-        <div class="spec">
-          <div class="spec-item"><b>1. 复制 skill 生产课程</b><br>每节必须有标题术语、阿波 hook、正文、UX、after、terms、close。</div>
-          <div class="spec-item"><b>2. 按 JSON 格式上传</b><br>课程码 `code` 是隐藏查看入口。小范围测试时，保存到同源 localStorage 即可。</div>
-          <div class="spec-item"><b>3. 主网页输入课程码</b><br>主站动态读取课程包，转成 `CHAPTERS['lab:CODE']`，复用现有阅读器。</div>
-          <div class="spec-item"><b>4. 归档</b><br>好作品后续改 `status: official` 并加入正式课程索引。</div>
+          <button type="button" class="btn blue" onclick="openPlan()">工程实现方案</button>
         </div>
       </section>
       <section class="upload-panel">
@@ -88,26 +87,28 @@
         <div class="edit-layout">
           <div>
             <textarea id="jsonBox" spellcheck="false"></textarea>
-            <div class="actions">
-              <button type="button" class="btn blue" onclick="loadTemplate()">载入模板</button>
-              <label class="btn ghost file-wrap">导入 JSON<input type="file" id="fileInput" accept=".json,application/json"></label>
-              <button type="button" class="btn violet" onclick="validateOnly()">校验格式</button>
-              <button type="button" class="btn primary" onclick="saveCourse()">保存到实验区</button>
+            <div class="edit-actions">
+              <label class="btn primary file-wrap">导入 JSON<input type="file" id="fileInput" accept=".json,application/json"></label>
+              <button type="button" class="btn ghost" onclick="loadTemplate()">载入模板</button>
             </div>
           </div>
           <div class="sidebox">
-            <div class="spec-item"><b>JSON 必填</b><br>`code`、`title`、`chapters`、`sections`、`ux`、`terms`、`close`。</div>
-            <div class="spec-item"><b>术语划线</b><br>`terms` 里的核心术语必须在 `close` 里用 `[[术语]]` 引用。</div>
-            <div class="spec-item"><b>UX 组件</b><br>先用 `labSlider`、`labChoice`、`labSteps` 跑通；成熟后再做专用组件。</div>
+            <div class="spec-item"><b>课程码</b><br>`code` 会成为主站隐藏查看入口。</div>
+            <div class="spec-item"><b>结构</b><br>课程包必须包含章节、小节、UX、术语和收束段。</div>
+            <div class="spec-item"><b>预览</b><br>保存后可直接跳回主站读取这份课程包。</div>
           </div>
         </div>
       </section>
       <section class="upload-panel">
         <h2>3. 校验 / 保存 / 预览</h2>
         <div class="result" id="result">等待上传。</div>
+        <div class="check-actions">
+          <button type="button" class="btn violet" onclick="validateOnly()">校验格式</button>
+          <button type="button" class="btn primary" onclick="saveCourse()">保存到实验区</button>
+          <button type="button" class="btn blue" onclick="previewCourse()">去主站预览</button>
+        </div>
         <div class="row">
           <input class="code" id="codeJump" placeholder="课程码">
-          <button type="button" class="btn primary" onclick="previewCourse()">去主站预览</button>
         </div>
       </section>
       <section class="upload-panel">
@@ -117,12 +118,22 @@
     </div>
   </div>
 </main>
+<div class="modal" id="planModal" onclick="closePlan(event)">
+  <div class="modal-card">
+    <div class="modal-head"><h3>工程实现方案</h3><button type="button" onclick="closePlan()">×</button></div>
+    <p><b>第一阶段：</b>上传页把课程 JSON 保存到同源浏览器存储，主站输入课程码后动态加载。</p>
+    <p><b>接入方式：</b>课程包会转换成 <code>CHAPTERS['lab:CODE']</code>，复用现有阅读器、阿波、术语、逐段展开和金币流程。</p>
+    <p><b>归档方式：</b>测试通过后，把课程包移动到正式课程索引；后续再升级为后端上传和审核队列。</p>
+  </div>
+</div>
 <script>
 var STORE='ai-explorer-lab-courses-v1';
 function normCode(x){return String(x||'').trim().toUpperCase().replace(/\s+/g,'-');}
 function loadStore(){try{return JSON.parse(localStorage.getItem(STORE)||'{}')||{};}catch(e){return {};}}
 function saveStore(s){localStorage.setItem(STORE,JSON.stringify(s));}
 function setResult(html){document.getElementById('result').innerHTML=html;}
+function openPlan(){document.getElementById('planModal').classList.add('open');}
+function closePlan(ev){if(!ev||ev.target.id==='planModal')document.getElementById('planModal').classList.remove('open');}
 var TEMPLATE={
   schemaVersion:'1.0',
   id:'internet-security-basic',
