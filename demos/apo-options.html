@@ -59,12 +59,16 @@
   .bot .eye { width:12px; height:15px; border-radius:7px; background:#fff; animation:blink 4s infinite; }
   .bot .eye::after { content:""; position:absolute; left:3px; top:3px; width:5px; height:5px; border-radius:3px; background:var(--glow); }
   .bot .mini-eye { width:11px; height:13px; border-radius:5px; background:var(--glow); animation:wink 4.4s infinite; }
-  .bot .mouth { width:26px; height:8px; border-radius:0 0 12px 12px; border-bottom:4px solid var(--dark); }
+  .bot .mouth { display:none; }
   .bot .dot { width:10px; height:10px; border-radius:5px; background:var(--glow); box-shadow:0 0 0 5px rgba(34,211,238,.16); animation:antenna 1.7s ease-in-out infinite; }
   .bot .bar { height:5px; border-radius:999px; background:#c4b5fd; opacity:.9; }
   .bot .bolt { width:9px; height:9px; border-radius:4px; background:#c4b5fd; box-shadow:inset 0 0 0 2px rgba(255,255,255,.55); }
   .bot .panel { height:4px; border-radius:999px; background:#d8d5f2; opacity:.9; }
   .bot .cheek { width:11px; height:6px; border-radius:999px; background:#fb7185; opacity:.55; }
+  .bot .shine { width:20px; height:30px; border-radius:999px; background:rgba(255,255,255,.42); transform:rotate(24deg); }
+  .bot .emoji-eye { width:17px; height:22px; border-radius:10px; background:#15142c; animation:blink 4s infinite; }
+  .bot .emoji-eye::after { content:""; position:absolute; left:4px; top:4px; width:6px; height:6px; border-radius:4px; background:#fff; }
+  .bot .stub { width:18px; height:7px; border-radius:999px; background:#c4b5fd; }
 
   .r1 .back { left:17px; top:25px; width:88px; height:84px; background:#c4b5fd; border-radius:24px; transform:rotate(-3deg); }
   .r1 .face { left:14px; top:23px; width:92px; height:84px; border-radius:24px; }
@@ -152,6 +156,22 @@
   .r8 .bolt.a { left:30px; top:39px; background:#58cc02; } .r8 .bolt.b { right:30px; top:39px; background:#58cc02; }
   .r8 .cheek.l { left:31px; top:83px; } .r8 .cheek.r { right:31px; top:83px; }
 
+  .r9 .back { left:16px; top:24px; width:90px; height:86px; border-radius:25px; background:#c4b5fd; transform:translate(3px,5px); opacity:.78; }
+  .r9 .face { left:14px; top:20px; width:92px; height:88px; border-radius:26px; background:linear-gradient(150deg,#ffffff,#dff7ff 72%,#c4b5fd); }
+  .r9 .side.l { left:0; top:50px; width:20px; height:42px; border-radius:11px; background:#8b5cf6; }
+  .r9 .side.r { right:0; top:50px; width:20px; height:42px; border-radius:11px; background:#22d3ee; }
+  .r9 .topbar { left:42px; top:12px; width:36px; height:7px; border-radius:999px; background:#22d3ee; }
+  .r9 .dot { left:55px; top:4px; }
+  .r9 .shine { left:28px; top:32px; }
+  .r9 .emoji-eye.l { left:38px; top:56px; }
+  .r9 .emoji-eye.r { right:38px; top:56px; }
+  .r9 .bolt.a { left:25px; top:41px; background:#c4b5fd; }
+  .r9 .bolt.b { right:25px; top:41px; background:#c4b5fd; }
+  .r9 .stub.a { left:33px; bottom:15px; }
+  .r9 .stub.b { right:33px; bottom:15px; background:#22d3ee; }
+  .r9 .panel.p1 { left:38px; bottom:7px; width:44px; background:#d8d5f2; }
+
+  .r9 .visor,.r9 .eye,.r9 .mini-eye,.r9 .bar,.r9 .scan,.r9 .plate,.r9 .chip,.r9 .tab,.r9 .cheek,.r9 .panel.p2,.r9 .mouth { display:none; }
   @media (max-width:640px) {
     .abo-top { flex-direction:column; }
     .abo-grid { grid-template-columns:1fr; }
@@ -188,7 +208,8 @@ var OPTIONS=[
   {id:'r5',name:'圆角学习机',tag:'稳定',say:'错一点没关系，我会慢慢调准。',fit:'像学习设备，适合主线课程长期陪伴。',risk:'外形偏稳，灵动感靠动效补。'},
   {id:'r6',name:'双耳助教头',tag:'可爱',say:'左边听输入，右边看答案，我来帮你对齐。',fit:'侧耳明显，机器人识别度强。',risk:'侧耳别像耳机广告。'},
   {id:'r7',name:'模块工程头',tag:'进阶课',say:'我不是魔法盒，是一块块模块拼起来的。',fit:'结构感强，适合拓展课。',risk:'亲和力稍弱。'},
-  {id:'r8',name:'绿灯反馈头',tag:'鼓励',say:'答错也没关系，我给你一个新线索。',fit:'反馈场景友好，绿色状态灯清楚。',risk:'绿色面积要控制。'}
+  {id:'r8',name:'绿灯反馈头',tag:'鼓励',say:'答错也没关系，我给你一个新线索。',fit:'反馈场景友好，绿色状态灯清楚。',risk:'绿色面积要控制。'},
+  {id:'r9',name:'Emoji 复刻头',tag:'复刻🤖',say:'你好呀！我是阿波，准备好一起探险了吗？',fit:'直接复刻 🤖 emoji：方圆头、深色圆眼、天线灯、侧耳，无面罩。',risk:'太接近 emoji，辨识度要靠配色微调。'}
 ];
 
 function getStore(k){try{return localStorage.getItem(k)||'';}catch(e){return '';}}
@@ -199,7 +220,7 @@ function bot(cls){
     '<i class="eye l"></i><i class="eye r"></i><i class="mini-eye l"></i><i class="mini-eye r"></i>'+
     '<i class="mouth"></i><i class="dot"></i><i class="bar"></i><i class="scan"></i>'+
     '<i class="side l"></i><i class="side r"></i><i class="topbar"></i><i class="chip"></i><i class="tab l"></i><i class="tab r"></i>'+
-    '<i class="bolt a"></i><i class="bolt b"></i><i class="panel p1"></i><i class="panel p2"></i><i class="cheek l"></i><i class="cheek r"></i>'+
+    '<i class="bolt a"></i><i class="bolt b"></i><i class="panel p1"></i><i class="panel p2"></i><i class="cheek l"></i><i class="cheek r"></i><i class="emoji-eye l"></i><i class="emoji-eye r"></i><i class="stub a"></i><i class="stub b"></i><i class="shine"></i>'+
   '</div>';
 }
 var picked=getStore('apo-rect-head-pick');
