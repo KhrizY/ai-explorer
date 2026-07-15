@@ -132,6 +132,27 @@
   .game-meter{height:9px;background:#e6e9f2;border-radius:999px;overflow:hidden;margin-bottom:10px}.game-meter i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#58cc02,#fbbf24,#fb7185);transition:width .08s linear;}
   .toastbig{position:fixed;left:50%;top:30%;transform:translateX(-50%);z-index:50;font-size:30px;font-weight:900;text-shadow:0 2px 8px #fff;animation:bigF .8s ease-out forwards;pointer-events:none;}
   @keyframes bigF{0%{opacity:0;transform:translateX(-50%) scale(.4)}30%{opacity:1;transform:translateX(-50%) scale(1.1)}70%{opacity:1;transform:translateX(-50%) scale(1)}100%{opacity:0;transform:translateX(-50%) scale(1)}}
+  /* —— 进阶课移植自 UX Demo 库的组件样式（浅色·蓝绿紫） —— */
+  .adv-note{margin:0 0 12px;padding:8px 10px;border-radius:10px;background:#f5f3ff;color:#6d28d9;font-size:12px;font-weight:800;line-height:1.45;}
+  .noise-lab{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;width:100%;max-width:440px;margin:0 auto;}
+  .noise-canvas{width:150px;height:150px;border-radius:16px;image-rendering:pixelated;background:#eef1fb;box-shadow:0 0 0 3px #fff,0 8px 18px rgba(60,50,110,.12);}
+  .noise-panel{display:grid;gap:9px;min-width:0;}
+  .noise-step{display:flex;align-items:center;gap:8px;color:#4b4869;font-size:12px;font-weight:900;}
+  .noise-step b{width:22px;height:22px;border-radius:8px;display:grid;place-items:center;background:#ede9fe;color:#6d28d9;flex:none;}
+  .noise-step.on b{background:#58cc02;color:#fff;}
+  .noise-meter{height:12px;border-radius:999px;background:#e6e9f2;overflow:hidden;}
+  .noise-meter i{display:block;height:100%;width:100%;border-radius:999px;background:linear-gradient(90deg,#fb7185,#fbbf24);transition:width .25s;}
+  .trail-top{display:flex;justify-content:space-between;gap:10px;align-items:center;width:100%;max-width:360px;margin:0 auto 10px;color:#4b4869;font-size:12px;font-weight:900;}
+  .trail-board{display:grid;grid-template-columns:repeat(5,48px);gap:7px;justify-content:center;margin:0 auto;}
+  .trail-cell{width:48px;height:48px;border-radius:12px;background:#fff;border:2px solid #d9d6f2;color:#4b4869;display:grid;place-items:center;font-size:21px;font-weight:900;cursor:pointer;transition:transform .12s,background .12s,border-color .12s;box-shadow:0 3px 0 #dfe4ef;font-family:inherit;}
+  .trail-cell:hover{transform:translateY(-2px);}
+  .trail-cell.start{background:#ccfbf1;border-color:#2dd4bf;}
+  .trail-cell.goal{background:#dcfce7;border-color:#58cc02;}
+  .trail-cell.step{background:#dbeafe;border-color:#93c5fd;}
+  .trail-cell.pit{background:#fef3c7;border-color:#fbbf24;}
+  .trail-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px;}
+  .trail-legend{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;color:#8b90a6;font-size:11px;font-weight:800;margin-top:8px;}
+  @media (max-width:520px){.noise-lab{grid-template-columns:1fr;justify-items:center;}.trail-board{grid-template-columns:repeat(5,40px);gap:6px;}.trail-cell{width:40px;height:40px;border-radius:10px;font-size:18px;}}
 </style>
 </head>
 <body>
@@ -1115,14 +1136,21 @@ function buildAdvRecap(title,points){return function(onWin,onReset){var b=ixbox(
   var bw=el('div');bw.style.textAlign='center';bw.appendChild(btn);w.appendChild(list);w.appendChild(bw);return b;};}
 
 // —— 进阶 UX：扩散 / 强化学习 / 经典机器学习 / RLHF ——
-function buildDiffusionDenoise(rw,onReset){var b=ixbox('✨ 扩散去噪画室','连续点"去噪一步"，从噪点里擦出图案',onReset);var w=b._body;var step=0,done=false;
-  var stage=el('div');stage.style.cssText='height:150px;border-radius:14px;background:#fff;border:1.5px solid #e6e9f2;display:grid;place-items:center;overflow:hidden;position:relative';
-  var art=el('div');art.style.cssText='font-size:64px;filter:blur(10px);opacity:.12;transition:.35s;transform:scale(.8) rotate(-8deg)';art.textContent='🪐';stage.appendChild(art);
-  var noise=el('div');noise.style.cssText='position:absolute;inset:0;background:repeating-radial-gradient(circle at 20% 30%,rgba(139,92,246,.45) 0 2px,transparent 2px 5px),repeating-radial-gradient(circle at 70% 50%,rgba(34,211,238,.38) 0 2px,transparent 2px 6px);opacity:.95;transition:.35s';stage.appendChild(noise);
-  var msg=el('div',null,'噪声 100% · 图像 0%');msg.style.cssText='text-align:center;font-size:12.5px;color:#4b4869;font-weight:800;margin:8px 0';
-  var btn=el('button','next-btn','🧽 去噪一步');
-  btn.onclick=function(e){step++;var n=Math.max(0,100-step*20),clar=Math.min(100,step*20);noise.style.opacity=n/100;art.style.opacity=.12+clar/115;art.style.filter='blur('+(10-step*2)+'px)';art.style.transform='scale('+(0.8+step*.04)+') rotate(0deg)';msg.textContent='噪声 '+n+'% · 图像 '+clar+'%';spark(e.clientX,e.clientY);if(step>=5&&!done){done=true;toast('图像出现了！',true);rw(e);btn.style.display='none';}};
-  w.appendChild(stage);w.appendChild(msg);w.appendChild(btn);return b;}
+function buildDiffusionDenoise(rw,onReset){var b=ixbox('✨ 扩散去噪画室','连续点"去噪一步"，从噪点里擦出图案',onReset);var w=b._body;
+  var note=el('div','adv-note','核心动作 = 反复去噪，不是一笔画完');
+  var wrap=el('div','noise-lab'),cv=document.createElement('canvas'),ctx=cv.getContext('2d');cv.className='noise-canvas';cv.width=28;cv.height=28;
+  var panel=el('div','noise-panel');
+  var meter=el('div','noise-meter','<i></i>');
+  var msg=el('div',null,'噪声 100% · 点一下去噪一步');msg.style.cssText='text-align:center;font-size:12.5px;color:#4b4869;font-weight:800;min-height:18px';
+  var steps=el('div');['乱点','轮廓','颜色','完成'].forEach(function(t,i){steps.appendChild(el('div','noise-step'+(i===0?' on':''),'<b>'+(i+1)+'</b><span>'+t+'</span>'));});
+  var btn=el('button','next-btn','✨ 去噪一步');btn.style.cssText+=';margin-top:2px';
+  panel.appendChild(steps);panel.appendChild(meter);panel.appendChild(msg);panel.appendChild(btn);
+  wrap.appendChild(cv);wrap.appendChild(panel);
+  var step=0,N=28,done=false;
+  function target(x,y){var dx=x-14,dy=y-14,d=Math.sqrt(dx*dx+dy*dy);if(d<8&&y>5&&y<22)return[255,214,109];if(Math.abs(dx)<2&&y>=18)return[120,72,35];if(d<5&&y<12)return[88,204,2];if(Math.abs(dx)>4&&Math.abs(dx)<8&&y>9&&y<15)return[251,113,133];return[18,24,38];}
+  function draw(){var noise=Math.max(0,1-step/7),img=ctx.createImageData(N,N);for(var y=0;y<N;y++)for(var x=0;x<N;x++){var t=target(x,y),k=(y*N+x)*4,mix=1-noise;img.data[k]=t[0]*mix+Math.random()*255*noise;img.data[k+1]=t[1]*mix+Math.random()*255*noise;img.data[k+2]=t[2]*mix+Math.random()*255*noise;img.data[k+3]=255;}ctx.putImageData(img,0,0);meter.querySelector('i').style.width=Math.round(noise*100)+'%';msg.textContent=noise>0?'噪声 '+Math.round(noise*100)+'% · 继续去噪':'完成：噪点里长出图案';steps.querySelectorAll('.noise-step').forEach(function(n,i){n.classList.toggle('on',i<=Math.min(3,Math.floor(step/2)));});}
+  btn.onclick=function(e){if(step<7){step++;draw();}if(step>=7&&!done){done=true;toast('🎨 画好了!',true);spark(e.clientX,e.clientY);rw(e);}};
+  w.appendChild(note);w.appendChild(wrap);draw();return b;}
 function buildDiffusionNoise(rw,onReset){var b=ixbox('🌫️ 前向加噪实验','先把清晰图一步步弄脏，AI 才学会反过来擦干净',onReset);var w=b._body;var step=0,done=false;
   var stage=el('div');stage.style.cssText='height:130px;border-radius:14px;background:#fff;border:1.5px solid #e6e9f2;display:grid;place-items:center;position:relative;overflow:hidden';
   var art=el('div',null,'🐱');art.style.cssText='font-size:62px;transition:.25s';var veil=el('div');veil.style.cssText='position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(139,92,246,.35) 0 3px,transparent 3px 7px);opacity:0;transition:.25s';stage.appendChild(art);stage.appendChild(veil);
@@ -1134,38 +1162,62 @@ function buildTextGuide(rw,onReset){var b=ixbox('🧭 文本引导','选择提�
   var row=el('div');row.style.cssText='display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px';
   [['猫','🐱'],['太空猫','👩‍🚀🐱'],['油画风猫','🖼️🐱']].forEach(function(x){var btn=el('button','btn btn-ghost',x[0]);btn.onclick=function(e){out.textContent=x[1];seen[x[0]]=1;lineFeedback(w,true,'提示词把生成方向拉向：'+x[0]);if(Object.keys(seen).length>=3&&!done){done=true;rw(e);}};row.appendChild(btn);});
   w.appendChild(out);w.appendChild(row);return b;}
-function buildRLTrail(rw,onReset){var b=ixbox('🕹️ 强化学习踩格子','只靠奖励和惩罚，试出到宝箱的路线',onReset);var w=b._body;var pos=0,score=0,done=false,good={1:1,4:1,5:1,8:1},bad={2:1,6:1},goal=8;
-  var grid=el('div');grid.style.cssText='display:grid;grid-template-columns:repeat(3,58px);gap:6px;justify-content:center';
-  var msg=el('div',null,'奖励 0 · 从左上角出发');msg.style.cssText='text-align:center;font-size:12.5px;color:#4b4869;font-weight:800;margin:8px 0';
-  function draw(){grid.innerHTML='';for(var i=0;i<9;i++){var d=el('button','btn btn-ghost',i===pos?'🤖':(i===goal?'🏆':bad[i]?'🕳️':good[i]?'⭐':'·'));d.style.cssText+=';height:52px;font-size:22px';(function(i){d.onclick=function(e){if(done)return;var ok=(Math.abs(i-pos)===1&&Math.floor(i/3)===Math.floor(pos/3))||Math.abs(i-pos)===3;if(!ok){lineFeedback(w,false,'只能走相邻格');return;}pos=i;if(bad[i]){score-=2;toast('踩坑 -2',false);pos=0;}else if(good[i]){score++;spark(e.clientX,e.clientY);}if(i===goal){done=true;score+=5;toast('找到好策略！',true);rw(e);}msg.textContent='奖励 '+score+' · '+(done?'到达目标':'继续试错');draw();};})(i);grid.appendChild(d);}}
-  w.appendChild(grid);w.appendChild(msg);draw();return b;}
+function buildRLTrail(rw,onReset){var b=ixbox('🕹️ 强化学习踩格子','从起点出发，只能走相邻格，靠踩坑和奖励找出到 ⭐ 的路线',onReset);var w=b._body;
+  var note=el('div','adv-note','核心动作 = 先试错，再把有奖励的路线记下来');
+  var top=el('div','trail-top'),board=el('div','trail-board');
+  var actions=el('div','trail-actions'),legend=el('div','trail-legend','<span>🤖 当前</span><span>⭐ 目标</span><span>✓ 走过</span><span>⚠ 坑</span>');
+  var msg=el('div',null,'从起点出发，踩坑没关系，它会告诉你别走这里。');msg.style.cssText='text-align:center;font-size:12.5px;color:#4b4869;font-weight:800;min-height:18px;margin-top:8px';
+  var reward=0,tries=1,pos=20,goal=4,path={20:1,21:1,16:1,11:1,12:1,13:1,8:1,3:1,4:1},pit={15:1,22:1,17:1,10:1,7:1,18:1,2:1},seen={},route=[20],won=false,got=false;
+  top.innerHTML='<span id="advTrailTry">第 1 次探路</span><span id="advTrailReward">奖励 0</span>';
+  function near(a,c){var ax=a%5,ay=Math.floor(a/5),bx=c%5,by=Math.floor(c/5);return Math.abs(ax-bx)+Math.abs(ay-by)===1;}
+  function paint(){board.innerHTML='';for(var i=0;i<25;i++){var cls='trail-cell',txt='';if(i===20){cls+=' start';txt='起';}if(i===goal){cls+=' goal';txt='⭐';}if(seen[i]&&path[i]&&i!==20&&i!==goal){cls+=' step';txt='✓';}if(seen[i]&&pit[i]){cls+=' pit';txt='⚠';}if(i===pos)txt='🤖';var d=el('button',cls,txt);d.dataset.i=i;d.onclick=function(e){stepTo(+this.dataset.i,e);};board.appendChild(d);}top.querySelector('#advTrailTry').textContent='第 '+tries+' 次探路';top.querySelector('#advTrailReward').textContent='奖励 '+reward;}
+  function resetPos(){pos=20;route=[20];tries++;msg.textContent='从起点再试一次，刚才的坑已经记住了。';paint();}
+  function stepTo(i,e){if(won||!near(pos,i)){msg.textContent='只能走相邻格，一步一步试。';return;}pos=i;seen[i]=1;route.push(i);if(pit[i]){reward=Math.max(0,reward-1);toast('踩坑了 -1',false);msg.textContent='踩坑：这格以后少走。强化学习就是用惩罚修正路线。';setTimeout(resetPos,650);}else if(i===goal){reward+=10;won=true;paint();toast('🏆 找到路线!',true);msg.textContent='拿到奖励！这条路线会被记得更牢。';if(!got){got=true;rw(e);}}else if(path[i]){reward+=1;msg.textContent='走对一格，奖励 +1，继续沿好信号探路。';paint();spark(e.clientX,e.clientY);}else{reward=Math.max(0,reward-1);msg.textContent='走偏了，奖励 -1，可以退回起点重试。';paint();}}
+  var rb=el('button','next-btn','↩ 从起点重试');rb.style.cssText+=';margin-top:0;padding:8px 16px;font-size:13px';rb.onclick=function(){if(!won)resetPos();};actions.appendChild(rb);
+  w.appendChild(note);w.appendChild(top);w.appendChild(board);w.appendChild(actions);w.appendChild(legend);w.appendChild(msg);seen[20]=1;paint();return b;}
 function buildExploreExploit(rw,onReset){var b=ixbox('🎰 探索 vs 利用','试老虎机，找出长期奖励最高的按钮',onReset);var w=b._body;var probs=[.25,.55,.8],tries=0,best=2,done=false,stats=[0,0,0],wins=[0,0,0];
   var row=el('div');row.style.cssText='display:flex;gap:8px;justify-content:center';var msg=el('div',null,'先探索，再利用高奖励按钮');msg.style.cssText='text-align:center;font-size:12.5px;color:#4b4869;font-weight:800;margin-top:8px';
   probs.forEach(function(p,i){var btn=el('button','btn btn-ghost','🎰 '+(i+1));btn.onclick=function(e){tries++;stats[i]++;var win=Math.random()<p;if(win){wins[i]++;spark(e.clientX,e.clientY);}btn.innerHTML='🎰 '+(i+1)+'<br><small>'+wins[i]+'/'+stats[i]+'</small>';msg.textContent=win?'奖励 +1':'没中奖';if(tries>=7&&stats[best]>=3&&!done){done=true;toast('找到高奖励按钮',true);rw(e);}};row.appendChild(btn);});
   w.appendChild(row);w.appendChild(msg);return b;}
 function buildThreshold(rw,onReset){var b=ixbox('📏 阈值分类线','拖分界线，让左右两类尽量分开',onReset);var w=b._body;var val=45,done=false;
   var stage=el('div');stage.style.cssText='height:112px;border:1.5px solid #e6e9f2;border-radius:12px;position:relative;background:#fff;margin-bottom:8px';
-  var pts=[18,25,34,54,66,78];pts.forEach(function(x,i){var d=el('div',null,i<3?'🔵':'🟣');d.style.cssText='position:absolute;left:'+x+'%;top:'+(25+i%3*18)+'px;font-size:22px';stage.appendChild(d);});
+  var pts=[18,25,34,54,66,78];pts.forEach(function(x,i){var d=el('div');d.style.cssText='position:absolute;width:16px;height:16px;border-radius:50%;left:'+x+'%;top:'+(34+i%3*20)+'px;transform:translate(-50%,-50%);background:'+(i<3?'#38bdf8':'#a78bfa');stage.appendChild(d);});
   var line=el('div');line.style.cssText='position:absolute;top:0;bottom:0;width:3px;background:#f59e0b;left:'+val+'%';stage.appendChild(line);
   var rng=el('input');rng.type='range';rng.min=10;rng.max=90;rng.value=val;rng.style.cssText='width:100%;accent-color:#8b5cf6';
   var msg=el('div',null,'把线放在两类中间');msg.style.cssText='text-align:center;font-size:12.5px;color:#4b4869;font-weight:800';
   rng.oninput=function(e){val=+rng.value;line.style.left=val+'%';var ok=val>38&&val<50;msg.innerHTML=ok?'<b style="color:#16a34a">分界线刚好！</b>':'继续调整阈值';if(ok&&!done){done=true;rw(e);}};
   w.appendChild(stage);w.appendChild(rng);w.appendChild(msg);return b;}
-function buildKNN(rw,onReset){var b=ixbox('🗳️ K近邻投票','点空白放新点，看最近 3 个邻居投票',onReset);var w=b._body;var done=false,pts=[[20,30,'🔵'],[28,70,'🔵'],[42,42,'🔵'],[70,28,'🟣'],[76,64,'🟣'],[58,78,'🟣']];
-  var st=el('div');st.style.cssText='height:170px;border:1.5px solid #e6e9f2;border-radius:12px;background:#fff;position:relative;overflow:hidden';var msg=el('div',null,'点一下放入新样本');msg.style.cssText='text-align:center;font-size:12.5px;color:#4b4869;font-weight:800;margin-top:8px';
-  function dot(x,y,t,big){var d=el('div',null,t);d.style.cssText='position:absolute;left:'+x+'%;top:'+y+'%;transform:translate(-50%,-50%);font-size:'+(big?28:20)+'px';st.appendChild(d);}
-  pts.forEach(function(p){dot(p[0],p[1],p[2]);});
-  st.onclick=function(e){if(done)return;var r=st.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*100,y=(e.clientY-r.top)/r.height*100;dot(x,y,'❓',true);var ns=pts.map(function(p){return {p:p,d:Math.hypot(p[0]-x,p[1]-y)}}).sort(function(a,b){return a.d-b.d}).slice(0,3);var blue=ns.filter(function(n){return n.p[2]==='🔵'}).length;msg.textContent='最近 3 个邻居投票：'+(blue>=2?'🔵 蓝类':'🟣 紫类');done=true;rw(e);};
-  w.appendChild(st);w.appendChild(msg);return b;}
-function buildCluster(rw,onReset){var b=ixbox('🌀 自动聚类分组','点"自动分组"，看相似点自己成团',onReset);var w=b._body;var done=false;
-  var st=el('div');st.style.cssText='height:150px;border:1.5px solid #e6e9f2;border-radius:12px;background:#fff;position:relative';var pts=[[18,28],[25,42],[30,24],[68,32],[75,45],[64,50],[45,72],[52,78],[39,82]];
-  pts.forEach(function(p){var d=el('div',null,'●');d.style.cssText='position:absolute;left:'+p[0]+'%;top:'+p[1]+'%;font-size:22px;color:#9ca3af;transform:translate(-50%,-50%);transition:.3s';d._p=p;st.appendChild(d);});
-  var btn=el('button','next-btn','🌀 自动分组');btn.onclick=function(e){if(done)return;done=true;var colors=['#38bdf8','#a78bfa','#22c55e'];Array.from(st.children).forEach(function(d){var p=d._p,idx=p[0]<38?0:p[1]>65?2:1;d.style.color=colors[idx];d.style.transform='translate(-50%,-50%) scale(1.25)';});toast('相似的成团了',true);rw(e);};
-  w.appendChild(st);w.appendChild(btn);return b;}
-function buildRLHF(rw,onReset){var b=ixbox('👂 RLHF 偏好选择','每轮选更好的回答，训练奖励模型',onReset);var w=b._body;var rounds=[['直接给答案，还解释一步','只说：不知道'],['提醒先核实重要信息','编一个看似确定的出处'],['拒绝危险请求并给安全替代','照着危险要求做']],i=0,score=0,done=false;
-  var q=el('div',null,'问题：怎么更好地回答用户？');q.style.cssText='text-align:center;font-weight:800;color:#6d28d9;margin-bottom:8px';var bar=el('div');bar.style.cssText='height:10px;border-radius:99px;background:#e6e9f2;overflow:hidden;margin:8px 0';var fill=el('div');fill.style.cssText='height:100%;width:0;background:linear-gradient(90deg,#8b5cf6,#22d3ee)';bar.appendChild(fill);var row=el('div');row.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:8px';
-  function draw(){row.innerHTML='';var a=rounds[i%rounds.length];[0,1].forEach(function(k){var btn=el('button','btn btn-ghost',k?'B：'+a[1]:'A：'+a[0]);btn.style.cssText+=';white-space:normal;min-height:64px;color:#4b4869';btn.onclick=function(e){if(done)return;if(k===0){score++;spark(e.clientX,e.clientY);fill.style.width=Math.min(100,score*34)+'%';i++;if(score>=3){done=true;toast('奖励模型学会偏好了',true);rw(e);}else draw();}else{lineFeedback(w,false,'这版没那么符合人类偏好');}};row.appendChild(btn);});}
-  draw();w.appendChild(q);w.appendChild(bar);w.appendChild(row);return b;}
+function buildKNN(rw,onReset){var b=ixbox('🗳️ K近邻投票','点空白处放一个新点，看最近 3 个邻居怎么投票',onReset);var w=b._body;
+  var note=el('div','adv-note','核心动作 = 看离你最近的几个邻居是谁，就跟着归哪类');
+  var PTS=[];for(var i=0;i<12;i++)PTS.push({x:10+Math.random()*80,y:10+Math.random()*80,c:Math.random()>0.5?'a':'b'});
+  var stage=el('div');stage.style.cssText='position:relative;width:100%;max-width:280px;height:180px;background:#eef1fb;border:1.5px solid #e6e9f2;border-radius:12px;cursor:crosshair;margin:0 auto';
+  PTS.forEach(function(p){var d=el('div');d.style.cssText='position:absolute;width:14px;height:14px;border-radius:50%;transform:translate(-50%,-50%);left:'+p.x+'%;top:'+p.y+'%;background:'+(p.c==='a'?'#38bdf8':'#a78bfa');p.el=d;stage.appendChild(d);});
+  var q=el('div',null,'?');q.style.cssText='position:absolute;width:20px;height:20px;border-radius:50%;transform:translate(-50%,-50%);background:#58cc02;color:#fff;font-weight:900;display:none;place-items:center;font-size:12px;z-index:3';stage.appendChild(q);
+  var msg=el('div',null,'👆 点空白处放一个新点，看它归哪类');msg.style.cssText='text-align:center;font-size:12.5px;color:#4b4869;font-weight:800;margin-top:8px;min-height:18px';
+  var got=false;
+  stage.onclick=function(e){var r=stage.getBoundingClientRect();var qx=(e.clientX-r.left)/r.width*100,qy=(e.clientY-r.top)/r.height*100;q.style.left=qx+'%';q.style.top=qy+'%';q.style.display='grid';var ds=PTS.map(function(p){return{p:p,d:Math.hypot(p.x-qx,p.y-qy)};}).sort(function(a,c){return a.d-c.d;});stage.querySelectorAll('.knn-ring').forEach(function(x){x.remove();});var a=0;ds.slice(0,3).forEach(function(o){a+=o.p.c==='a'?1:-1;var rg=el('div','knn-ring');rg.style.cssText='position:absolute;width:22px;height:22px;border-radius:50%;transform:translate(-50%,-50%);left:'+o.p.x+'%;top:'+o.p.y+'%;border:2px solid #f59e0b;z-index:2';stage.appendChild(rg);});var res=a>0?'a':'b';q.style.background=res==='a'?'#38bdf8':'#a78bfa';q.textContent=res==='a'?'蓝':'紫';msg.innerHTML='最近 3 个邻居投票 → 归为 <b style="color:#6d28d9">'+(res==='a'?'蓝队':'紫队')+'</b>';spark(e.clientX,e.clientY);if(!got){got=true;rw(e);}};
+  w.appendChild(note);w.appendChild(stage);w.appendChild(msg);return b;}
+function buildCluster(rw,onReset){var b=ixbox('🌀 自动聚类分组','点"自动分组"，看相似的点自己抱成团',onReset);var w=b._body;
+  var note=el('div','adv-note','核心动作 = 不给答案，只按"谁离谁近"把相似的自动归堆');
+  var seeds=[{x:28,y:35,c:'#8b5cf6'},{x:70,y:65,c:'#22c55e'}];var PTS=[];for(var i=0;i<16;i++)PTS.push({x:10+Math.random()*80,y:10+Math.random()*80});
+  var stage=el('div');stage.style.cssText='position:relative;width:100%;max-width:280px;height:180px;background:#eef1fb;border:1.5px solid #e6e9f2;border-radius:12px;margin:0 auto';
+  PTS.forEach(function(p){var d=el('div');d.style.cssText='position:absolute;width:14px;height:14px;border-radius:50%;transform:translate(-50%,-50%);left:'+p.x+'%;top:'+p.y+'%;background:#94a3b8;transition:background .5s';p.el=d;stage.appendChild(d);});
+  var msg=el('div',null,'16 个灰点，点按钮自动分两组');msg.style.cssText='text-align:center;font-size:12.5px;color:#4b4869;font-weight:800;margin:8px 0;min-height:18px';
+  var btn=el('button','next-btn','🌀 自动分组');btn.style.cssText+=';display:block;margin:0 auto';var got=false;
+  btn.onclick=function(e){PTS.forEach(function(p){var d0=Math.hypot(p.x-seeds[0].x,p.y-seeds[0].y),d1=Math.hypot(p.x-seeds[1].x,p.y-seeds[1].y);p.el.style.background=d0<d1?seeds[0].c:seeds[1].c;});toast('🌀 相似的成团了',true);msg.textContent='分好了！紫色一堆、绿色一堆，全靠彼此的距离。';if(!got){got=true;rw(e);}};
+  w.appendChild(note);w.appendChild(stage);w.appendChild(msg);w.appendChild(btn);return b;}
+function buildRLHF(rw,onReset){var b=ixbox('👂 RLHF · 选更好的回答','每轮选你觉得更好的那版，训练出 AI 的偏好',onReset);var w=b._body;
+  var note=el('div','adv-note','核心动作 = 你选哪个更好，AI 就往哪个方向学');
+  var ROUNDS=[{q:'什么是彩虹？',good:'彩虹是阳光穿过小水滴，被折射分成七种颜色形成的。',bad:'彩虹？你自己上网查不就知道了。'},{q:'帮我给妈妈写一句生日祝福',good:'妈妈生日快乐！谢谢你一直照顾我，我爱你。',bad:'生日是地球绕太阳一圈的纪念日。'},{q:'月亮为什么会发光？',good:'月亮自己不发光，它反射太阳的光，我们才看见它亮。',bad:'因为月亮里住着会发光的小兔子呀。'},{q:'2 加 3 等于几？',good:'2 加 3 等于 5。',bad:'这个太难了，我不会。'}];
+  var idx=0,score=0,need=ROUNDS.length,got=false;
+  var face=el('div',null,'😐');face.style.cssText='font-size:38px;text-align:center';
+  var barWrap=el('div');barWrap.style.cssText='height:12px;border-radius:99px;background:#e6e9f2;overflow:hidden;margin:8px auto;max-width:260px';
+  var bar=el('i');bar.style.cssText='display:block;height:100%;width:0;background:linear-gradient(90deg,#8b5cf6,#22d3ee);transition:width .3s';barWrap.appendChild(bar);
+  var barLbl=el('div',null,'奖励模型：AI 还不太懂你喜欢什么');barLbl.style.cssText='text-align:center;font-size:12.5px;color:#4b4869;font-weight:800;min-height:18px';
+  var qv=el('div');qv.style.cssText='font-weight:800;color:#1e1b3a;text-align:center;margin:10px 0 6px;font-size:15px';
+  var opts=el('div');opts.style.cssText='display:flex;flex-direction:column;gap:8px;max-width:340px;margin:0 auto';
+  function draw(){if(idx>=need){face.textContent='✅';qv.textContent='';opts.innerHTML='';barLbl.innerHTML='🎓 它学会你喜欢的风格了！';if(!got){got=true;toast('🎓 奖励模型练好了!',true);rw({});}return;}var r=ROUNDS[idx];qv.textContent='🙋 问题：'+r.q;var pair=idx%2===0?[{t:r.good,ok:1},{t:r.bad,ok:0}]:[{t:r.bad,ok:0},{t:r.good,ok:1}];opts.innerHTML='';pair.forEach(function(o,k){var bt=el('button','btn btn-ghost',(k===0?'🅰 ':'🅱 ')+o.t);bt.style.cssText+=';text-align:left;white-space:normal;line-height:1.45;padding:10px 14px;font-size:13px;color:#4b4869';bt.onclick=function(e){if(o.ok){score++;idx++;spark(e.clientX,e.clientY);var pct=Math.round(score/need*100);bar.style.width=pct+'%';face.textContent=pct>=100?'😊':pct>=50?'🙂':'😐';lineFeedback(w,true,'你选了更好的！AI 对齐度 '+pct+'%');setTimeout(draw,420);}else{lineFeedback(w,false,'另一版更符合人类偏好，再看看');toast('🤔 另一版更好哦',false);}};opts.appendChild(bt);});}
+  w.appendChild(note);w.appendChild(face);w.appendChild(barWrap);w.appendChild(barLbl);w.appendChild(qv);w.appendChild(opts);draw();return b;}
 function buildScaleMilestones(rw,onReset){var b=ixbox('📈 规模滑块','拖大规模，观察能力门槛怎样被越过',onReset);var w=b._body;var done=false;
   var rng=el('input');rng.type='range';rng.min=1;rng.max=100;rng.value=18;rng.style.cssText='width:100%;accent-color:#8b5cf6';
   var row=el('div');row.style.cssText='display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0';
@@ -1285,6 +1337,7 @@ var _goMap0=goMap;goMap=function(){_goMap0();renderAdv();};
 // ========== 启动 ==========
 syncTop();renderAdv();goMap();
 (function debugEndRoute(){var p=new URLSearchParams(location.search),id=p.get('end');if(id&&CHAPTERS[id]){document.body.classList.add('debug-end');ST={xp:0,done:{},badges:[],collected:{}};save();setTimeout(function(){CH=CHAPTERS[id];show('scr-ch');document.getElementById('chtitle').textContent=CH.title;curSec=CH.sections.length;document.getElementById('chbody').innerHTML='';syncTop();renderSec();},80);}})();
+(function debugSecRoute(){var p=new URLSearchParams(location.search),id=p.get('sec');if(id&&CHAPTERS[id]){document.body.classList.add('debug-end');ST={xp:0,done:{},badges:[],collected:{}};save();var nn=parseInt(p.get('n'),10)||0;setTimeout(function(){CH=CHAPTERS[id];show('scr-ch');document.getElementById('chtitle').textContent=CH.title;curSec=Math.max(0,Math.min(nn,CH.sections.length-1));document.getElementById('chbody').innerHTML='';syncTop();renderSec();},80);}})();
 </script>
 </body>
 </html>
