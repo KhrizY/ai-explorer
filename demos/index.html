@@ -11,6 +11,20 @@
   .wrap { max-width:1080px; margin:0 auto; padding:24px 16px 90px; }
   h1 { font-size:24px; color:#1e1b3a; margin:0 0 4px; font-weight:900; }
   .sub { color:#6b7280; font-size:13px; margin-bottom:16px; line-height:1.65; }
+  .jump-card { width:100%; margin:0 0 14px; padding:14px 16px; border-radius:18px; border:1.5px solid #bae6fd; background:linear-gradient(135deg,#ecfeff,#f5f3ff); box-shadow:0 6px 0 #dfe4ef,0 14px 24px rgba(60,50,110,.08); cursor:pointer; display:flex; align-items:center; gap:12px; text-align:left; font-family:var(--font); transition:transform .15s var(--ease-bounce), box-shadow .15s; }
+  .jump-card:hover { transform:translateY(-3px); box-shadow:0 9px 0 #dfe4ef,0 18px 28px rgba(60,50,110,.11); }
+  .jump-card:active { transform:translateY(2px); box-shadow:0 3px 0 #dfe4ef; }
+  .jump-ico { width:42px; height:42px; border-radius:14px; display:grid; place-items:center; flex:none; background:linear-gradient(135deg,var(--violet),var(--cyan)); color:#fff; font-size:22px; box-shadow:0 4px 0 var(--violet-dd); }
+  .jump-main { min-width:0; display:grid; gap:3px; }
+  .jump-main b { color:#1e1b3a; font-size:15px; font-weight:900; }
+  .jump-main span { color:#4b4869; font-size:12px; line-height:1.45; font-weight:800; }
+  .compare-shell { display:none; margin:0 0 18px; border:1.5px solid #bae6fd; border-radius:18px; background:#fff; box-shadow:0 6px 0 #dfe4ef,0 14px 24px rgba(60,50,110,.08); overflow:hidden; }
+  .compare-shell.on { display:block; }
+  .compare-head { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px; background:linear-gradient(135deg,#ecfeff,#f5f3ff); border-bottom:1px solid #e6e9f2; }
+  .compare-head b { color:#1e1b3a; font-size:14px; font-weight:900; }
+  .compare-head .actions { display:flex; gap:8px; flex:none; }
+  .mini-link { display:inline-flex; align-items:center; height:30px; padding:0 10px; border-radius:10px; border:1.5px solid #e6e9f2; background:#fff; color:#6d28d9; text-decoration:none; font-size:12px; font-weight:900; box-shadow:0 2px 0 #dfe4ef; cursor:pointer; font-family:var(--font); }
+  .compare-frame { width:100%; height:720px; border:0; display:block; background:#fff; }
   /* 可拖拽标签条 */
   .tabs { display:flex; gap:10px; overflow-x:auto; padding:6px 2px 12px; cursor:grab; scrollbar-width:none; }
   .tabs::-webkit-scrollbar { display:none; }
@@ -87,6 +101,20 @@
 <div class="wrap">
   <h1>🧪 AI 探险号 · UX Demo 库</h1>
   <div class="sub">20 个可玩原型 · 三类：🎮游戏交互 / 🔬可视化讲解 / 🎚️探索模拟 · 标签条可左右拖动 · <a href="apo-options.html" style="color:#6d28d9;font-weight:900;text-decoration:none;border-bottom:2px dotted #eab308">阿波候选页</a> · <a href="advanced-ux-compare.html" style="color:#0891b2;font-weight:900;text-decoration:none;border-bottom:2px dotted #22d3ee">进阶UX对比台</a></div>
+  <button class="jump-card" type="button" onclick="showComparePanel()">
+    <span class="jump-ico">🔬</span>
+    <span class="jump-main"><b>展开进阶 UX 对比测试台</b><span>在当前预览页内打开，不依赖页面跳转；左侧旧交互，右侧新交互。</span></span>
+  </button>
+  <div class="compare-shell" id="compareShell">
+    <div class="compare-head">
+      <b>进阶 UX 对比测试台</b>
+      <div class="actions">
+        <a class="mini-link" href="advanced-ux-compare.html">独立页</a>
+        <button class="mini-link" type="button" onclick="hideComparePanel()">收起</button>
+      </div>
+    </div>
+    <iframe class="compare-frame" id="compareFrame" title="进阶 UX 对比测试台"></iframe>
+  </div>
   <div class="tabs" id="tabs"></div>
   <div class="grid" id="grid"></div>
 </div>
@@ -96,6 +124,8 @@
 function spark(x,y){var E=['✨','⭐','🎉','💫','🌟'];for(var i=0;i<9;i++){var s=document.createElement('div');s.className='spark';s.textContent=E[i%5];s.style.left=x+'px';s.style.top=y+'px';var a=Math.PI*2*i/9;s.style.setProperty('--dx',Math.cos(a)*66+'px');s.style.setProperty('--dy',(Math.sin(a)*66-24)+'px');document.body.appendChild(s);(function(el){setTimeout(function(){el.remove();},900);})(s);}}
 function bigFlash(stage, txt, ok){var f=document.createElement('div');f.className='bigflash';f.textContent=txt;f.style.color=ok?'#7CFC66':'#ffd166';stage.appendChild(f);stage.classList.add('shake');setTimeout(function(){f.remove();stage.classList.remove('shake');},700);if(ok){var r=stage.getBoundingClientRect();spark(r.left+r.width/2,r.top+r.height/2);}}
 function el(tag,cls,html){var e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e;}
+function showComparePanel(){var sh=document.getElementById('compareShell'),fr=document.getElementById('compareFrame');if(!fr.src)fr.src='advanced-ux-compare.html';sh.classList.add('on');sh.scrollIntoView({behavior:'smooth',block:'start'});}
+function hideComparePanel(){document.getElementById('compareShell').classList.remove('on');}
 
 // ============ Demo 注册表 ============
 var DEMOS=[];
