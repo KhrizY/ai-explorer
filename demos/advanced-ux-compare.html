@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>进阶课程 UX 对比测试台</title>
+<link rel="stylesheet" href="ui-system.css">
+<style>
+  :root { color-scheme:light; }
+  * { box-sizing:border-box; user-select:none; -webkit-user-select:none; }
+  body { margin:0; min-height:100vh; background:linear-gradient(180deg,var(--paper),var(--paper-2)); color:var(--ink); font-family:var(--font); }
+  .wrap { max-width:1220px; margin:0 auto; padding:24px 16px 90px; }
+  .top { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:16px; }
+  h1 { margin:0 0 6px; font-size:25px; line-height:1.2; font-weight:900; letter-spacing:0; color:var(--ink); }
+  .sub { margin:0; max-width:850px; color:var(--ink-dim); font-size:13px; line-height:1.65; font-weight:700; }
+  .back { flex:none; display:inline-flex; align-items:center; height:38px; padding:0 14px; border-radius:12px; text-decoration:none; background:#fff; color:var(--violet-d); border:1.5px solid var(--line); font-weight:900; font-size:13px; box-shadow:0 3px 0 #dfe4ef; }
+  .tabs { display:flex; gap:10px; overflow-x:auto; padding:6px 2px 14px; scrollbar-width:none; cursor:grab; }
+  .tabs::-webkit-scrollbar { display:none; }
+  .tab { flex:none; border:2px solid var(--line); background:#fff; color:var(--ink-2); border-radius:999px; padding:9px 15px; font:900 13px/1 var(--font); cursor:pointer; white-space:nowrap; box-shadow:0 3px 0 #dfe4ef; }
+  .tab.on { color:#fff; border-color:transparent; background:linear-gradient(90deg,var(--violet),var(--cyan)); box-shadow:0 4px 0 var(--violet-dd),0 10px 20px rgba(139,92,246,.2); }
+  .case { display:none; background:#fff; border:1.5px solid var(--line); border-radius:20px; padding:14px; box-shadow:0 7px 0 #dfe4ef,0 16px 30px rgba(60,50,110,.08); }
+  .case.on { display:block; animation:fadeUp .22s var(--ease) both; }
+  .case-head { display:flex; justify-content:space-between; gap:14px; align-items:flex-start; padding:4px 4px 14px; }
+  .case-title { margin:0; font-size:20px; color:var(--ink); font-weight:900; }
+  .case-note { margin:5px 0 0; color:var(--ink-dim); font-size:12.5px; line-height:1.55; font-weight:700; }
+  .pill { flex:none; padding:5px 10px; border-radius:999px; background:#ecfeff; color:#0891b2; font-size:12px; font-weight:900; border:1px solid #bae6fd; }
+  .compare { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .panel { border:1.5px solid var(--line); border-radius:18px; background:linear-gradient(160deg,#faf8ff,#eef1fb); padding:14px; min-height:440px; overflow:hidden; }
+  .panel.old { background:linear-gradient(160deg,#fff,#f6f7fb); }
+  .label { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
+  .label b { color:var(--ink); font-size:15px; font-weight:900; }
+  .tag { padding:4px 9px; border-radius:999px; font-size:11px; font-weight:900; }
+  .old .tag { background:#fef3c7; color:#92400e; }
+  .new .tag { background:#dcfce7; color:#15803d; }
+  .why { min-height:42px; color:var(--ink-dim); font-size:12px; line-height:1.5; font-weight:700; margin-bottom:10px; }
+  .stage { position:relative; min-height:318px; border-radius:16px; background:#fff; border:1.5px solid var(--line); padding:14px; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .btn { appearance:none; border:none; cursor:pointer; border-radius:12px; padding:9px 15px; background:var(--correct); color:#fff; font:900 13px/1 var(--font); box-shadow:0 4px 0 var(--correct-d); }
+  .btn:active { transform:translateY(3px); box-shadow:0 1px 0 var(--correct-d); }
+  .btn.v { background:linear-gradient(90deg,var(--violet),var(--cyan)); box-shadow:0 4px 0 var(--violet-dd); }
+  .btn.ghost { background:#fff; color:var(--violet-d); border:1.5px solid var(--line); box-shadow:0 3px 0 #dfe4ef; }
+  .msg { min-height:20px; margin-top:10px; color:var(--ink-2); font-size:12.5px; line-height:1.5; font-weight:800; text-align:center; }
+  .small { color:var(--ink-dim); font-size:11.5px; font-weight:800; line-height:1.45; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+  .cardlet { background:#fff; border:1.5px solid var(--line); border-radius:13px; padding:9px; text-align:center; color:var(--ink-2); font-size:12px; font-weight:900; box-shadow:0 3px 0 #dfe4ef; }
+  .lit { background:#f5f3ff !important; color:var(--violet-d) !important; border-color:#c4b5fd !important; transform:translateY(-2px); }
+  .range { width:100%; accent-color:var(--violet); }
+  .split { display:grid; grid-template-columns:1fr 1fr; gap:10px; width:100%; align-items:center; }
+  .meter { height:12px; border-radius:999px; background:#e6e9f2; overflow:hidden; }
+  .meter i { display:block; height:100%; width:0; border-radius:999px; background:linear-gradient(90deg,var(--violet),var(--cyan),var(--correct)); transition:width .2s; }
+  .flow-svg { width:100%; height:220px; overflow:visible; }
+  .node { fill:#fff; stroke:#c7d2fe; stroke-width:1.5; }
+  .node-on { fill:#f5f3ff; stroke:#8b5cf6; }
+  .wire { stroke:#c4b5fd; stroke-width:2.5; fill:none; stroke-linecap:round; }
+  .wire.live { stroke:#22d3ee; stroke-dasharray:7 7; animation:dash 1s linear infinite; }
+  @keyframes dash { to { stroke-dashoffset:-28; } }
+  .svgtext { font:800 9px var(--font); fill:#4b4869; text-anchor:middle; }
+  .svgsmall { font:800 7px var(--font); fill:#8b90a6; text-anchor:middle; }
+  .timeline { position:relative; width:100%; height:190px; }
+  .axis { position:absolute; left:7%; right:7%; top:93px; height:6px; border-radius:999px; background:#e6e9f2; }
+  .axis i { display:block; height:100%; width:0; border-radius:999px; background:linear-gradient(90deg,var(--violet),var(--cyan),var(--correct)); transition:width .25s linear; }
+  .era { position:absolute; transform:translateX(-50%); width:78px; text-align:center; }
+  .era .dot { width:28px; height:28px; border-radius:11px; background:#fff; border:2px solid #c4b5fd; margin:0 auto 6px; display:grid; place-items:center; box-shadow:0 3px 0 #dfe4ef; transition:.2s; }
+  .era.on .dot { background:#dcfce7; border-color:var(--correct); transform:scale(1.12); box-shadow:0 3px 0 var(--correct-d); }
+  .era b { display:block; color:var(--ink); font-size:11px; line-height:1.2; }
+  .era span { color:var(--ink-dim); font-size:10px; font-weight:800; }
+  .branch { position:absolute; height:3px; border-radius:999px; background:#c4b5fd; transform-origin:left center; opacity:.35; }
+  .branch.on { opacity:1; background:#22d3ee; box-shadow:0 0 10px rgba(34,211,238,.35); }
+  .chart { width:100%; height:128px; }
+  .ability { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; width:100%; }
+  .ability .cardlet { font-size:11px; min-height:52px; display:grid; place-items:center; }
+  .ability .on { background:#dcfce7; border-color:var(--correct); color:#15803d; box-shadow:0 3px 0 var(--correct-d); }
+  .token-row { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
+  .token { padding:7px 10px; border-radius:11px; background:#ede9fe; color:var(--violet-d); border:1.5px solid #c4b5fd; font-size:12px; font-weight:900; cursor:pointer; }
+  .token.on { background:#ccfbf1; color:#0f766e; border-color:#2dd4bf; }
+  .bars { width:100%; display:grid; gap:7px; margin-top:10px; }
+  .barline { display:grid; grid-template-columns:48px 1fr 36px; gap:8px; align-items:center; color:var(--ink-2); font-size:12px; font-weight:900; }
+  .barline .meter { height:10px; }
+  .conveyor { width:100%; display:grid; gap:10px; }
+  .words { display:flex; gap:7px; justify-content:center; flex-wrap:wrap; }
+  .word { padding:7px 9px; border-radius:10px; background:#fff; border:1.5px solid var(--line); color:var(--ink-2); font-size:12px; font-weight:900; }
+  .word.seen { background:#e0f2fe; border-color:#7dd3fc; }
+  .capsule { min-height:72px; border-radius:18px; background:linear-gradient(90deg,#ede9fe,#ecfeff); border:1.5px solid #c4b5fd; padding:10px; display:flex; align-items:center; gap:7px; justify-content:center; }
+  .mem { padding:5px 7px; border-radius:8px; background:#fff; color:var(--violet-d); font-size:11px; font-weight:900; transition:.2s; }
+  .grad { display:flex; gap:8px; justify-content:center; align-items:center; min-height:42px; }
+  .pulse { border-radius:999px; background:var(--cyan); box-shadow:0 0 12px rgba(34,211,238,.4); }
+  .heat { display:grid; grid-template-columns:repeat(5,42px); gap:6px; justify-content:center; }
+  .cell { width:42px; height:42px; border-radius:12px; display:grid; place-items:center; font-size:13px; font-weight:900; color:#1e1b3a; border:1.5px solid #d9d6f2; background:#fff; box-shadow:0 3px 0 #dfe4ef; }
+  .legend { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:10px; }
+  .legend span { font-size:11px; color:var(--ink-dim); font-weight:800; }
+  @keyframes fadeUp { from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)} }
+  @media (max-width:880px) {
+    .compare { grid-template-columns:1fr; }
+    .panel { min-height:0; }
+    .stage { min-height:300px; }
+  }
+  @media (max-width:520px) {
+    .top { flex-direction:column; }
+    .case-head { flex-direction:column; }
+    .heat { grid-template-columns:repeat(5,36px); gap:5px; }
+    .cell { width:36px; height:36px; border-radius:10px; }
+    .split { grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1>进阶课程 UX 对比测试台</h1>
+      <p class="sub">左侧保留当前课程里的旧交互逻辑，右侧按知识点原理重做。页面遵循浅色工作台、多邻国式圆润卡片、绿蓝紫主色和“操作必须匹配机制”的可视化 skill。</p>
+    </div>
+    <a class="back" href="index.html">返回 Demo 库</a>
+  </div>
+  <div class="tabs" id="tabs"></div>
+  <div id="cases"></div>
+</div>
+
+<script>
+function el(tag,cls,html){var e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e;}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+function pct(n){return Math.round(n)+'%';}
+function clear(n){n.innerHTML='';}
+
+var DATA=[
+  {id:'history',title:'AI 简史',type:'了解叙事型',old:'按顺序点亮年份，操作成本高，重点变成“点按钮”而不是“看路线演变”。',newer:'自动时间线 + 路线分叉。用户只控制播放/暂停/拖动，认知负担放在路线变化上。',oldMount:oldHistory,newMount:newHistory},
+  {id:'scaling',title:'规模法则',type:'参数探索型',old:'单滑块点亮能力门槛，能看见“变大”，但看不见数据、参数、算力三者要一起平衡。',newer:'三变量控制台 + loss 曲线 + 能力灯。把“资源配置影响能力”直接可视化。',oldMount:oldScaling,newMount:newScaling},
+  {id:'transformer',title:'Transformer 全貌',type:'结构关系型',old:'普通前向传播只是一层层点亮，弱化了 token 交换、残差、前馈层这些架构关系。',newer:'token 行进入 Attention、Residual、FFN、Output，流线动画表现模块间数据流。',oldMount:oldForward,newMount:newTransformer},
+  {id:'attention',title:'注意力数学',type:'机制理解型',old:'点词看连线只能说明“相关”，还没有展示分数、softmax 权重和 Value 混合。',newer:'Q/K/V 权重混合器：选 Query，看 Key 分数变权重，再混合 Value。',oldMount:oldAttention,newMount:newAttention},
+  {id:'rnn',title:'RNN 与记忆',type:'结构关系型',old:'排队读只能说明“顺序”，不能体现隐藏状态携带前文和长距离信息变淡。',newer:'序列传送带 + 记忆胶囊 + 梯度衰减，让“带着记忆读”和“容易忘”可见。',oldMount:oldRNN,newMount:newRNN},
+  {id:'rlvalue',title:'强化学习价值函数',type:'机制理解型',old:'重复使用踩格子，和“试错找路线”太像，价值函数的“未来奖励回传”不明显。',newer:'奖励热力图从目标格向外传播，越远价值越低，直接表现长期收益估计。',oldMount:oldRLTrail,newMount:newRLValue}
+];
+
+var tabs=document.getElementById('tabs'), cases=document.getElementById('cases'), cur=0;
+DATA.forEach(function(d,i){
+  var t=el('button','tab'+(i===0?' on':''),d.title);t.onclick=function(){show(i);};tabs.appendChild(t);
+  var c=el('section','case'+(i===0?' on':''));c.id='case-'+d.id;
+  var head=el('div','case-head');
+  head.appendChild(el('div',null,'<h2 class="case-title">'+d.title+'</h2><p class="case-note">'+d.type+' · 右侧不是最终课程 UI，只验证“交互和知识点原理是否同构”。</p>'));
+  head.appendChild(el('div','pill',d.type));
+  var comp=el('div','compare');
+  var oldPanel=el('div','panel old'), newPanel=el('div','panel new');
+  oldPanel.appendChild(el('div','label','<b>当前旧 UX</b><span class="tag">现状</span>'));
+  oldPanel.appendChild(el('div','why',d.old));
+  var oldStage=el('div','stage old-stage');oldPanel.appendChild(oldStage);
+  newPanel.appendChild(el('div','label','<b>新 UX 方向</b><span class="tag">建议</span>'));
+  newPanel.appendChild(el('div','why',d.newer));
+  var newStage=el('div','stage new-stage');newPanel.appendChild(newStage);
+  comp.appendChild(oldPanel);comp.appendChild(newPanel);
+  c.appendChild(head);c.appendChild(comp);cases.appendChild(c);
+  d.oldMount(oldStage);d.newMount(newStage);
+});
+function show(i){cur=i;Array.from(tabs.children).forEach(function(t,k){t.classList.toggle('on',k===i);});DATA.forEach(function(d,k){document.getElementById('case-'+d.id).classList.toggle('on',k===i);});}
+
+var dragging=false,sx=0,sl=0;
+tabs.addEventListener('pointerdown',function(e){dragging=true;sx=e.clientX;sl=tabs.scrollLeft;tabs.setPointerCapture(e.pointerId);});
+tabs.addEventListener('pointermove',function(e){if(dragging)tabs.scrollLeft=sl-(e.clientX-sx);});
+tabs.addEventListener('pointerup',function(){dragging=false;});
+
+function oldHistory(s){
+  var data=[['1950','图灵测试'],['1956','达特茅斯'],['1980s','专家系统'],['2012','深度学习'],['2016','AlphaGo'],['2020s','大模型']];
+  var row=el('div','row'), msg=el('div','msg','从最早的一步开始点');var i=0;
+  data.forEach(function(x,k){var b=el('button','btn ghost',x[0]+'<br><span class="small">'+x[1]+'</span>');b.onclick=function(){if(k!==i){msg.textContent='要按时间顺序点';return;}b.classList.add('lit');i++;msg.textContent=i>=data.length?'时间线点亮完成':'下一站：'+data[i][1];};row.appendChild(b);});
+  s.appendChild(row);s.appendChild(msg);
+}
+function newHistory(s){
+  var data=[['1950','图灵测试','🧪',7,72],['1956','AI 命名','📛',24,45],['1980s','专家系统','📚',42,72],['2012','深度学习','🧠',62,45],['2017','Transformer','🔗',76,72],['2020s','大模型','🌊',91,45]];
+  var tl=el('div','timeline'), axis=el('div','axis'), axisFill=el('i'), note=el('div','msg','自动播放：路线从“规则”流向“数据 + 规模”');axis.appendChild(axisFill);tl.appendChild(axis);
+  [['规则路线',24,58,21],['数据路线',42,62,42],['规模路线',64,81,23]].forEach(function(b){var br=el('div','branch');br.style.left=b[1]+'%';br.style.top=b[2]+'px';br.style.width=b[3]+'%';br.style.transform='rotate('+(b[0]==='规则路线'?-15:b[0]==='数据路线'?0:12)+'deg)';tl.appendChild(br);});
+  data.forEach(function(d,i){var e=el('div','era','<div class="dot">'+d[2]+'</div><b>'+d[0]+'</b><span>'+d[1]+'</span>');e.style.left=d[3]+'%';e.style.top=d[4]+'px';tl.appendChild(e);d.el=e;});
+  var controls=el('div','row'), play=el('button','btn v','暂停'), rng=el('input');rng.type='range';rng.min=0;rng.max=100;rng.value=0;rng.className='range';rng.style.maxWidth='360px';
+  var v=0,run=true;function draw(){axisFill.style.width=v+'%';data.forEach(function(d){d.el.classList.toggle('on',v>=d[3]);});Array.from(tl.querySelectorAll('.branch')).forEach(function(b,i){b.classList.toggle('on',v>[32,52,70][i]);});var on=data.filter(function(d){return v>=d[3];}).pop();note.textContent=on?'当前：'+on[0]+' · '+on[1]:'自动播放：路线从“规则”流向“数据 + 规模”';rng.value=v;}
+  play.onclick=function(){run=!run;play.textContent=run?'暂停':'播放';};
+  rng.oninput=function(){v=+rng.value;run=false;play.textContent='播放';draw();};
+  setInterval(function(){if(!run)return;v+=1.1;if(v>100)v=0;draw();},120);
+  controls.appendChild(play);s.appendChild(tl);s.appendChild(rng);s.appendChild(controls);s.appendChild(note);draw();
+}
+
+function oldScaling(s){
+  var rng=el('input');rng.type='range';rng.min=1;rng.max=100;rng.value=18;rng.className='range';
+  var row=el('div','ability'), caps=[['📖','接话',18],['🌐','翻译',42],['💻','代码',66],['🧠','推理',88]], msg=el('div','msg','规模 18%');
+  caps.forEach(function(c){var d=el('div','cardlet','<div style="font-size:22px">'+c[0]+'</div>'+c[1]);d.need=c[2];row.appendChild(d);});
+  function upd(){var v=+rng.value;Array.from(row.children).forEach(function(d){d.classList.toggle('on',v>=d.need);});msg.textContent='规模 '+v+'% · '+(v<42?'基础能力':v<66?'跨语言能力':v<88?'代码能力':'推理门槛');}
+  rng.oninput=upd;s.appendChild(rng);s.appendChild(row);s.appendChild(msg);upd();
+}
+function newScaling(s){
+  var sliders=el('div');sliders.style.cssText='width:100%;display:grid;gap:8px';
+  var vals={data:55,param:52,compute:48};
+  [['data','数据'],['param','参数'],['compute','算力']].forEach(function(x){var line=el('label','small',x[1]+' <input class="range" type="range" min="5" max="100" value="'+vals[x[0]]+'">');line.style.display='grid';line.querySelector('input').oninput=function(){vals[x[0]]=+this.value;draw();};sliders.appendChild(line);});
+  var svg=el('div',null,'<svg class="chart" viewBox="0 0 320 120"><path d="M20 104 C80 75 125 54 180 38 S270 22 304 16" fill="none" stroke="#e6e9f2" stroke-width="7" stroke-linecap="round"/><path id="loss" d="" fill="none" stroke="#22d3ee" stroke-width="5" stroke-linecap="round"/><text x="24" y="116" class="svgsmall">训练资源</text><text x="285" y="116" class="svgsmall">更多</text><text x="30" y="22" class="svgsmall">loss 更低</text></svg>');
+  var lights=el('div','ability'), msg=el('div','msg','');
+  [['📖','语言'],['🌐','迁移'],['💻','代码'],['✨','涌现']].forEach(function(c){lights.appendChild(el('div','cardlet','<div style="font-size:20px">'+c[0]+'</div>'+c[1]));});
+  function draw(){var balance=100-(Math.max(vals.data,vals.param,vals.compute)-Math.min(vals.data,vals.param,vals.compute));var power=(vals.data+vals.param+vals.compute)/3*0.72+balance*0.28;var pts=[];for(var i=0;i<8;i++){var x=20+i*40,y=105-Math.pow(power/100,1.35)*(20+i*10);pts.push((i?'L':'M')+x+' '+clamp(y,15,105));}svg.querySelector('#loss').setAttribute('d',pts.join(' '));Array.from(lights.children).forEach(function(d,i){d.classList.toggle('on',power>[25,48,68,84][i]);});msg.textContent='综合规模 '+Math.round(power)+'% · '+(balance<55?'三件套失衡，曲线提升慢':'数据、参数、算力比较均衡');}
+  s.appendChild(sliders);s.appendChild(svg);s.appendChild(lights);s.appendChild(msg);draw();
+}
+
+function oldForward(s){
+  var layers=[3,4,3,2], step=-1, msg=el('div','msg','点按钮，看信号一层层点亮');
+  var svg=el('div',null,'<svg class="flow-svg" viewBox="0 0 320 220"></svg>'), root=svg.firstChild;
+  layers.forEach(function(n,li){for(var j=0;j<n;j++){var y=110-(n-1)*20+j*40,x=40+li*80;root.innerHTML+='<circle class="node l'+li+'" cx="'+x+'" cy="'+y+'" r="13"/>';if(li>0){var pn=layers[li-1];for(var p=0;p<pn;p++){var py=110-(pn-1)*20+p*40,px=40+(li-1)*80;root.innerHTML='<path class="wire" d="M'+px+' '+py+' L'+x+' '+y+'"/>'+root.innerHTML;}}}});
+  var btn=el('button','btn v','点亮下一层');btn.onclick=function(){step++;Array.from(root.querySelectorAll('circle')).forEach(function(c){var li=+c.getAttribute('class').match(/l(\d)/)[1];c.classList.toggle('node-on',li<=step);});if(step>=layers.length-1)msg.textContent='输出完成';};
+  s.appendChild(svg);s.appendChild(btn);s.appendChild(msg);
+}
+function newTransformer(s){
+  var svg=el('div',null,'<svg class="flow-svg" viewBox="0 0 360 220"><path class="wire live" d="M42 75 C85 25 115 25 158 75"/><path class="wire live" d="M42 110 C85 110 115 110 158 110"/><path class="wire live" d="M42 145 C85 195 115 195 158 145"/><path class="wire" d="M185 110 L225 110"/><path class="wire" d="M255 110 L294 110"/><rect class="node node-on" x="16" y="58" width="52" height="104" rx="14"/><rect class="node node-on" x="138" y="58" width="62" height="104" rx="14"/><rect class="node" x="220" y="70" width="44" height="80" rx="14"/><rect class="node" x="290" y="70" width="54" height="80" rx="14"/><text class="svgtext" x="42" y="102">Token</text><text class="svgsmall" x="42" y="119">输入行</text><text class="svgtext" x="169" y="98">Attention</text><text class="svgsmall" x="169" y="116">互相取信息</text><text class="svgtext" x="242" y="103">残差</text><text class="svgsmall" x="242" y="120">相加</text><text class="svgtext" x="317" y="103">FFN</text><text class="svgsmall" x="317" y="120">加工</text></svg>');
+  var step=0,msg=el('div','msg','点一步，看 token 怎样穿过 Transformer block');
+  var btn=el('button','btn v','走一步');btn.onclick=function(){step=(step+1)%4;Array.from(svg.querySelectorAll('rect')).forEach(function(r,i){r.classList.toggle('node-on',i<=step);});msg.textContent=['Token 先排成一行','Attention 让 token 互相取信息','残差把原信息加回来，防止丢失','前馈层逐 token 加工，送到下一层'][step];};
+  s.appendChild(svg);s.appendChild(btn);s.appendChild(msg);
+}
+
+function oldAttention(s){
+  var words=['小猫','在','沙发','上','睡觉'], svg=el('div',null,'<svg class="flow-svg" viewBox="0 0 320 190"></svg>'), root=svg.firstChild, msg=el('div','msg','点 3 个词，看不同连线');
+  words.forEach(function(w,i){var b=el('button','btn ghost',w);b.onclick=function(){draw(i);};s.appendChild(b);});
+  function draw(i){root.innerHTML='';words.forEach(function(w,k){root.innerHTML+='<circle class="node '+(k===i?'node-on':'')+'" cx="'+(38+k*61)+'" cy="120" r="17"/><text class="svgsmall" x="'+(38+k*61)+'" y="125">'+w+'</text>';});[0,2,4].forEach(function(k){if(k!==i)root.innerHTML='<path class="wire live" d="M'+(38+i*61)+' 103 Q160 25 '+(38+k*61)+' 103"/>'+root.innerHTML;});msg.textContent='连线表示“这个词会看相关词”';}
+  s.appendChild(svg);s.appendChild(msg);draw(0);
+}
+function newAttention(s){
+  var words=['小猫','在','沙发','上','睡觉'], q=0, bars=el('div','bars'), mix=el('div','msg','');
+  var row=el('div','token-row');words.forEach(function(w,i){var b=el('button','token',w);b.onclick=function(){q=i;draw();};row.appendChild(b);});
+  function score(i){return q===0?[.05,.08,.45,.16,.26][i]:q===4?[.38,.06,.22,.08,.26][i]:[.12,.18,.26,.19,.25][i];}
+  function draw(){Array.from(row.children).forEach(function(b,i){b.classList.toggle('on',i===q);});clear(bars);words.forEach(function(w,i){var v=score(i)*100;var line=el('div','barline','<span>'+w+'</span><div class="meter"><i style="width:'+v+'%"></i></div><span>'+Math.round(v)+'</span>');bars.appendChild(line);});mix.innerHTML='Query：<b>'+words[q]+'</b> · Key 打分经过 softmax 变权重，再把 Value 加权混合。';}
+  s.appendChild(row);s.appendChild(bars);s.appendChild(mix);draw();
+}
+
+function oldRNN(s){
+  var words=['今','天','天','气','很','好'], i=-1, row=el('div','row'), msg=el('div','msg','点“读下一个”，排队读完整句');
+  words.forEach(function(w){row.appendChild(el('div','cardlet',w));});var btn=el('button','btn v','读下一个');btn.onclick=function(){i++;Array.from(row.children).forEach(function(d,k){d.classList.toggle('lit',k<=i);});if(i>=words.length-1)msg.textContent='读完了，但记忆怎么带着走并不明显';};
+  s.appendChild(row);s.appendChild(btn);s.appendChild(msg);
+}
+function newRNN(s){
+  var words=['小猫','昨天','在','沙发','睡觉'], i=-1, row=el('div','words'), cap=el('div','capsule'), grad=el('div','grad'), msg=el('div','msg','每读一个词，隐藏状态会更新；早期记忆逐渐变淡');
+  words.forEach(function(w){row.appendChild(el('div','word',w));});var btn=el('button','btn v','读下一个');
+  function draw(){Array.from(row.children).forEach(function(d,k){d.classList.toggle('seen',k<=i);});clear(cap);for(var k=0;k<=i;k++){var m=el('div','mem',words[k]);m.style.opacity=String(clamp(.28+(k/(i+1))*.72,.28,1));cap.appendChild(m);}clear(grad);for(var g=0;g<5;g++){var p=el('div','pulse');var size=24-g*3-i*1.2;p.style.width=clamp(size,5,24)+'px';p.style.height=clamp(size,5,24)+'px';p.style.opacity=String(clamp(1-g*.16-i*.06,.18,1));grad.appendChild(p);}if(i>=words.length-1)msg.textContent='长句里，早期信息和反向梯度都会变弱，这就是 RNN 难记长距离的直觉。';}
+  btn.onclick=function(){i=(i+1)%words.length;draw();};
+  s.appendChild(row);s.appendChild(cap);s.appendChild(grad);s.appendChild(btn);s.appendChild(msg);draw();
+}
+
+function oldRLTrail(s){
+  var board=el('div');board.style.cssText='display:grid;grid-template-columns:repeat(5,42px);gap:6px';
+  for(var i=0;i<25;i++){var c=el('div','cell',i===0?'🤖':i===24?'⭐':(i===7||i===13?'坑':''));board.appendChild(c);}s.appendChild(board);s.appendChild(el('div','msg','旧版还是“踩格子找路线”，和试错小节重复。'));
+}
+function newRLValue(s){
+  var board=el('div','heat'), vals=[], step=0, goal=24, msg=el('div','msg','点“传播价值”，奖励会从 ⭐ 向外回传');
+  for(var i=0;i<25;i++){vals[i]=i===goal?100:0;board.appendChild(el('div','cell',i===goal?'⭐':''));}
+  function color(v){var a=v/100;return 'rgb('+Math.round(255-167*a)+','+Math.round(255-51*a)+','+Math.round(255-253*a)+')';}
+  function draw(){Array.from(board.children).forEach(function(c,i){var v=vals[i];c.style.background=color(v);c.textContent=i===goal?'⭐':(v?Math.round(v):'');c.style.borderColor=v>60?'#58cc02':v>25?'#22d3ee':'#d9d6f2';});}
+  var btn=el('button','btn v','传播价值');btn.onclick=function(){step++;var next=vals.slice();for(var i=0;i<25;i++){var r=Math.floor(i/5),c=i%5,max=next[i];[[1,0],[-1,0],[0,1],[0,-1]].forEach(function(d){var rr=r+d[0],cc=c+d[1],j=rr*5+cc;if(rr>=0&&rr<5&&cc>=0&&cc<5)max=Math.max(max,vals[j]*.78);});next[i]=Math.max(next[i],max);}vals=next;msg.textContent='第 '+step+' 轮：越靠近未来奖励，状态价值越高';draw();};
+  s.appendChild(board);s.appendChild(btn);s.appendChild(msg);s.appendChild(el('div','legend','<span>浅色=价值低</span><span>绿色=通向奖励</span>'));draw();
+}
+</script>
+</body>
+</html>
