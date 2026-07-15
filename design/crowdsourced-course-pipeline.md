@@ -945,6 +945,7 @@ GET  /api/courses/:code
 POST /api/courses/:code/renew
 DELETE /api/courses/:code
 ```
+```
 
 发布请求：
 
@@ -1017,11 +1018,17 @@ DELETE /api/courses/:code
 
 ```text
 课程名
-本地课程码
+发布课程码（仅已发布课程显示）
 发布状态：未发布 / 已发布 / 已过期
 过期时间
-按钮：预览 / 发布 / 重新发布 / 删除本地
+按钮：发布 / 预览 / 删除
 ```
+
+删除规则：
+
+- 未发布草稿：只删除当前浏览器 `localStorage` 里的本地记录。
+- 已发布课程：先删除本地记录，再请求 `DELETE /api/courses/:code` 清除服务器临时发布版。
+- 如果服务器删除失败，本地删除仍生效；界面提示“服务器发布版可能仍在有效期内”。
 
 ### 13.7 清理策略
 

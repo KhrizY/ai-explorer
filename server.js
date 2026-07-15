@@ -155,6 +155,17 @@ async function handleApi(req, res, url) {
     json(res, 200, Object.assign({ found: true }, item));
     return;
   }
+  if (req.method === 'DELETE' && m) {
+    const code = m[1];
+    const store = cleanStore(readStore());
+    const existed = Boolean(store[code]);
+    if (existed) {
+      delete store[code];
+      writeStore(store);
+    }
+    json(res, 200, { ok: true, deleted: existed });
+    return;
+  }
   json(res, 200, { found: false, error: 'NOT_FOUND' });
 }
 
