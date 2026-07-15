@@ -901,6 +901,7 @@ var ADV=[
  {e:'🏋️',t:'大模型训练三部曲',c:'🏗️ 架构探秘',p:['预训练：读全网猜下词','自监督不用人标','微调：学专长','指令微调','RLHF：用人类反馈','奖励模型','对齐"听话"','能力"涌现"','训练成本有多高']},
  {e:'🎨',t:'扩散模型怎么画画',c:'🏗️ 架构探秘',p:['生成式 AI 是什么','从噪点到图','前向加噪','反向学去噪','一步步采样','U-Net 骨架','文字如何引导（CLIP）','文生图/图生图','代表作 SD/DALL·E']},
  {e:'🕹️',t:'强化学习',c:'🏗️ 架构探秘',p:['和监督学习的区别','智能体/环境/状态','动作与奖励','试错学策略','探索 vs 利用','价值与策略','Q-learning 直觉','AlphaGo 怎么下棋','游戏与机器人应用']},
+ {e:'🧩',t:'经典机器学习：KNN/聚类/阈值',c:'🏗️ 架构探秘',p:['不用神经网络也能学习','阈值分类','K近邻投票','自动聚类','距离与相似度','分类边界','优点和局限','适合什么任务']},
  {e:'📜',t:'为什么越大越强',c:'🌌 AI 大观',p:['手写规则 vs 让它学','苦涩的教训','算力的胜利','通用方法赢在长期','规模法则：越大越强','数据/参数/算力三要素','能力"涌现"','会不会到头','对我们的启示']},
  {e:'🕰️',t:'AI 简史',c:'🌌 AI 大观',p:['图灵与"会思考的机器"','达特茅斯会议','符号主义','专家系统兴衰','两次 AI 寒冬','神经网络回归','深度学习复兴（2012）','AlphaGo 时刻','大模型时代']},
  {e:'🌍',t:'AI 与社会',c:'🌌 AI 大观',p:['会取代哪些工作','也创造哪些新工作','创作与版权','偏见与公平','假信息与深度伪造','隐私与数据','教育与 AI','我们怎么共处']},
@@ -1029,8 +1030,96 @@ CHAPTERS['adv:nn']={id:'adv:nn',title:'🧠 神经网络在算什么',badge:{e:'
   peg:'🔧 全是在调数字，没有魔法',close:'神经网络的全部秘密就一句话：<b>前向传播猜答案 → 损失量错误 → 反向传播＋梯度下降把几百万个数字一点点调好</b>。',nextHint:null}
 ]};
 
+// —— 进阶通用收尾卡 ——
+function buildAdvRecap(title,points){return function(onWin,onReset){var b=ixbox('🎓 课程小结',title,onReset);var w=b._body;
+  var list=el('div');list.style.cssText='display:flex;flex-direction:column;gap:8px;margin-bottom:12px';
+  points.forEach(function(p){var row=el('div');row.style.cssText='display:flex;gap:10px;align-items:flex-start;background:#faf8ff;border:1px solid #ece9f7;border-radius:12px;padding:9px 12px';row.innerHTML='<span style="font-size:22px">'+p[0]+'</span><span><b style="color:#6d28d9">'+p[1]+'</b><br><span style="color:#4b4869;font-size:13px">'+p[2]+'</span></span>';list.appendChild(row);});
+  var btn=el('button','next-btn','🏅 领取徽章，完成这一课'),done=false;btn.onclick=function(e){if(done)return;done=true;spark(e.clientX,e.clientY);onWin(e);};
+  var bw=el('div');bw.style.textAlign='center';bw.appendChild(btn);w.appendChild(list);w.appendChild(bw);return b;};}
+
+// —— 进阶 UX：扩散 / 强化学习 / 经典机器学习 / RLHF ——
+function buildDiffusionDenoise(rw,onReset){var b=ixbox('✨ 扩散去噪画室','连续点"去噪一步"，从噪点里擦出图案',onReset);var w=b._body;var step=0,done=false;
+  var stage=el('div');stage.style.cssText='height:150px;border-radius:14px;background:#fff;border:1.5px solid #e6e9f2;display:grid;place-items:center;overflow:hidden;position:relative';
+  var art=el('div');art.style.cssText='font-size:64px;filter:blur(10px);opacity:.12;transition:.35s;transform:scale(.8) rotate(-8deg)';art.textContent='🪐';stage.appendChild(art);
+  var noise=el('div');noise.style.cssText='position:absolute;inset:0;background:repeating-radial-gradient(circle at 20% 30%,rgba(139,92,246,.45) 0 2px,transparent 2px 5px),repeating-radial-gradient(circle at 70% 50%,rgba(34,211,238,.38) 0 2px,transparent 2px 6px);opacity:.95;transition:.35s';stage.appendChild(noise);
+  var msg=el('div',null,'噪声 100% · 图像 0%');msg.style.cssText='text-align:center;font-size:12.5px;color:#4b4869;font-weight:800;margin:8px 0';
+  var btn=el('button','next-btn','🧽 去噪一步');
+  btn.onclick=function(e){step++;var n=Math.max(0,100-step*20),clar=Math.min(100,step*20);noise.style.opacity=n/100;art.style.opacity=.12+clar/115;art.style.filter='blur('+(10-step*2)+'px)';art.style.transform='scale('+(0.8+step*.04)+') rotate(0deg)';msg.textContent='噪声 '+n+'% · 图像 '+clar+'%';spark(e.clientX,e.clientY);if(step>=5&&!done){done=true;toast('图像出现了！',true);rw(e);btn.style.display='none';}};
+  w.appendChild(stage);w.appendChild(msg);w.appendChild(btn);return b;}
+function buildDiffusionNoise(rw,onReset){var b=ixbox('🌫️ 前向加噪实验','先把清晰图一步步弄脏，AI 才学会反过来擦干净',onReset);var w=b._body;var step=0,done=false;
+  var stage=el('div');stage.style.cssText='height:130px;border-radius:14px;background:#fff;border:1.5px solid #e6e9f2;display:grid;place-items:center;position:relative;overflow:hidden';
+  var art=el('div',null,'🐱');art.style.cssText='font-size:62px;transition:.25s';var veil=el('div');veil.style.cssText='position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(139,92,246,.35) 0 3px,transparent 3px 7px);opacity:0;transition:.25s';stage.appendChild(art);stage.appendChild(veil);
+  var btn=el('button','next-btn','➕ 加一点噪');var msg=el('div',null,'清晰图 → 半噪图 → 纯噪点');msg.style.cssText='text-align:center;font-size:12.5px;color:#4b4869;font-weight:800;margin:8px 0';
+  btn.onclick=function(e){step++;veil.style.opacity=Math.min(.95,step*.22);art.style.filter='blur('+(step*1.6)+'px)';art.style.opacity=Math.max(.12,1-step*.16);msg.textContent='已加噪 '+Math.min(100,step*20)+'%';if(step>=5&&!done){done=true;toast('训练题造好了',true);rw(e);btn.style.display='none';}};
+  w.appendChild(stage);w.appendChild(msg);w.appendChild(btn);return b;}
+function buildTextGuide(rw,onReset){var b=ixbox('🧭 文本引导','选择提示词，看图像往不同方向长',onReset);var w=b._body;var seen={},done=false;
+  var out=el('div',null,'✨');out.style.cssText='height:120px;border-radius:14px;background:#fff;border:1.5px solid #e6e9f2;display:grid;place-items:center;font-size:58px;transition:.2s';
+  var row=el('div');row.style.cssText='display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px';
+  [['猫','🐱'],['太空猫','👩‍🚀🐱'],['油画风猫','🖼️🐱']].forEach(function(x){var btn=el('button','btn btn-ghost',x[0]);btn.onclick=function(e){out.textContent=x[1];seen[x[0]]=1;lineFeedback(w,true,'提示词把生成方向拉向：'+x[0]);if(Object.keys(seen).length>=3&&!done){done=true;rw(e);}};row.appendChild(btn);});
+  w.appendChild(out);w.appendChild(row);return b;}
+function buildRLTrail(rw,onReset){var b=ixbox('🕹️ 强化学习踩格子','只靠奖励和惩罚，试出到宝箱的路线',onReset);var w=b._body;var pos=0,score=0,done=false,good={1:1,4:1,5:1,8:1},bad={2:1,6:1},goal=8;
+  var grid=el('div');grid.style.cssText='display:grid;grid-template-columns:repeat(3,58px);gap:6px;justify-content:center';
+  var msg=el('div',null,'奖励 0 · 从左上角出发');msg.style.cssText='text-align:center;font-size:12.5px;color:#4b4869;font-weight:800;margin:8px 0';
+  function draw(){grid.innerHTML='';for(var i=0;i<9;i++){var d=el('button','btn btn-ghost',i===pos?'🤖':(i===goal?'🏆':bad[i]?'🕳️':good[i]?'⭐':'·'));d.style.cssText+=';height:52px;font-size:22px';(function(i){d.onclick=function(e){if(done)return;var ok=(Math.abs(i-pos)===1&&Math.floor(i/3)===Math.floor(pos/3))||Math.abs(i-pos)===3;if(!ok){lineFeedback(w,false,'只能走相邻格');return;}pos=i;if(bad[i]){score-=2;toast('踩坑 -2',false);pos=0;}else if(good[i]){score++;spark(e.clientX,e.clientY);}if(i===goal){done=true;score+=5;toast('找到好策略！',true);rw(e);}msg.textContent='奖励 '+score+' · '+(done?'到达目标':'继续试错');draw();};})(i);grid.appendChild(d);}}
+  w.appendChild(grid);w.appendChild(msg);draw();return b;}
+function buildExploreExploit(rw,onReset){var b=ixbox('🎰 探索 vs 利用','试老虎机，找出长期奖励最高的按钮',onReset);var w=b._body;var probs=[.25,.55,.8],tries=0,best=2,done=false,stats=[0,0,0],wins=[0,0,0];
+  var row=el('div');row.style.cssText='display:flex;gap:8px;justify-content:center';var msg=el('div',null,'先探索，再利用高奖励按钮');msg.style.cssText='text-align:center;font-size:12.5px;color:#4b4869;font-weight:800;margin-top:8px';
+  probs.forEach(function(p,i){var btn=el('button','btn btn-ghost','🎰 '+(i+1));btn.onclick=function(e){tries++;stats[i]++;var win=Math.random()<p;if(win){wins[i]++;spark(e.clientX,e.clientY);}btn.innerHTML='🎰 '+(i+1)+'<br><small>'+wins[i]+'/'+stats[i]+'</small>';msg.textContent=win?'奖励 +1':'没中奖';if(tries>=7&&stats[best]>=3&&!done){done=true;toast('找到高奖励按钮',true);rw(e);}};row.appendChild(btn);});
+  w.appendChild(row);w.appendChild(msg);return b;}
+function buildThreshold(rw,onReset){var b=ixbox('📏 阈值分类线','拖分界线，让左右两类尽量分开',onReset);var w=b._body;var val=45,done=false;
+  var stage=el('div');stage.style.cssText='height:112px;border:1.5px solid #e6e9f2;border-radius:12px;position:relative;background:#fff;margin-bottom:8px';
+  var pts=[18,25,34,54,66,78];pts.forEach(function(x,i){var d=el('div',null,i<3?'🔵':'🟣');d.style.cssText='position:absolute;left:'+x+'%;top:'+(25+i%3*18)+'px;font-size:22px';stage.appendChild(d);});
+  var line=el('div');line.style.cssText='position:absolute;top:0;bottom:0;width:3px;background:#f59e0b;left:'+val+'%';stage.appendChild(line);
+  var rng=el('input');rng.type='range';rng.min=10;rng.max=90;rng.value=val;rng.style.cssText='width:100%;accent-color:#8b5cf6';
+  var msg=el('div',null,'把线放在两类中间');msg.style.cssText='text-align:center;font-size:12.5px;color:#4b4869;font-weight:800';
+  rng.oninput=function(e){val=+rng.value;line.style.left=val+'%';var ok=val>38&&val<50;msg.innerHTML=ok?'<b style="color:#16a34a">分界线刚好！</b>':'继续调整阈值';if(ok&&!done){done=true;rw(e);}};
+  w.appendChild(stage);w.appendChild(rng);w.appendChild(msg);return b;}
+function buildKNN(rw,onReset){var b=ixbox('🗳️ K近邻投票','点空白放新点，看最近 3 个邻居投票',onReset);var w=b._body;var done=false,pts=[[20,30,'🔵'],[28,70,'🔵'],[42,42,'🔵'],[70,28,'🟣'],[76,64,'🟣'],[58,78,'🟣']];
+  var st=el('div');st.style.cssText='height:170px;border:1.5px solid #e6e9f2;border-radius:12px;background:#fff;position:relative;overflow:hidden';var msg=el('div',null,'点一下放入新样本');msg.style.cssText='text-align:center;font-size:12.5px;color:#4b4869;font-weight:800;margin-top:8px';
+  function dot(x,y,t,big){var d=el('div',null,t);d.style.cssText='position:absolute;left:'+x+'%;top:'+y+'%;transform:translate(-50%,-50%);font-size:'+(big?28:20)+'px';st.appendChild(d);}
+  pts.forEach(function(p){dot(p[0],p[1],p[2]);});
+  st.onclick=function(e){if(done)return;var r=st.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*100,y=(e.clientY-r.top)/r.height*100;dot(x,y,'❓',true);var ns=pts.map(function(p){return {p:p,d:Math.hypot(p[0]-x,p[1]-y)}}).sort(function(a,b){return a.d-b.d}).slice(0,3);var blue=ns.filter(function(n){return n.p[2]==='🔵'}).length;msg.textContent='最近 3 个邻居投票：'+(blue>=2?'🔵 蓝类':'🟣 紫类');done=true;rw(e);};
+  w.appendChild(st);w.appendChild(msg);return b;}
+function buildCluster(rw,onReset){var b=ixbox('🌀 自动聚类分组','点"自动分组"，看相似点自己成团',onReset);var w=b._body;var done=false;
+  var st=el('div');st.style.cssText='height:150px;border:1.5px solid #e6e9f2;border-radius:12px;background:#fff;position:relative';var pts=[[18,28],[25,42],[30,24],[68,32],[75,45],[64,50],[45,72],[52,78],[39,82]];
+  pts.forEach(function(p){var d=el('div',null,'●');d.style.cssText='position:absolute;left:'+p[0]+'%;top:'+p[1]+'%;font-size:22px;color:#9ca3af;transform:translate(-50%,-50%);transition:.3s';d._p=p;st.appendChild(d);});
+  var btn=el('button','next-btn','🌀 自动分组');btn.onclick=function(e){if(done)return;done=true;var colors=['#38bdf8','#a78bfa','#22c55e'];Array.from(st.children).forEach(function(d){var p=d._p,idx=p[0]<38?0:p[1]>65?2:1;d.style.color=colors[idx];d.style.transform='translate(-50%,-50%) scale(1.25)';});toast('相似的成团了',true);rw(e);};
+  w.appendChild(st);w.appendChild(btn);return b;}
+function buildRLHF(rw,onReset){var b=ixbox('👂 RLHF 偏好选择','每轮选更好的回答，训练奖励模型',onReset);var w=b._body;var rounds=[['直接给答案，还解释一步','只说：不知道'],['提醒先核实重要信息','编一个看似确定的出处'],['拒绝危险请求并给安全替代','照着危险要求做']],i=0,score=0,done=false;
+  var q=el('div',null,'问题：怎么更好地回答用户？');q.style.cssText='text-align:center;font-weight:800;color:#6d28d9;margin-bottom:8px';var bar=el('div');bar.style.cssText='height:10px;border-radius:99px;background:#e6e9f2;overflow:hidden;margin:8px 0';var fill=el('div');fill.style.cssText='height:100%;width:0;background:linear-gradient(90deg,#8b5cf6,#22d3ee)';bar.appendChild(fill);var row=el('div');row.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:8px';
+  function draw(){row.innerHTML='';var a=rounds[i%rounds.length];[0,1].forEach(function(k){var btn=el('button','btn btn-ghost',k?'B：'+a[1]:'A：'+a[0]);btn.style.cssText+=';white-space:normal;min-height:64px;color:#4b4869';btn.onclick=function(e){if(done)return;if(k===0){score++;spark(e.clientX,e.clientY);fill.style.width=Math.min(100,score*34)+'%';i++;if(score>=3){done=true;toast('奖励模型学会偏好了',true);rw(e);}else draw();}else{lineFeedback(w,false,'这版没那么符合人类偏好');}};row.appendChild(btn);});}
+  draw();w.appendChild(q);w.appendChild(bar);w.appendChild(row);return b;}
+
+// —— 四门进阶课注册 ——
+CHAPTERS['adv:diffusion']={id:'adv:diffusion',title:'🎨 扩散模型怎么画画',badge:{e:'🎨',t:'扩散画师',s:'你看懂了 AI 如何从噪点一步步生成图像'},endGame:buildAdvRecap('扩散模型：从噪点去噪成图',[['🌫️','加噪','训练时先把清晰图一步步弄脏'],['✨','去噪','生成时从噪点一步步擦出图'],['🧭','文本引导','提示词像指南针，拉着图像往目标走'],['⚖️','双刃剑','会创作，也可能被用来伪造']]),beat:true,sections:[
+ {n:1,heading:'生成式 AI · 从判断到创造',hook:'<span class="apo">阿波：</span>以前 AI 多半在判断"这是什么"，扩散模型能回答"请画一个从没见过的东西"。',build:buildOnlyTalk,paras:['[[生成式 AI]] 的重点不是分类，而是造出新的内容：图、文、音乐、视频都可以。','扩散模型是图像生成里最有代表性的一种。'],terms:{'生成式 AI':{s:'能创造新内容的 AI，比如生成图片、文字、音乐。',pro:'Generative AI 学习数据分布，再从分布中采样出新的样本。'}},after:['判断模型输出标签，生成模型输出样本；它不是复制某张训练图，而是在学"什么样的图像像真实图"。','这也是版权和伪造争议的来源：生成结果是新的，但训练经验来自大量已有作品。'],peg:'🎭 它在生成，不是在复制',close:'从"判断"走到"生成"，AI 的角色就从答选择题变成了写作文、画图。',nextHint:'它从哪里开始画？'},
+ {n:2,heading:'扩散 · 从噪点一步步去噪',hook:'<span class="apo">阿波：</span>反直觉来了：它不是从白纸开始画，而是从一屏乱噪点开始擦。',build:buildDiffusionDenoise,paras:['扩散模型生成图片时，起点常是一团随机[[噪声]]。','模型每一步预测该去掉哪些噪声，图像就一点点显出来。'],terms:{'扩散':{s:'从噪点一步步去噪，生成图像的过程。'},'噪声':{s:'随机、杂乱、没有明确图案的数字扰动。'},'去噪':{s:'预测并去掉图像里的噪声。'}},after:['它不一次性画完整图，而是把难题拆成许多小步：每步只做一点[[去噪]]。','几十步叠加后，小修正变成大图像，这就是扩散模型的核心直觉。'],peg:'🪜 一步步来',close:'你刚才看到的"从乱到清"，就是[[扩散]]生成的基本动作。',nextHint:'那它怎么学会去噪？'},
+ {n:3,heading:'前向加噪 · 训练题从这里来',hook:'<span class="apo">阿波：</span>想会去噪，先得见过图是怎么被弄脏的。',build:buildDiffusionNoise,paras:['训练时反过来：拿清晰图片，一点点[[加噪]]，直到变成纯噪点。','这样就得到一组练习题：这张图被弄脏到什么程度？该去掉哪些噪？'],terms:{'加噪':{s:'给清晰图逐步加入随机噪声。',pro:'Forward diffusion 是固定的加噪过程，用来制造训练样本。'}},after:['加噪过程不需要 AI 学，是人为规定好的；AI 真正学的是反方向。','这让复杂的"画整张图"变成许多可训练的"预测噪声"小任务。'],peg:'🔁 先弄脏，才学会擦干净',close:'扩散模型的训练题，就是从[[加噪]]过程里造出来的。',nextHint:'文字怎么控制它画什么？'},
+ {n:4,heading:'文本引导 · 提示词像指南针',hook:'<span class="apo">阿波：</span>同样是去噪，为什么你写"太空猫"，它就往太空猫长？',build:buildTextGuide,paras:['生成时，文字会变成[[文本引导]]，在每一步去噪时提醒模型："更像这句话一点"。','[[CLIP]] 这类模型能把文字和图片放到同一个[[语义空间]]里比较。'],terms:{'文本引导':{s:'用文字提示控制生成方向。'},'CLIP':{s:'把文字和图片对应起来的模型。',pro:'CLIP 会把图文映射到同一向量空间，让模型比较"这张图像不像这句话"。'},'语义空间':{s:'把意思相近的文字和图片放得更近的一张数字地图。'}},after:['提示词不是直接画图命令，而是每一步都在影响"往哪个方向去噪"。','引导强度太低会跑题，太高可能生硬失真，这是质量和听话程度的权衡。'],peg:'🧭 文字拉着图像走',close:'所以"文生图"不是一句话直接变图片，而是文字持续引导去噪。',nextHint:null}
+]};
+
+CHAPTERS['adv:rl']={id:'adv:rl',title:'🕹️ 强化学习',badge:{e:'🕹️',t:'奖励策略师',s:'你学会了 AI 如何靠试错和奖励找策略'},endGame:buildAdvRecap('强化学习：靠奖励学策略',[['🤖','智能体','做动作、看结果、拿奖励'],['🎯','奖励','好结果加分，坏结果扣分'],['🧭','策略','长期看，哪条路奖励最高'],['🎲','探索','先试新路，才知道哪条更好']]),beat:true,sections:[
+ {n:1,heading:'强化学习 · 不是看答案而是拿奖励',hook:'<span class="apo">阿波：</span>这次没人告诉我标准答案，我只能自己试，踩坑，拿奖励。',build:buildRLTrail,paras:['[[强化学习]] 像玩游戏：AI 做一个动作，环境给它奖励或惩罚。','它的目标不是答对一题，而是学到一套能拿高分的[[策略]]。'],terms:{'强化学习':{s:'靠奖励和惩罚，通过试错学会好行为。',pro:'Reinforcement Learning 研究智能体如何在环境中行动，以最大化长期累计奖励。'},'策略':{s:'遇到某种情况时，决定下一步做什么的规则。'}},after:['监督学习有标准答案；强化学习只有行动后的反馈，常常要走很多步才知道选择好不好。','这让它特别适合游戏、机器人、资源调度等"连续决策"问题。'],peg:'🎯 奖励塑造行为',close:'刚才你靠奖励走到宝箱，这就是[[强化学习]]的核心。',nextHint:'那它什么时候该试新路？'},
+ {n:2,heading:'探索 vs 利用 · 试新路还是走老路',hook:'<span class="apo">阿波：</span>如果一个按钮常中奖，我要一直按它，还是再试试别的？',build:buildExploreExploit,paras:['[[探索]] 是试没试过的动作，[[利用]] 是选择目前看起来最好的动作。','只利用会错过更好机会；只探索又拿不到稳定奖励。'],terms:{'探索':{s:'尝试未知选择，收集新信息。'},'利用':{s:'选择当前已知最好的方案来拿奖励。'}},after:['强化学习的难点常在这个平衡：早期多探索，后期多利用。','很多算法会保留一点随机试错，防止太早被局部好结果困住。'],peg:'🎲 先试，才知道',close:'好策略不是一开始就知道的，是在[[探索]]和[[利用]]之间慢慢调出来的。',nextHint:'奖励怎么变成路线记忆？'},
+ {n:3,heading:'价值函数 · 哪个状态更值得去',hook:'<span class="apo">阿波：</span>有些格子眼前没奖励，却通向宝箱；AI 要学会看长远。',build:buildRLTrail,paras:['AI 会估计每个[[状态]]"未来大概能拿多少奖励"，这叫[[价值函数]]。','看起来普通的一步，如果通向高奖励，也会变得很有价值。'],terms:{'价值函数':{s:'估计一个状态或动作未来能带来多少总奖励。'},'状态':{s:'环境当前是什么样，比如棋盘位置、机器人姿势。'}},after:['只看眼前奖励会短视；价值函数把未来收益也算进去。','AlphaGo 下棋时就不是贪眼前一子，而是在估计整盘棋的长期胜率。'],peg:'📈 看长期总分',close:'强化学习真正学的是长期[[价值函数]]，不是只看眼前加一分。',nextHint:null}
+]};
+
+CHAPTERS['adv:classicml']={id:'adv:classicml',title:'🧩 经典机器学习：KNN/聚类/阈值',badge:{e:'🧩',t:'经典方法收藏家',s:'你知道了不用神经网络也能做 AI'},endGame:buildAdvRecap('经典机器学习：简单方法也有力量',[['📏','阈值','一条线就能分两类'],['🗳️','KNN','看最近邻居投票'],['🌀','聚类','没答案也能自动成团'],['⚖️','边界','简单、透明，但遇复杂任务会吃力']]),beat:true,sections:[
+ {n:1,heading:'阈值分类 · 一条线分两类',hook:'<span class="apo">阿波：</span>有时候 AI 不需要大脑袋，一条分界线就够了。',build:buildThreshold,paras:['[[阈值]] 就像一条分界线：大于它算一类，小于它算另一类。','这是最简单的[[分类]]方法之一。'],terms:{'阈值':{s:'用来分界的一个数，超过和没超过会得到不同判断。'},'分类':{s:'把东西分到不同类别里。'}},after:['阈值法透明、好解释，但只适合边界很简单的任务。','一旦数据纠缠在一起，就要用更复杂的边界或模型。'],peg:'📏 简单边界先试试',close:'这条分界线，就是一个最简单的[[阈值]]分类器。',nextHint:'不用线，能不能看邻居？'},
+ {n:2,heading:'K近邻 · 看最近邻居投票',hook:'<span class="apo">阿波：</span>新同学坐到哪一桌？看看他旁边都是什么人。',build:buildKNN,paras:['[[K近邻]] 的想法很朴素：新点属于哪类，看看它最近的 K 个邻居怎么投票。','离得近，通常代表更相似。'],terms:{'K近邻':{s:'看离新样本最近的 K 个样本，让邻居投票决定类别。',pro:'KNN 不需要训练复杂参数，但预测时要和许多样本比较，数据大时会变慢。'},'距离':{s:'用数字衡量两个样本有多像或多远。'}},after:['K 取得太小容易被噪声带偏，太大又会把远处不相关的点算进来。','所以 KNN 的关键不是背规则，而是定义好[[距离]]和 K 的大小。'],peg:'🗳️ 邻居投票',close:'你刚才放点、看邻居投票，就是[[K近邻]]。',nextHint:'如果没有答案标签呢？'},
+ {n:3,heading:'聚类 · 没答案也能自动成团',hook:'<span class="apo">阿波：</span>不给标准答案，只看谁和谁像，也能分出几堆。',build:buildCluster,paras:['[[聚类]] 不需要提前告诉 AI 哪个点属于哪一类。','它只看[[相似度]]，把彼此接近的样本自动归到一组。'],terms:{'聚类':{s:'没有标准答案时，把相似的样本自动分成几组。'},'相似度':{s:'衡量两个样本有多像的数字。'}},after:['聚类适合先探索数据结构：比如把用户、图片、文章按相似性分组。','但每一组到底代表什么，还需要人来解释；算法只负责成团，不负责命名。'],peg:'🌀 相似的自动抱团',close:'不给答案也能分组，这就是[[聚类]]。',nextHint:'这些老方法和神经网络是什么关系？'},
+ {n:4,heading:'经典方法 · 小而透明的 AI',hook:'<span class="apo">阿波：</span>不是所有 AI 都是大模型。小工具也能解决很多清楚的问题。',build:buildThreshold,paras:['阈值、K近邻、聚类都属于[[经典机器学习]]方法。','它们通常更简单、更好解释，也更容易看出哪里错了。'],terms:{'经典机器学习':{s:'神经网络和大模型流行前就很常用的一批学习方法。'},'可解释性':{s:'人能不能看懂模型为什么这样判断。'}},after:['经典方法适合数据少、规则清楚、需要解释的任务；深度学习适合图像、语音、语言等复杂模式。','真正的工程里常常不是"谁最酷"，而是谁最适合当前问题。'],peg:'🔍 能解释，也很重要',close:'[[经典机器学习]]提醒我们：AI 不只有大模型，合适的方法才是好方法。',nextHint:null}
+]};
+
+CHAPTERS['adv:training']={id:'adv:training',title:'🏋️ 大模型训练三部曲',badge:{e:'🏋️',t:'大模型训练师',s:'你看懂了 ChatGPT 如何从猜词模型变成助手'},endGame:buildAdvRecap('大模型训练三部曲',[['📚','预训练','读海量文本，练猜下一个词'],['🎓','微调','用优质示范学会好好答题'],['👂','RLHF','人类选择更好回答，训练偏好'],['⚖️','仍会幻觉','更顺手不等于永远正确']]),beat:true,sections:[
+ {n:1,heading:'预训练 · 读全网猜下词',hook:'<span class="apo">阿波：</span>大模型的第一课很简单：看到半句话，猜下一个词。',build:buildWordChain,paras:['[[预训练]] 让模型读海量文本，反复练"猜下一个 [[token]]"。','它没有专门学翻译或写代码，却在猜词中顺带摸到语言结构和知识。'],terms:{'预训练':{s:'让 AI 先读海量数据，打好基础能力。'},'token':{s:'模型读文字时切成的小块，可能是字、词或词片段。'},'自监督':{s:'不用人工写答案，而是让数据自己提供练习题和答案。'},'涌现':{s:'规模变大后突然出现的新能力。'}},after:['这一步用的是[[自监督]]：答案就藏在原文里，不需要人一句句标注。','规模越大，模型越可能出现没专门教过的能力，这叫[[涌现]]。'],peg:'📚 先打底',close:'预训练把模型从空白数字，变成会接话的语言模型。',nextHint:'会接话就会当助手吗？'},
+ {n:2,heading:'微调 · 从会接话到会答题',hook:'<span class="apo">阿波：</span>读遍全网后，它还不一定听话；还得看好示范。',build:buildCompare,paras:['[[微调]] 用少量高质量问答继续训练，让模型学会按用户问题认真回答。','这像是从"会说话"进入"会当助手"。'],terms:{'微调':{s:'在预训练之后，用更有目标的数据继续训练。'},'自监督':{s:'让数据自己提供练习题和答案。'},'涌现':{s:'规模变大后突然出现的新能力。'}},after:['微调数据少但质量要求高：示范写得啰嗦、偏见或不安全，模型也会学进去。','所以训练三部曲里，数据质量始终是决定模型气质的关键。'],peg:'🍎 示范决定风格',close:'微调不是重造一个模型，而是在已有能力上校准行为。',nextHint:'人的偏好说不清，怎么教？'},
+ {n:3,heading:'RLHF · 人选哪个更好',hook:'<span class="apo">阿波：</span>有些规则写不清，但两个回答摆一起，你能看出哪个好。',build:buildRLHF,paras:['[[RLHF]] 让人类比较两版回答，选择更好的那一个。','这些偏好会训练出一个[[奖励模型]]，替人给回答打分。'],terms:{'RLHF':{s:'靠人类选择"哪个更好"来调教 AI。',pro:'RLHF 是人类反馈强化学习，常用于让语言模型更符合人类偏好。'},'奖励模型':{s:'替人类给 AI 回答打分的模型。'}},after:['人类偏好比硬规则更灵活：有用、礼貌、安全、不过度自信，都能通过比较慢慢学到。','但它也可能学会迎合人，而不一定更真实；所以还需要查证和安全评估。'],peg:'👂 人类反馈塑造回答',close:'你刚才选更好的回答，就是 RLHF 的核心动作。',nextHint:'训练完是不是就不会错？'},
+ {n:4,heading:'幻觉与对齐 · 更顺手不等于永远正确',hook:'<span class="apo">阿波：</span>三步训练后，它更像助手了，但骨子里仍在生成词。',build:buildHallucination,paras:['三部训练让模型更好用，却不能彻底消灭[[幻觉]]。','[[对齐]] 是让 AI 尽量符合人类目标，但人类目标本身也复杂。'],terms:{'幻觉':{s:'AI 一本正经地生成错误或编造内容。'},'对齐':{s:'让 AI 的行为尽量符合人类期望和价值观。'}},after:['RLHF 优化的是"人更喜欢哪种回答"，不等于建立了事实数据库。','所以强模型也要接检索、标来源、做人类审核，尤其是高风险问题。'],peg:'⚖️ 顺手，也要怀疑',close:'大模型训练三部曲让 AI 变成助手，但聪明使用仍离不开核实。',nextHint:null}
+]};
+
 // —— 把进阶卡接进阅读器：给对应卡挂 chapter，覆盖 showAdv/renderAdv/goMap ——
-ADV.forEach(function(a){if(a.t==='神经网络在算什么')a.chapter='adv:nn';});
+ADV.forEach(function(a){if(a.t==='神经网络在算什么')a.chapter='adv:nn';if(a.t==='扩散模型怎么画画')a.chapter='adv:diffusion';if(a.t==='强化学习')a.chapter='adv:rl';if(a.t==='经典机器学习：KNN/聚类/阈值')a.chapter='adv:classicml';if(a.t==='大模型训练三部曲')a.chapter='adv:training';});
 showAdv=function(a){if(a.chapter&&CHAPTERS[a.chapter]){var pop=document.getElementById('advpop');if(pop)pop.classList.remove('open');enterChapter(a.chapter);return;}
   document.getElementById('apCat').textContent=a.c;document.getElementById('apT').textContent=a.e+' '+a.t;var ul=document.getElementById('apList');ul.innerHTML='';a.p.forEach(function(p){ul.appendChild(el('li',null,p));});document.getElementById('advpop').classList.add('open');};
 renderAdv=function(){var g=document.getElementById('advgrid');if(!g)return;g.innerHTML='';ADV.forEach(function(a){var playable=a.chapter&&CHAPTERS[a.chapter],done=playable&&ST.done[a.chapter];var d=el('div','adv-card');var foot=done?'✓ 已通关 · 点击重温':playable?'▶ 开始探索 · '+a.p.length+' 个知识点':a.p.length+' 个知识点 ›';d.innerHTML='<div class="ae">'+a.e+'</div><div class="at">'+a.t+'</div><div class="ac">'+a.c+'</div><div class="an"'+(playable?' style="color:#a78bfa;font-weight:800"':'')+'>'+foot+'</div>';d.onclick=function(){showAdv(a);};g.appendChild(d);});};
