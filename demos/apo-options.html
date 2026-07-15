@@ -19,6 +19,15 @@
     box-shadow:0 5px 0 #dfe4ef; display:flex; align-items:center; justify-content:space-between; gap:10px; color:var(--ink-2); font-size:13px; font-weight:800; }
   .abo-pickbar b { color:var(--violet-d); }
   .abo-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:18px; }
+  .abo-section { margin-top:26px; }
+  .abo-section h2 { margin:0 0 6px; font-size:20px; line-height:1.25; color:var(--ink); font-weight:900; letter-spacing:0; }
+  .abo-section p { margin:0 0 14px; color:var(--ink-dim); font-size:13px; line-height:1.65; font-weight:700; }
+  .expr-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:14px; }
+  .expr-card { background:#fff; border:1.5px solid var(--line); border-radius:16px; padding:12px; box-shadow:0 5px 0 #dfe4ef,0 12px 22px rgba(60,50,110,.07); }
+  .expr-stage { min-height:150px; border-radius:14px; background:linear-gradient(160deg,#faf8ff,#eef1fb); border:1.5px solid var(--line); display:grid; place-items:center; overflow:hidden; }
+  .expr-stage .bot { transform:scale(.92); animation:botFloat 2.8s ease-in-out infinite; }
+  .expr-name { margin-top:10px; font-size:13px; font-weight:900; color:var(--ink); }
+  .expr-use { margin-top:3px; color:var(--ink-dim); font-size:11.5px; line-height:1.45; font-weight:700; }
   .abo-card { width:auto; background:#fff; border:1.5px solid var(--line); border-radius:18px; padding:14px;
     box-shadow:0 6px 0 #dfe4ef,0 14px 24px rgba(60,50,110,.08); position:relative; overflow:hidden;
     transition:transform .18s var(--ease-bounce), box-shadow .18s; }
@@ -52,6 +61,12 @@
   @keyframes pulseGlow { 0%,100%{box-shadow:0 0 0 rgba(34,211,238,0)} 50%{box-shadow:0 0 18px rgba(34,211,238,.65)} }
   @keyframes scan { 0%{transform:translateX(-32px); opacity:0} 20%,80%{opacity:.9} 100%{transform:translateX(32px); opacity:0} }
   @keyframes antenna { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
+  @keyframes visorTalk { 0%,100%{transform:translateY(0) scaleY(1)} 22%{transform:translateY(-2px) scaleY(.92)} 45%{transform:translateY(2px) scaleY(1.06)} 68%{transform:translateY(-1px) scaleY(.96)} }
+  @keyframes eyesHappy { 0%,100%{height:13px; transform:translateY(0)} 50%{height:8px; transform:translateY(3px)} }
+  @keyframes botNod { 0%,100%{transform:translateY(2px) rotate(0)} 35%{transform:translateY(6px) rotate(1deg)} 70%{transform:translateY(-3px) rotate(-1deg)} }
+  @keyframes botThink { 0%,100%{transform:translateY(1px) rotate(-2deg)} 50%{transform:translateY(-4px) rotate(2deg)} }
+  @keyframes alertPulse { 0%,100%{background:#fbbf24; box-shadow:0 0 0 4px rgba(251,191,36,.18)} 50%{background:#fb7185; box-shadow:0 0 0 8px rgba(251,113,133,.12)} }
+  @keyframes successGlow { 0%,100%{box-shadow:0 0 0 rgba(88,204,2,0)} 50%{box-shadow:0 0 20px rgba(88,204,2,.55)} }
   .bot i { position:absolute; display:block; }
   .bot .layer { border-radius:22px; background:linear-gradient(150deg,var(--skin),var(--skin2)); border:3px solid #fff; }
   .bot .plate { background:linear-gradient(135deg,var(--plate),var(--plate2)); border-radius:16px; }
@@ -90,9 +105,31 @@
   .r2 .side.l { left:2px; top:55px; width:18px; height:35px; background:#8b5cf6; border-radius:10px; }
   .r2 .side.r { right:2px; top:55px; width:18px; height:35px; background:#8b5cf6; border-radius:10px; }
   .r2 .bar { left:36px; top:14px; width:48px; background:#22d3ee; }
-  .r2 .dot { left:55px; top:4px; }
-  .r2 .bolt.a { left:25px; top:37px; background:#22d3ee; } .r2 .bolt.b { right:25px; top:37px; background:#22d3ee; }
+  .r2 .dot { display:none; }
+  .r2 .bolt.a,.r2 .bolt.b { display:none; }
   .r2 .cheek.l { left:30px; top:83px; } .r2 .cheek.r { right:30px; top:83px; }
+
+  .expr-talk .visor { animation:visorTalk .42s ease-in-out infinite, pulseGlow 2.4s ease-in-out infinite; }
+  .expr-talk .mini-eye { animation:wink 3.8s infinite; }
+  .expr-listen .side.l,.expr-listen .side.r { animation:pulseGlow 1.5s ease-in-out infinite; }
+  .expr-listen .visor { box-shadow:0 0 16px rgba(34,211,238,.42); }
+  .expr-happy .mini-eye { animation:eyesHappy 1.4s ease-in-out infinite; background:#67e8f9; }
+  .expr-happy .cheek { opacity:.9; }
+  .expr-think { animation:botThink 2.4s ease-in-out infinite; }
+  .expr-think .bar { width:30px; left:45px; background:#fbbf24; }
+  .expr-think .visor { transform:translateY(1px); }
+  .expr-surprise .visor { height:38px; top:46px; box-shadow:0 0 20px rgba(34,211,238,.5); }
+  .expr-surprise .mini-eye { height:17px; width:13px; }
+  .expr-success .visor { animation:successGlow 1.2s ease-in-out infinite; }
+  .expr-success .side.l,.expr-success .side.r,.expr-success .bar { background:#58cc02; }
+  .expr-warn .bar { animation:alertPulse .9s ease-in-out infinite; }
+  .expr-warn .visor { box-shadow:0 0 18px rgba(251,191,36,.4); }
+  .expr-warn .mini-eye { background:#fbbf24; }
+  .expr-sleep .visor { height:24px; top:54px; opacity:.86; }
+  .expr-sleep .mini-eye { height:4px; top:64px; background:#c4b5fd; animation:none; }
+  .expr-sleep { animation:botNod 3s ease-in-out infinite; }
+  .expr-process .scan { display:block; left:42px; top:54px; width:4px; height:22px; border-radius:5px; background:#fff; opacity:.8; animation:scan 1.2s linear infinite; }
+  .expr-process .visor { box-shadow:0 0 18px rgba(34,211,238,.48); }
 
   .r3 .back { left:21px; top:19px; width:82px; height:92px; background:#5b21b6; border-radius:25px; }
   .r3 .face { left:13px; top:28px; width:94px; height:78px; border-radius:24px; }
@@ -198,6 +235,12 @@
   </div>
 
   <div class="abo-grid" id="grid"></div>
+
+  <section class="abo-section">
+    <h2>宽屏面罩头 · 表情动画库</h2>
+    <p>同一头部基底，不加嘴巴。后期交互主要靠面罩、眼灯、侧耳和顶部状态条表达状态；说话用面罩上下轻动。</p>
+    <div class="expr-grid" id="exprGrid"></div>
+  </section>
 </div>
 
 <script>
@@ -211,6 +254,17 @@ var OPTIONS=[
   {id:'r7',name:'模块工程头',tag:'进阶课',say:'我不是魔法盒，是一块块模块拼起来的。',fit:'结构感强，适合拓展课。',risk:'亲和力稍弱。'},
   {id:'r8',name:'绿灯反馈头',tag:'鼓励',say:'答错也没关系，我给你一个新线索。',fit:'反馈场景友好，绿色状态灯清楚。',risk:'绿色面积要控制。'},
   {id:'r9',name:'Emoji 复刻头',tag:'复刻🤖',say:'你好呀！我是阿波，准备好一起探险了吗？',fit:'直接复刻 🤖 emoji：方圆头、深色圆眼、天线灯、侧耳，无面罩。',risk:'太接近 emoji，辨识度要靠配色微调。'}
+];
+var EXPRESSIONS=[
+  {id:'expr-talk',name:'说话',use:'开场气泡逐字出现时使用'},
+  {id:'expr-listen',name:'倾听',use:'等待孩子点击/选择时使用'},
+  {id:'expr-happy',name:'开心',use:'答对、通关、小奖励'},
+  {id:'expr-think',name:'思考',use:'计算中、正在判断'},
+  {id:'expr-surprise',name:'惊讶',use:'发现反直觉现象'},
+  {id:'expr-success',name:'完成',use:'训练完成、任务达标'},
+  {id:'expr-warn',name:'提醒',use:'温和错误反馈，不用红叉'},
+  {id:'expr-sleep',name:'待机',use:'复习页或空闲状态'},
+  {id:'expr-process',name:'扫描',use:'识别、检索、看图类交互'}
 ];
 
 function getStore(k){try{return localStorage.getItem(k)||'';}catch(e){return '';}}
@@ -226,6 +280,7 @@ function bot(cls){
 }
 var picked=getStore('apo-rect-head-pick');
 var grid=document.getElementById('grid');
+var exprGrid=document.getElementById('exprGrid');
 var pickedEl=document.getElementById('picked');
 function render(){
   var current=OPTIONS.find(function(o){return o.id===picked;});
@@ -248,6 +303,16 @@ function render(){
   });
 }
 render();
+function renderExpressions(){
+  exprGrid.innerHTML='';
+  EXPRESSIONS.forEach(function(o){
+    var card=document.createElement('div');
+    card.className='expr-card';
+    card.innerHTML='<div class="expr-stage">'+bot('r2 '+o.id)+'</div><div class="expr-name">'+o.name+'</div><div class="expr-use">'+o.use+'</div>';
+    exprGrid.appendChild(card);
+  });
+}
+renderExpressions();
 </script>
 </body>
 </html>
