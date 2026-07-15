@@ -17,6 +17,8 @@
   .wb-top .tb-back{background:#ede9fe;color:#6d28d9;box-shadow:0 3px 0 #c4b5fd;}
   .wb-top .title{font-weight:900;color:#1e1b3a;font-size:16px;}
   .wb-top .xp{margin-left:auto;font-size:13px;font-weight:800;color:#eab308;background:#fffbeb;border:1px solid #fde68a;padding:5px 12px;border-radius:999px;}
+  .tb-level{cursor:pointer;transition:transform .16s ease,filter .16s ease;}
+  .tb-level:hover{transform:translateY(-2px) scale(1.02);filter:brightness(1.08);}
   #chbody{padding-top:16px;}
   #chbody .section:first-child{margin-top:6px;}
   .beat{animation:fadeUp .35s ease both;}
@@ -131,8 +133,28 @@
   .badge-stat b{display:block;color:#6d28d9;font-size:16px;margin-top:2px;}
   .badge-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;}
   .badge-item{border:1.5px solid #e6e9f2;background:#fff;border-radius:14px;padding:12px;text-align:center;}
+  .badge-item.adv{border-color:#c4b5fd;background:linear-gradient(180deg,#fff,#f8f5ff);}
+  .badge-item.lab{border-color:#a5f3fc;background:linear-gradient(180deg,#fff,#effcff);}
   .badge-item.locked{filter:grayscale(1);opacity:.48;}
   .badge-item .be{font-size:34px}.badge-item .bt{font-weight:900;color:#1e1b3a;font-size:13px;margin-top:4px}.badge-item .bs{font-size:11px;color:#6b7280;line-height:1.45;margin-top:4px}
+  .level-panel{width:min(680px,100%);border-top-color:#22d3ee;}
+  .level-hero{display:grid;grid-template-columns:72px 1fr;gap:14px;align-items:center;background:linear-gradient(135deg,#eff6ff,#f5f3ff);border:1.5px solid #dbeafe;border-radius:16px;padding:14px;margin-bottom:12px;}
+  .level-rocket{width:64px;height:64px;border-radius:20px;background:#fff;display:grid;place-items:center;font-size:34px;box-shadow:0 5px 0 #bfdbfe;}
+  .level-name{font-size:20px;font-weight:900;color:#1e1b3a;margin-bottom:4px;}
+  .level-desc{font-size:12.5px;color:#6b668a;line-height:1.5;}
+  .level-bar{height:14px;border-radius:999px;background:#e6e9f2;overflow:hidden;margin-top:10px;}
+  .level-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#58cc02,#22d3ee,#8b5cf6);border-radius:999px;transition:width .25s;}
+  .level-next{margin-top:6px;font-size:12px;color:#6d28d9;font-weight:900;}
+  .level-stat{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0;}
+  .level-stat div{background:#f8fafc;border:1px solid #e6e9f2;border-radius:12px;padding:10px;text-align:center;font-size:12px;color:#6b7280;}
+  .level-stat b{display:block;color:#1e1b3a;font-size:16px;margin-top:2px;}
+  .level-track{display:grid;gap:7px;margin:12px 0 14px;}
+  .level-step{display:grid;grid-template-columns:34px 1fr auto;gap:8px;align-items:center;border:1.5px solid #e6e9f2;border-radius:13px;background:#fff;padding:8px 10px;}
+  .level-step.done{background:#ecfdf5;border-color:#bbf7d0;}
+  .level-step.cur{background:#f5f3ff;border-color:#c4b5fd;box-shadow:0 0 0 3px rgba(139,92,246,.10);}
+  .level-step .li{font-size:21px}.level-step .lt{font-weight:900;color:#1e1b3a;font-size:13px}.level-step .ld{font-size:11px;color:#6b7280;margin-top:2px}.level-step .ln{font-size:11px;color:#8b5cf6;font-weight:900;}
+  .level-section-title{font-size:13px;color:#6d28d9;font-weight:900;margin:14px 0 8px;}
+  @media(max-width:560px){.level-hero{grid-template-columns:1fr;text-align:center}.level-rocket{margin:0 auto}.level-stat{grid-template-columns:repeat(2,1fr)}.level-step{grid-template-columns:28px 1fr}.level-step .ln{grid-column:2}}
   .fbline{border-radius:12px;padding:9px 12px;font-size:12.5px;font-weight:900;text-align:center;margin:9px auto 0;max-width:360px;animation:popIn .24s var(--ease-bounce,ease);}
   .fbline.ok{background:#ecfdf5;color:#15803d;border:1px solid #bbf7d0;}
   .fbline.gentle{background:#fffbeb;color:#b45309;border:1px solid #fde68a;}
@@ -177,7 +199,7 @@
 <div id="app">
   <section id="scr-map" class="screen cosmos">
     <div class="topbar">
-      <div class="tb-level"><span class="ring">🚀</span><b id="lvl">AI 新手</b></div>
+      <div class="tb-level" onclick="showLevelPanel()" role="button" tabindex="0" title="查看等级与勋章"><span class="ring">🚀</span><b id="lvl">AI 新手</b></div>
       <div class="tb-xp"><i id="xpbar"></i></div>
       <span class="tb-gem" id="gem">✨ 0</span>
       <div class="top-actions">
@@ -225,6 +247,7 @@
 <div class="term-pop" id="termpop"><div class="term-card"><h4 id="tpT"></h4><p id="tpD"></p><p id="tpP" class="tp-pro"></p></div></div>
 <div class="adv-pop" id="advpop"><div class="adv-card2"><div class="cat" id="apCat"></div><h3 id="apT"></h3><div class="badge">进阶课程 · 即将推出</div><ul id="apList"></ul></div></div>
 <div class="badge-pop" id="badgepop"><div class="badge-panel"><div class="badge-head"><h3>🏅 勋章与成就</h3><button onclick="hideBadges()">×</button></div><div class="badge-stat" id="badgestat"></div><div class="badge-grid" id="badgegrid"></div></div></div>
+<div class="badge-pop" id="levelpop"><div class="badge-panel level-panel"><div class="badge-head"><h3>🚀 等级与进度</h3><button onclick="hideLevelPanel()">×</button></div><div id="levelbody"></div></div></div>
 
 <script>
 // ========== 工具 ==========
@@ -254,7 +277,18 @@ function buildArcadeGame(cfg,onWin,onReset){var b=ixbox(cfg.title,cfg.hint,onRes
 var ST;try{ST=JSON.parse(localStorage.getItem('ai-explorer-2')||'null');}catch(e){ST=null;}
 if(!ST)ST={xp:0,done:{},badges:[]};if(!ST.collected)ST.collected={};
 function save(){try{localStorage.setItem('ai-explorer-2',JSON.stringify(ST));}catch(e){}}
-function syncTop(){var lv=ST.xp<100?'AI 新手':ST.xp<300?'见习探险家':ST.xp<700?'AI 探险家':'AI 大师';document.getElementById('lvl').textContent=lv;document.getElementById('gem').textContent='✨ '+ST.xp;document.getElementById('xpbar').style.width=Math.min(100,(ST.xp%300)/3)+'%';document.getElementById('chxp').textContent='✨ '+ST.xp;}
+var LEVELS=[
+  {n:'AI 新手',e:'🚀',xp:0,d:'刚刚启程，先完成序章和第一站。'},
+  {n:'见习探险家',e:'🛰️',xp:100,d:'开始理解 AI 的基本工作方式。'},
+  {n:'AI 探险家',e:'🌌',xp:300,d:'主线知识开始连成完整地图。'},
+  {n:'进阶研究员',e:'🔭',xp:600,d:'进入更硬核的架构、训练和社会议题。'},
+  {n:'AI 架构师',e:'🧠',xp:900,d:'能把模型机制拆开来看。'},
+  {n:'星际导师',e:'🌟',xp:1200,d:'主线和进阶都能讲给别人听。'}
+];
+function levelInfo(){var xp=ST.xp||0,idx=0;for(var i=0;i<LEVELS.length;i++){if(xp>=LEVELS[i].xp)idx=i;}var cur=LEVELS[idx],next=LEVELS[idx+1],pct=next?Math.max(0,Math.min(100,(xp-cur.xp)/(next.xp-cur.xp)*100)):100;return{idx:idx,cur:cur,next:next,pct:pct};}
+function courseCatalog(){var arr=[];STATIONS.forEach(function(s){var ch=CHAPTERS[s.id];if(ch)arr.push({id:s.id,type:'主线',cls:'main',name:s.id+' · '+s.name,badge:ch.badge});});if(typeof ADV!=='undefined')ADV.forEach(function(a){var id=a.chapter,ch=id&&CHAPTERS[id];if(ch)arr.push({id:id,type:'进阶',cls:'adv',name:a.t,badge:ch.badge});});Object.keys(ST.done||{}).forEach(function(id){if(id.indexOf('lab:')===0&&!arr.some(function(x){return x.id===id;})){var ch=CHAPTERS[id];arr.push({id:id,type:'实验',cls:'lab',name:ch?ch.title.replace(/^[^ ]+ /,''):'实验课程',badge:ch?ch.badge:{e:'🧪',t:id.replace('lab:','实验课程 '),s:'你完成了一门实验课程'}});}});return arr;}
+function progressStats(){var all=courseCatalog(),main=all.filter(function(x){return x.cls==='main';}),adv=all.filter(function(x){return x.cls==='adv';});function count(a){return a.filter(function(x){return ST.done&&ST.done[x.id];}).length;}return{all:all,main:main,adv:adv,doneAll:count(all),doneMain:count(main),doneAdv:count(adv)};}
+function syncTop(){var li=levelInfo();document.getElementById('lvl').textContent=li.cur.n;document.getElementById('gem').textContent='✨ '+ST.xp;document.getElementById('xpbar').style.width=li.pct+'%';document.getElementById('chxp').textContent='✨ '+ST.xp;}
 function awardCoins(n,ev){ST.xp+=n;save();
   var x=(ev&&ev.clientX)?ev.clientX:innerWidth/2,y=(ev&&ev.clientY)?ev.clientY:140;
   var mapOn=document.getElementById('scr-map').classList.contains('on');var g=document.getElementById(mapOn?'gem':'chxp');var t=g.getBoundingClientRect();var tx=t.left+t.width/2,ty=t.top+t.height/2;
@@ -270,10 +304,23 @@ function awardCoins(n,ev){ST.xp+=n;save();
   setTimeout(function(){f.remove();},850);}
 function resetProgress(){if(!confirm('确定要重置所有金币、章节进度和勋章吗？'))return;ST={xp:0,done:{},badges:[],collected:{}};save();syncTop();renderMap();renderBadges();toast('进度已重置',false);}
 function hideBadges(){document.getElementById('badgepop').classList.remove('open');}
-function renderBadges(){var stat=document.getElementById('badgestat'),grid=document.getElementById('badgegrid');if(!stat||!grid)return;var total=STATIONS.filter(function(s){return CHAPTERS[s.id];}).length,done=Object.keys(ST.done||{}).length;
-  stat.innerHTML='<div>金币<b>✨ '+ST.xp+'</b></div><div>已通关<b>'+done+' / '+total+'</b></div><div>已收集<b>'+(ST.badges||[]).length+' / '+total+'</b></div>';
-  grid.innerHTML='';STATIONS.forEach(function(s){var ch=CHAPTERS[s.id];if(!ch)return;var got=(ST.badges||[]).indexOf(ch.badge.t)>=0;var d=el('div','badge-item'+(got?'':' locked'));d.innerHTML='<div class="be">'+(got?ch.badge.e:'🔒')+'</div><div class="bt">'+ch.badge.t+'</div><div class="bs">'+(got?ch.badge.s:'通关「'+s.id+'」章后解锁')+'</div>';grid.appendChild(d);});}
+function renderBadges(){var stat=document.getElementById('badgestat'),grid=document.getElementById('badgegrid');if(!stat||!grid)return;var ps=progressStats(),gotCount=ps.all.filter(function(x){return ST.badges.indexOf(x.badge.t)>=0;}).length;
+  stat.innerHTML='<div>金币<b>✨ '+ST.xp+'</b></div><div>主线<b>'+ps.doneMain+' / '+ps.main.length+'</b></div><div>进阶<b>'+ps.doneAdv+' / '+ps.adv.length+'</b></div>';
+  grid.innerHTML='';ps.all.forEach(function(x){var got=(ST.badges||[]).indexOf(x.badge.t)>=0;var d=el('div','badge-item '+x.cls+(got?'':' locked'));d.innerHTML='<div class="be">'+(got?x.badge.e:'🔒')+'</div><div class="bt">'+x.badge.t+'</div><div class="bs">'+(got?x.badge.s:'通关「'+x.name+'」解锁 · '+x.type)+'</div>';grid.appendChild(d);});
+  if(ps.all.length)stat.innerHTML+='<div>勋章<b>'+gotCount+' / '+ps.all.length+'</b></div>';
+}
 function showBadges(){renderBadges();document.getElementById('badgepop').classList.add('open');}
+function hideLevelPanel(){document.getElementById('levelpop').classList.remove('open');}
+function renderLevelPanel(){var body=document.getElementById('levelbody');if(!body)return;var li=levelInfo(),ps=progressStats(),need=li.next?li.next.xp-ST.xp:0;
+  var html='<div class="level-hero"><div class="level-rocket">'+li.cur.e+'</div><div><div class="level-name">'+li.cur.n+'</div><div class="level-desc">'+li.cur.d+'</div><div class="level-bar"><i style="width:'+li.pct+'%"></i></div><div class="level-next">'+(li.next?'距离「'+li.next.n+'」还差 '+need+' 金币':'已经到达最高等级')+'</div></div></div>';
+  html+='<div class="level-stat"><div>金币<b>✨ '+ST.xp+'</b></div><div>总通关<b>'+ps.doneAll+' / '+ps.all.length+'</b></div><div>主线<b>'+ps.doneMain+' / '+ps.main.length+'</b></div><div>进阶<b>'+ps.doneAdv+' / '+ps.adv.length+'</b></div></div>';
+  html+='<div class="level-section-title">等级路线</div><div class="level-track">';
+  LEVELS.forEach(function(l,i){var cls=ST.xp>=l.xp?' done':'';if(i===li.idx)cls+=' cur';html+='<div class="level-step'+cls+'"><div class="li">'+l.e+'</div><div><div class="lt">'+l.n+'</div><div class="ld">'+l.d+'</div></div><div class="ln">'+l.xp+' 金币</div></div>';});
+  html+='</div><div class="level-section-title">勋章系统规则</div><div class="spec-item">主线勋章负责记录 AI 素养地图；进阶勋章记录架构、训练、社会议题和实践能力；实验课程勋章只有加载并通关后出现。金币决定等级，勋章决定学习版图是否完整。</div>';
+  body.innerHTML=html;
+}
+function showLevelPanel(){renderLevelPanel();document.getElementById('levelpop').classList.add('open');}
+document.querySelector('.tb-level').addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();showLevelPanel();}});
 
 // ========== 术语弹窗 + 段落(支持<b>) ==========
 var pop=document.getElementById('termpop');
