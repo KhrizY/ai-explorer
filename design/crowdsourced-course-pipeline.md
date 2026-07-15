@@ -860,3 +860,199 @@ GET /api/courses/by-code/:code
 - 后台审核队列
 
 这些都依赖服务端，应该在课程格式和 UX 路径验证后再做。
+
+---
+
+## 十三、动态发布版本（Render + TTL）
+
+用户确认下一步希望从“同设备 localStorage 预览”升级到“别人电脑也能输入课程码预览”的动态版本。当前部署形态是 GitHub → Render，因此推荐做一个轻量 API 服务，先不做账号和审核后台。
+
+### 13.1 目标
+
+让课程包具备两种状态：
+
+```text
+本地草稿
+  保存在浏览器 localStorage / IndexedDB
+  作者自己可长期保留和反复修改
+
+临时发布
+  POST 到 Render API
+  获得课程码和有效期
+  其他设备可在有效期内用课程码预览
+  到期服务器自动删除
+```
+
+核心设计：**服务器只保存临时发布版，本地浏览器仍保留草稿**。课程过期后，作者可以从本地再次发布。
+
+### 13.2 为什么 Render Free 初期够用
+
+当前需求只是小规模上传/读取 JSON：
+
+- 文件很小：一个课程包通常几十 KB。
+- 请求频率低：小范围测试，不是大规模课堂实时并发。
+- 计算轻：只做 JSON 校验、保存、读取、删除。
+
+Render Free Web Service 初期可用于验证闭环，但要注意：
+
+- 免费实例可能冷启动。
+- 不要把课程写入 Render 本地文件系统；重启/部署后不可靠。
+- 持久数据应放外部 KV/数据库。
+
+### 13.3 推荐存储
+
+首选：支持 TTL 的 KV / Redis。
+
+```text
+Render Web Service
+  -> Upstash Redis / Vercel KV / Cloudflare KV / Supabase
+```
+
+推荐 KV key：
+
+```text
+course:{CODE}
+```
+
+value：
+
+```json
+{
+  "course": {},
+  "createdAt": "2026-07-15T00:00:00Z",
+  "expiresAt": "2026-07-22T00:00:00Z",
+  "ttlDays": 7
+}
+```
+
+如果使用 Redis：
+
+```text
+SET course:NET-001 <json> EX 604800
+```
+
+这样 7 天后自动清除，不需要手写清理任务。
+
+### 13.4 API 设计
+
+最小 API：
+
+```http
+POST /api/courses/publish
+GET  /api/courses/:code
+POST /api/courses/:code/renew
+DELETE /api/courses/:code
+```
+
+发布请求：
+
+```json
+{
+  "course": {},
+  "ttlDays": 7
+}
+```
+
+发布响应：
+
+```json
+{
+  "code": "NET-001",
+  "expiresAt": "2026-07-22T00:00:00Z",
+  "previewUrl": "/index.html?lab=NET-001"
+}
+```
+
+读取响应：
+
+```json
+{
+  "course": {},
+  "expiresAt": "2026-07-22T00:00:00Z"
+}
+```
+
+过期或不存在：
+
+```json
+{
+  "error": "COURSE_NOT_FOUND_OR_EXPIRED"
+}
+```
+
+### 13.5 主站加载顺序
+
+输入课程码后：
+
+```text
+1. 查本地 localStorage
+2. 本地没有 → 请求 Render API
+3. API 有 → 动态加载并进入阅读器
+4. API 没有 → 提示课程不存在或已过期
+```
+
+这样兼容当前本地 MVP，也支持跨设备预览。
+
+### 13.6 上传页 UX 增量
+
+上传页新增发布区：
+
+```text
+本地保存
+  保存到本机实验区
+
+临时发布
+  有效期：1 天 / 7 天 / 30 天
+  发布到服务器
+  显示课程码、过期时间、预览链接
+
+重新发布
+  如果服务器课程过期，本地草稿仍在
+  点击重新发布，生成新的有效期
+```
+
+本机课程列表应显示：
+
+```text
+课程名
+本地课程码
+发布状态：未发布 / 已发布 / 已过期
+过期时间
+按钮：预览 / 发布 / 重新发布 / 删除本地
+```
+
+### 13.7 清理策略
+
+优先使用 KV/Redis TTL 自动清理。
+
+如果选用普通数据库，则加字段：
+
+```text
+expires_at
+```
+
+再加一个低频清理任务：
+
+```text
+DELETE FROM courses WHERE expires_at < now()
+```
+
+但第一版建议避免 cron，直接用 TTL 存储。
+
+### 13.8 安全边界（当前小范围测试版）
+
+用户已确认当前是小范围可控测试，可暂不做严格权限，但仍保留基础工程边界：
+
+- 课程包仍然只允许 JSON，不允许上传 JS。
+- 服务端做 schema 校验。
+- 限制单个课程包大小。
+- 限制 TTL 最大值，例如 30 天。
+- 课程码使用随机后缀，避免猜码过于容易。
+
+后续再加：
+
+- 作者登录
+- 审核队列
+- 归档后台
+- 发布次数限制
+- 滥用检测
