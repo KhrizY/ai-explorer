@@ -14,9 +14,10 @@
   h1 { margin:0 0 6px; font-size:25px; line-height:1.2; font-weight:900; letter-spacing:0; color:var(--ink); }
   .sub { margin:0; max-width:850px; color:var(--ink-dim); font-size:13px; line-height:1.65; font-weight:700; }
   .back { flex:none; display:inline-flex; align-items:center; height:38px; padding:0 14px; border-radius:12px; text-decoration:none; background:#fff; color:var(--violet-d); border:1.5px solid var(--line); font-weight:900; font-size:13px; box-shadow:0 3px 0 #dfe4ef; }
-  .tabs { display:flex; gap:10px; overflow-x:auto; padding:6px 2px 14px; scrollbar-width:none; cursor:grab; }
-  .tabs::-webkit-scrollbar { display:none; }
-  .tab { flex:none; border:2px solid var(--line); background:#fff; color:var(--ink-2); border-radius:999px; padding:9px 15px; font:900 13px/1 var(--font); cursor:pointer; white-space:nowrap; box-shadow:0 3px 0 #dfe4ef; }
+  .tabs { display:flex; gap:10px; overflow-x:auto; padding:6px 2px 14px; scrollbar-width:thin; scroll-snap-type:x proximity; -webkit-overflow-scrolling:touch; }
+  .tabs::-webkit-scrollbar { height:6px; }
+  .tabs::-webkit-scrollbar-thumb { background:#d8d5f2; border-radius:999px; }
+  .tab { flex:none; border:2px solid var(--line); background:#fff; color:var(--ink-2); border-radius:999px; padding:9px 15px; font:900 13px/1 var(--font); cursor:pointer; white-space:nowrap; box-shadow:0 3px 0 #dfe4ef; scroll-snap-align:start; touch-action:manipulation; }
   .tab.on { color:#fff; border-color:transparent; background:linear-gradient(90deg,var(--violet),var(--cyan)); box-shadow:0 4px 0 var(--violet-dd),0 10px 20px rgba(139,92,246,.2); }
   .case { display:none; background:#fff; border:1.5px solid var(--line); border-radius:20px; padding:14px; box-shadow:0 7px 0 #dfe4ef,0 16px 30px rgba(60,50,110,.08); overflow:visible; }
   .case.on { display:block; animation:fadeUp .22s var(--ease) both; }
@@ -87,6 +88,7 @@
   .cell { width:42px; height:42px; border-radius:12px; display:grid; place-items:center; font-size:13px; font-weight:900; color:#1e1b3a; border:1.5px solid #d9d6f2; background:#fff; box-shadow:0 3px 0 #dfe4ef; }
   .legend { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:10px; }
   .legend span { font-size:11px; color:var(--ink-dim); font-weight:800; }
+  .case-nav { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:14px; }
   @keyframes fadeUp { from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)} }
   @media (max-width:880px) {
     .compare { grid-template-columns:1fr; }
@@ -122,6 +124,10 @@
   </div>
   <div class="tabs" id="tabs"></div>
   <div id="cases"></div>
+  <div class="case-nav">
+    <button class="btn ghost" type="button" id="prevCase">← 上一个</button>
+    <button class="btn v" type="button" id="nextCase">下一个 →</button>
+  </div>
 </div>
 
 <script>
@@ -141,7 +147,7 @@ var DATA=[
 
 var tabs=document.getElementById('tabs'), cases=document.getElementById('cases'), cur=0;
 DATA.forEach(function(d,i){
-  var t=el('button','tab'+(i===0?' on':''),d.title);t.onclick=function(){show(i);};tabs.appendChild(t);
+  var t=el('button','tab'+(i===0?' on':''),d.title);t.type='button';t.dataset.i=i;t.addEventListener('click',function(e){e.preventDefault();show(+this.dataset.i);});tabs.appendChild(t);
   var c=el('section','case'+(i===0?' on':''));c.id='case-'+d.id;
   var head=el('div','case-head');
   head.appendChild(el('div',null,'<h2 class="case-title">'+d.title+'</h2><p class="case-note">'+d.type+' · 右侧不是最终课程 UI，只验证“交互和知识点原理是否同构”。</p>'));
@@ -158,12 +164,9 @@ DATA.forEach(function(d,i){
   c.appendChild(head);c.appendChild(comp);cases.appendChild(c);
   d.oldMount(oldStage);d.newMount(newStage);
 });
-function show(i){cur=i;Array.from(tabs.children).forEach(function(t,k){t.classList.toggle('on',k===i);});DATA.forEach(function(d,k){document.getElementById('case-'+d.id).classList.toggle('on',k===i);});}
-
-var dragging=false,sx=0,sl=0;
-tabs.addEventListener('pointerdown',function(e){dragging=true;sx=e.clientX;sl=tabs.scrollLeft;tabs.setPointerCapture(e.pointerId);});
-tabs.addEventListener('pointermove',function(e){if(dragging)tabs.scrollLeft=sl-(e.clientX-sx);});
-tabs.addEventListener('pointerup',function(){dragging=false;});
+function show(i){cur=(i+DATA.length)%DATA.length;Array.from(tabs.children).forEach(function(t,k){t.classList.toggle('on',k===cur);});DATA.forEach(function(d,k){document.getElementById('case-'+d.id).classList.toggle('on',k===cur);});if(tabs.children[cur])tabs.children[cur].scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});}
+document.getElementById('prevCase').onclick=function(){show(cur-1);};
+document.getElementById('nextCase').onclick=function(){show(cur+1);};
 
 function oldHistory(s){
   var data=[['1950','图灵测试'],['1956','达特茅斯'],['1980s','专家系统'],['2012','深度学习'],['2016','AlphaGo'],['2020s','大模型']];
