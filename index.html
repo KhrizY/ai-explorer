@@ -19,6 +19,11 @@
   .wb-top .xp{margin-left:auto;font-size:13px;font-weight:800;color:#eab308;background:#fffbeb;border:1px solid #fde68a;padding:5px 12px;border-radius:999px;}
   #chbody{padding-top:16px;}
   #chbody .section:first-child{margin-top:6px;}
+  .beat{animation:fadeUp .35s ease both;}
+  .beat-more{display:block;margin:16px auto 2px;width:44px;height:44px;border-radius:50%;border:none;background:#f1eefb;color:#b3a9d6;font-size:20px;cursor:pointer;box-shadow:0 3px 0 #e4def4;animation:beatBob 1.4s ease-in-out infinite;}
+  .beat-more:hover{background:#e9e3fa;color:#8b5cf6;}
+  @keyframes beatBob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+  .anchor-line{font-size:13px;color:#8b5cf6;font-weight:800;text-align:center;margin-top:12px;padding-top:10px;border-top:1px dashed #ece9f7;}
   .hook{background:linear-gradient(135deg,#fef9ff,#eef1fb);border:1.5px solid #ece9f7;border-left:4px solid var(--violet);border-radius:12px;padding:12px 14px;font-size:14.5px;color:#4b4869;line-height:1.6;margin-bottom:14px;}
   .hook b{color:#6d28d9;}
   .peg{display:inline-block;margin-top:8px;font-size:13px;background:#f5f3ff;color:#6d28d9;padding:4px 10px;border-radius:999px;font-weight:700;}
@@ -469,26 +474,26 @@ function buildChainPK(onWin,onReset){var b=ixbox('🎮 词语接龙 PK','说通 
   w.appendChild(sc);w.appendChild(view);w.appendChild(cand);start();return b;}
 
 // —— 「说」章内容(7 节) ——
-CHAPTERS['说']={id:'说',title:'💬 说 · AI 怎么听懂人话？',badge:{e:'🏅',t:'语言大师',s:'你搞懂了 AI 是怎么理解和生成语言的'},endGame:buildWordRhythm,sections:[
- {n:1,heading:'核心：一直猜下一个词',hook:'<span class="apo">阿波：</span>你手机打字才打"今天天"，它就猜出"气"——我和 ChatGPT 用的是同一个把戏！玩玩接龙👇',build:buildWordChain,
+CHAPTERS['说']={id:'说',title:'💬 说 · AI 怎么听懂人话？',badge:{e:'🏅',t:'语言大师',s:'你搞懂了 AI 是怎么理解和生成语言的'},endGame:buildWordRhythm,beat:true,sections:[
+ {n:1,heading:'大语言模型 · 一直在猜下一个词',hook:'<span class="apo">阿波：</span>你手机打字才打"今天天"，它就猜出"气"——我和 ChatGPT 用的是同一个把戏！玩玩接龙👇',build:buildWordChain,
   paras:['像 ChatGPT 这样的[[大语言模型]]，一辈子只练一件事：猜下一个词。','你给半句话，它就想"接下来最可能是哪个词"，接上去。','一个接一个，就成了一整段话。'],
   terms:{'大语言模型':{s:'读过海量文字、专门练"猜下一个词"的 AI，ChatGPT、DeepSeek 都是。',pro:'英文叫 LLM（Large Language Model）；它其实不"懂"意思，只是根据见过的海量句子猜最可能的接法。'}},peg:'🎭 它在猜，不在懂',close:'所以它不是"懂"你，只是猜——只不过见得太多，猜得很准。',nextHint:'它读句子之前，先要把句子怎么处理一下？'},
- {n:2,heading:'先把句子切成小块',hook:'<span class="apo">阿波：</span>我读句子前，会先把它"咔嚓"切成一小块一小块。点点看👇',build:buildTokenize,
+ {n:2,heading:'Token · 先把句子切成小块',hook:'<span class="apo">阿波：</span>我读句子前，会先把它"咔嚓"切成一小块一小块。点点看👇',build:buildTokenize,
   paras:['我读文字前，先把句子切成一小块一小块，每块叫一个[[token]]。','然后一块一块地读、一块一块地猜。'],
   terms:{'token':{s:'AI 把句子切成的一小块，可能是一个词或一个字。',pro:'中文叫"词元"；模型不是按整句处理，而是把文字都换成一个个 token 再计算。'}},peg:'',close:'切成 token，是我读懂文字的第一步。',nextHint:'那我是一个字一个字慢慢读，还是有更快的办法？'},
- {n:3,heading:'排队读 vs 一眼看',hook:'<span class="apo">阿波：</span>旧办法一个字一个字排队读，慢；新办法一眼看完整句，快！点两个按钮比比👇',build:buildSeqVsParallel,
+ {n:3,heading:'RNN vs 新办法 · 排队读还是一眼看',hook:'<span class="apo">阿波：</span>旧办法一个字一个字排队读，慢；新办法一眼看完整句，快！点两个按钮比比👇',build:buildSeqVsParallel,
   paras:['旧办法（叫 [[RNN]]）像排队：读完一个字才读下一个，句子长了就慢、还容易忘前面。','新办法像一眼扫完整句，所有字一起看——又快又不会忘。'],
   terms:{'RNN':{s:'一种"排队读"的老式 AI：读完一个字才读下一个。',pro:'全称循环神经网络（Recurrent Neural Network）；句子一长就慢、还容易忘掉前面，后来被更快的新办法取代。'}},peg:'',close:'新办法又快又记得牢，这是现在大模型能这么强的关键一步。',nextHint:'"一起看整句"——它具体是怎么看的？'},
- {n:4,heading:'注意力 + 知道位置',hook:'<span class="apo">阿波：</span>一起看整句时，每个词会去"看"和它有关的词——比如"它"指的是谁。点词看连线👇',build:buildAttention,
+ {n:4,heading:'注意力机制 · 每个词去看相关的词',hook:'<span class="apo">阿波：</span>一起看整句时，每个词会去"看"和它有关的词——比如"它"指的是谁。点词看连线👇',build:buildAttention,
   paras:['读句子时，每个词会去"关注"句子里和它有关的词，这叫[[注意力机制]]。','靠这个，我能搞清"小猫在沙发上睡觉"里是谁在睡觉。','另外，"我打你"和"你打我"不一样——所以我还得知道每个词排在第几位。'],
   terms:{'注意力机制':{s:'读句子时，每个词会去"关注"和它有关的词。'},'Transformer':{s:'用注意力、能"一眼看整句"的新式 AI 结构。',pro:'如今几乎所有大模型都建在 Transformer 上；它 2017 年被提出，彻底改变了 AI。'}},peg:'',close:'这套"注意力 + 知道位置"的新结构，叫[[Transformer]]——现在的大模型几乎都用它。',nextHint:'这么厉害的本事，它是怎么学会的？'},
- {n:5,heading:'读遍互联网，越大越聪明',hook:'<span class="apo">阿波：</span>我的本事哪来的？我读了几乎整个互联网的文字！而且书读得越多、脑子越大，我就越聪明。点点看👇',build:buildDataScale,
+ {n:5,heading:'预训练 · 读遍互联网，越大越聪明',hook:'<span class="apo">阿波：</span>我的本事哪来的？我读了几乎整个互联网的文字！而且书读得越多、脑子越大，我就越聪明。点点看👇',build:buildDataScale,
   paras:['我先把几乎整个互联网的文字都"读"一遍，这一步叫[[预训练]]。','有意思的是：与其一条条教我规则，不如给我更多文字、更大的脑子——我自己就会更强。','这条"越大越聪明"的规律，是 AI 这些年最重要的发现之一。'],
   terms:{'预训练':{s:'让 AI 先把海量文字读一遍、打好底子的过程。'}},peg:'🧲 多喂数据，真的管用',close:'这就是为什么 AI 越做越大——因为"多喂数据、多给算力"真的管用。',nextHint:'读了这么多，它说话是死板还是会变花样？'},
- {n:6,heading:'温度：有多"放飞"',hook:'<span class="apo">阿波：</span>同一个问题，我能答得很稳，也能答得很放飞——由一个叫"温度"的旋钮控制。拖拖看👇',build:buildTemperature,
+ {n:6,heading:'温度 · AI 说话有多"放飞"',hook:'<span class="apo">阿波：</span>同一个问题，我能答得很稳，也能答得很放飞——由一个叫"温度"的旋钮控制。拖拖看👇',build:buildTemperature,
   paras:['有个叫[[温度]]的设置，决定我说话有多大胆。','温度低，我只挑最稳的词，答得规矩；温度高，我敢挑冷门词，有创意甚至离谱。'],
   terms:{'温度':{s:'控制 AI 说话有多"随机大胆"的一个设置。'}},peg:'',close:'所以同一个 AI，调调温度，可以很规矩、也可以很有想象力。',nextHint:'它这么能说，说的都是真的吗？'},
- {n:7,heading:'它会一本正经地胡说',hook:'<span class="apo">阿波：</span>我坦白——我有时会一本正经地胡说，还特别自信！你能分辨吗？来判断👇',build:buildHallucination,
+ {n:7,heading:'幻觉 · 它会一本正经地胡说',hook:'<span class="apo">阿波：</span>我坦白——我有时会一本正经地胡说，还特别自信！你能分辨吗？来判断👇',build:buildHallucination,
   paras:['我不是故意骗人，但有时会把假的说得像真的一样——这叫[[幻觉]]。','因为我只是在"猜最像的接法"，并不真的知道对错。','所以我说的话，重要的一定要自己再核实。'],
   terms:{'幻觉':{s:'AI 一本正经地说出错误、编造的内容。',pro:'它并非故意撒谎，而是因为只在"猜最可能的词"，压根没有"知道对错"这回事。'}},peg:'🎭 很会说≠说得对',close:'记住：我很会说，但不等于我说的都对。',nextHint:null}
 ]};
@@ -706,7 +711,7 @@ CHAPTERS['序']={id:'序',title:'🎬 序 · AI 到底是不是魔法？',badge:
 
 // ========== 章节渲染 ==========
 var curSec=0;
-function enterChapter(id){CH=CHAPTERS[id];show('scr-ch');document.getElementById('chtitle').textContent=CH.title;curSec=(ST.done[id]&&id.indexOf('adv:')!==0)?CH.sections.length:0;document.getElementById('chbody').innerHTML='';syncTop();renderSec();}
+function enterChapter(id){CH=CHAPTERS[id];show('scr-ch');document.getElementById('chtitle').textContent=CH.title;curSec=(ST.done[id]&&id.indexOf('adv:')!==0&&!CH.beat)?CH.sections.length:0;document.getElementById('chbody').innerHTML='';syncTop();renderSec();}
 function renderSec(){
   if(curSec>=CH.sections.length){renderEnd();return;}
   var sec=CH.sections[curSec];
@@ -716,12 +721,24 @@ function renderSec(){
   var host=el('div');
   var rw=function(ev){var k=CH.id+'.'+sec.n;if(ST.collected[k]){completeFeedback(host,'这关已经完成过啦');return;}ST.collected[k]=true;save();awardCoins(10,ev);completeFeedback(host,'完成！金币已入库');};
   function mountIx(){host.innerHTML='';host.appendChild(sec.build(rw,mountIx));}
-  mountIx();wrap.appendChild(host);
-  sec.paras.forEach(function(p){wrap.appendChild(parseP(p,sec.terms));});
-  wrap.appendChild(parseP(sec.close,sec.terms));
-  var nw=el('div','next-wrap');var btn=el('button','next-btn',sec.nextHint||'完成这一章 →');
-  btn.onclick=function(){curSec++;renderSec();};
-  nw.appendChild(btn);wrap.appendChild(nw);
+  function addNextBtn(){var nw=el('div','next-wrap');var btn=el('button','next-btn',sec.nextHint||'完成这一章 →');btn.onclick=function(){curSec++;renderSec();};nw.appendChild(btn);wrap.appendChild(nw);}
+  if(!CH.beat){
+    // —— 旧渲染（未开启 beat 的章保持原样）——
+    mountIx();wrap.appendChild(host);
+    sec.paras.forEach(function(p){wrap.appendChild(parseP(p,sec.terms));});
+    wrap.appendChild(parseP(sec.close,sec.terms));
+    addNextBtn();
+  }else{
+    // —— beat 模式：B 层逐段展开（理解链：解释正文 → 交互 → 收束）——
+    var blocks=[];
+    sec.paras.forEach(function(p){blocks.push(function(){var d=el('div','beat');d.appendChild(parseP(p,sec.terms));return d;});});
+    blocks.push(function(){var d=el('div','beat');mountIx();d.appendChild(host);return d;});
+    blocks.push(function(){var d=el('div','beat');d.appendChild(parseP(sec.close,sec.terms));if(sec.peg)d.appendChild(el('div','anchor-line',sec.peg));return d;});
+    var review=!!(ST.done[CH.id]||ST.collected[CH.id+'.'+sec.n]),idx=0;
+    function showArrow(){var a=el('button','beat-more','▽');a.title='点一下，继续';a.onclick=function(){a.remove();var node=blocks[idx++]();wrap.appendChild(node);if(node.scrollIntoView)node.scrollIntoView({behavior:'smooth',block:'center'});if(idx<blocks.length)showArrow();else addNextBtn();};wrap.appendChild(a);}
+    if(review){while(idx<blocks.length)wrap.appendChild(blocks[idx++]());addNextBtn();}
+    else showArrow();
+  }
   document.getElementById('chbody').appendChild(wrap);
   wrap.scrollIntoView({behavior:'smooth',block:'start'});
 }
