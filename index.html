@@ -27,6 +27,36 @@
   .anchor-line{font-size:13px;color:#8b5cf6;font-weight:800;text-align:center;margin-top:12px;padding-top:10px;border-top:1px dashed #ece9f7;}
   .hook{background:linear-gradient(135deg,#fef9ff,#eef1fb);border:1.5px solid #ece9f7;border-left:4px solid var(--violet);border-radius:12px;padding:12px 14px;font-size:14.5px;color:#4b4869;line-height:1.6;margin-bottom:14px;}
   .hook b{color:#6d28d9;}
+  .apo-talk{display:grid;grid-template-columns:74px 1fr;gap:10px;align-items:end;margin:2px 0 16px;animation:fadeUp .35s ease both;}
+  .apo-bot{position:relative;width:66px;height:74px;align-self:end;filter:drop-shadow(0 8px 10px rgba(109,40,217,.12));animation:apoFloat 2.8s ease-in-out infinite;}
+  .apo-bot:before{content:"";position:absolute;left:10px;right:10px;top:13px;height:44px;border-radius:18px 18px 16px 16px;background:linear-gradient(180deg,#fff,#eef6ff);border:2px solid #c4b5fd;box-shadow:inset 0 -5px 0 rgba(139,92,246,.08);}
+  .apo-bot:after{content:"";position:absolute;left:20px;right:20px;bottom:4px;height:14px;border-radius:999px;background:#c4b5fd;box-shadow:0 3px 0 #8b5cf6;}
+  .apo-ant{position:absolute;left:31px;top:0;width:4px;height:15px;border-radius:99px;background:#8b5cf6;transform-origin:bottom;animation:apoWiggle 1.4s ease-in-out infinite;}
+  .apo-ant:after{content:"";position:absolute;left:-5px;top:-8px;width:14px;height:14px;border-radius:50%;background:#ffd66d;box-shadow:0 0 0 3px rgba(255,214,109,.28);}
+  .apo-eye{position:absolute;top:29px;width:12px;height:14px;border-radius:8px;background:#1e1b3a;z-index:2;animation:apoBlink 4.6s infinite;}
+  .apo-eye.l{left:22px}.apo-eye.r{right:22px}
+  .apo-cheek{position:absolute;top:43px;width:9px;height:5px;border-radius:999px;background:#fca5a5;z-index:2;opacity:.8}
+  .apo-cheek.l{left:17px}.apo-cheek.r{right:17px}
+  .apo-mouth{position:absolute;left:29px;top:45px;width:9px;height:5px;border-radius:0 0 10px 10px;border-bottom:2px solid #6d28d9;z-index:2;animation:apoMouth .42s steps(2,end) infinite;}
+  .apo-arm{position:absolute;top:40px;width:15px;height:6px;border-radius:999px;background:#8b5cf6;z-index:1;transform-origin:center;}
+  .apo-arm.l{left:1px;transform:rotate(-25deg);animation:apoArmL 1.6s ease-in-out infinite;}
+  .apo-arm.r{right:1px;transform:rotate(25deg);animation:apoArmR 1.6s ease-in-out infinite;}
+  .apo-bubble{position:relative;min-height:54px;background:#fff;border:2px solid #e6e9f2;border-radius:18px;padding:12px 14px 13px;box-shadow:0 5px 0 #dfe4ef;color:#4b4869;font-size:14.5px;line-height:1.65;font-weight:650;}
+  .apo-bubble:before{content:"";position:absolute;left:-10px;bottom:18px;width:18px;height:18px;background:#fff;border-left:2px solid #e6e9f2;border-bottom:2px solid #e6e9f2;transform:rotate(45deg);border-radius:4px;}
+  .apo-name{display:inline-flex;align-items:center;gap:4px;margin-right:4px;color:#6d28d9;font-weight:900;}
+  .apo-type{vertical-align:baseline;}
+  .apo-cursor{display:inline-block;width:7px;height:1.2em;margin-left:2px;background:#8b5cf6;border-radius:3px;vertical-align:-3px;animation:apoCursor .85s steps(1,end) infinite;}
+  .apo-bubble.done .apo-cursor{display:none;}
+  .apo-bubble b{color:#6d28d9;}
+  @keyframes apoFloat{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-5px) rotate(1deg)}}
+  @keyframes apoWiggle{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(10deg)}}
+  @keyframes apoBlink{0%,92%,100%{transform:scaleY(1)}94%,96%{transform:scaleY(.12)}}
+  @keyframes apoMouth{0%,100%{height:4px}50%{height:8px}}
+  @keyframes apoArmL{0%,100%{transform:rotate(-25deg)}50%{transform:rotate(-42deg) translateY(-1px)}}
+  @keyframes apoArmR{0%,100%{transform:rotate(25deg)}50%{transform:rotate(46deg) translateY(-2px)}}
+  @keyframes apoCursor{0%,49%{opacity:1}50%,100%{opacity:0}}
+  @media (max-width:560px){.apo-talk{grid-template-columns:58px 1fr;gap:8px}.apo-bot{width:54px;height:64px;transform:scale(.88);transform-origin:left bottom}.apo-bubble{font-size:14px;padding:11px 12px}.apo-bubble:before{left:-8px}}
+  @media (prefers-reduced-motion:reduce){.apo-bot,.apo-ant,.apo-eye,.apo-mouth,.apo-arm,.apo-cursor{animation:none!important}}
   .peg{display:inline-block;margin-top:8px;font-size:13px;background:#f5f3ff;color:#6d28d9;padding:4px 10px;border-radius:999px;font-weight:700;}
   .apo{font-weight:800;color:#6d28d9;}
   .term-card .tp-pro{margin-top:10px;padding-top:10px;border-top:1px dashed #e6e9f2;font-size:13px;color:#8b5cf6;line-height:1.65;}
@@ -773,12 +803,29 @@ CHAPTERS['序']={id:'序',title:'🎬 序 · AI 到底是不是魔法？',badge:
 // ========== 章节渲染 ==========
 var curSec=0;
 function enterChapter(id){CH=CHAPTERS[id];show('scr-ch');document.getElementById('chtitle').textContent=CH.title;curSec=(ST.done[id]&&id.indexOf('adv:')!==0&&!CH.beat)?CH.sections.length:0;document.getElementById('chbody').innerHTML='';syncTop();renderSec();}
+function hookText(html){var d=document.createElement('div');d.innerHTML=html||'';var txt=d.textContent||'';return txt.replace(/^\s*阿波\s*[:：]\s*/,'').trim();}
+function buildApoTalk(html,instant){
+  var box=el('div','apo-talk');
+  var bot=el('div','apo-bot','<i class="apo-ant"></i><i class="apo-arm l"></i><i class="apo-arm r"></i><i class="apo-eye l"></i><i class="apo-eye r"></i><i class="apo-cheek l"></i><i class="apo-cheek r"></i><i class="apo-mouth"></i>');
+  var bubble=el('div','apo-bubble');
+  var name=el('span','apo-name','阿波');
+  var type=el('span','apo-type');
+  var cur=el('span','apo-cursor');
+  bubble.appendChild(name);bubble.appendChild(type);bubble.appendChild(cur);box.appendChild(bot);box.appendChild(bubble);
+  var plain=hookText(html),i=0,timer=null;
+  function finish(){if(timer)clearInterval(timer);type.textContent=plain;bubble.classList.add('done');}
+  if(instant||document.body.classList.contains('debug-end')||matchMedia('(prefers-reduced-motion: reduce)').matches){finish();}
+  else{timer=setInterval(function(){i+=Math.max(1,Math.ceil((plain.length-i)/24));type.textContent=plain.slice(0,i);if(i>=plain.length)finish();},24);}
+  bubble.onclick=finish;
+  return box;
+}
 function renderSec(){
   if(curSec>=CH.sections.length){renderEnd();return;}
   var sec=CH.sections[curSec];
   var wrap=el('div','section');
   wrap.appendChild(el('div','section-heading','<span class="section-num">'+sec.n+'</span>'+sec.heading));
-  wrap.appendChild(el('div','hook',sec.hook));
+  var reviewHook=!!(ST.done[CH.id]||ST.collected[CH.id+'.'+sec.n]);
+  wrap.appendChild(buildApoTalk(sec.hook,reviewHook));
   var host=el('div');
   var rw=function(ev){var k=CH.id+'.'+sec.n;if(ST.collected[k]){completeFeedback(host,'这关已经完成过啦');return;}ST.collected[k]=true;save();awardCoins(10,ev);completeFeedback(host,'完成！金币已入库');};
   function mountIx(){host.innerHTML='';host.appendChild(sec.build(rw,mountIx));}
