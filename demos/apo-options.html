@@ -19,12 +19,12 @@
     box-shadow:0 5px 0 #dfe4ef; display:flex; align-items:center; justify-content:space-between; gap:10px; color:var(--ink-2); font-size:13px; font-weight:800; }
   .pickbar b { color:var(--violet-d); }
   .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:18px; }
-  .card { background:#fff; border:1.5px solid var(--line); border-radius:18px; padding:14px; box-shadow:0 6px 0 #dfe4ef,0 14px 24px rgba(60,50,110,.08);
+  .apo-card { width:auto; background:#fff; border:1.5px solid var(--line); border-radius:18px; padding:14px; box-shadow:0 6px 0 #dfe4ef,0 14px 24px rgba(60,50,110,.08);
     transition:transform .18s var(--ease-bounce), box-shadow .18s; position:relative; overflow:hidden; }
-  .card:hover { transform:translateY(-4px); box-shadow:0 10px 0 #dfe4ef,0 20px 34px rgba(60,50,110,.13); }
-  .card.on { border-color:var(--correct); box-shadow:0 6px 0 var(--correct-d),0 18px 32px rgba(88,204,2,.16); }
-  .card.on::after { content:"已选"; position:absolute; top:12px; right:12px; padding:4px 9px; border-radius:999px; background:var(--correct); color:#fff; font-size:12px; font-weight:900; }
-  .stage { min-height:232px; border-radius:16px; border:1.5px solid var(--line); background:linear-gradient(160deg,#faf8ff,#eef1fb);
+  .apo-card:hover { transform:translateY(-4px); box-shadow:0 10px 0 #dfe4ef,0 20px 34px rgba(60,50,110,.13); }
+  .apo-card.on { border-color:var(--correct); box-shadow:0 6px 0 var(--correct-d),0 18px 32px rgba(88,204,2,.16); }
+  .apo-card.on::after { content:"已选"; position:absolute; top:12px; right:12px; padding:4px 9px; border-radius:999px; background:var(--correct); color:#fff; font-size:12px; font-weight:900; }
+  .apo-stage { min-height:232px; border-radius:16px; border:1.5px solid var(--line); background:linear-gradient(160deg,#faf8ff,#eef1fb);
     display:grid; grid-template-columns:124px 1fr; gap:12px; align-items:center; padding:18px 16px; overflow:hidden; }
   .meta { display:grid; gap:8px; padding:13px 2px 0; }
   .name { display:flex; align-items:center; gap:8px; font-weight:900; color:var(--ink); font-size:16px; }
@@ -38,8 +38,8 @@
   .bubble::before { content:""; position:absolute; left:-10px; top:46px; width:18px; height:18px; background:#fff; border-left:2px solid #e7e7f2; border-bottom:2px solid #e7e7f2; transform:rotate(45deg); }
   .bubble b { color:var(--violet-d); }
   .mascot { position:relative; width:116px; height:136px; margin:auto; filter:drop-shadow(0 9px 0 rgba(91,33,182,.12)); animation:floaty 2.6s ease-in-out infinite; }
-  .card:nth-child(2n) .mascot { animation-delay:-.55s; }
-  .card:nth-child(3n) .mascot { animation-delay:-1.05s; }
+  .apo-card:nth-child(2n) .mascot { animation-delay:-.55s; }
+  .apo-card:nth-child(3n) .mascot { animation-delay:-1.05s; }
   @keyframes floaty { 0%,100%{transform:translateY(3px) rotate(-1deg)} 50%{transform:translateY(-6px) rotate(1deg)} }
   @keyframes blink { 0%,88%,100%{transform:scaleY(1)} 92%{transform:scaleY(.12)} }
   @keyframes wave { 0%,100%{transform:rotate(-12deg)} 50%{transform:rotate(14deg)} }
@@ -132,7 +132,7 @@
   @media (max-width:640px) {
     .top { flex-direction:column; }
     .grid { grid-template-columns:1fr; }
-    .stage { grid-template-columns:1fr; text-align:center; }
+    .apo-stage { grid-template-columns:1fr; text-align:center; }
     .bubble::before { left:50%; top:-10px; transform:translateX(-50%) rotate(135deg); }
     .choose { justify-self:stretch; }
   }
@@ -182,22 +182,26 @@ function mascot(cls){
   return '<div class="mascot '+cls+'">'+parts[cls]+'</div>';
 }
 
-var picked=localStorage.getItem('apo-pick')||'';
+function getStore(k){try{return localStorage.getItem(k)||'';}catch(e){return '';}}
+function setStore(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+var picked=getStore('apo-pick');
 var grid=document.getElementById('grid');
 var pickedEl=document.getElementById('picked');
 function render(){
-  pickedEl.textContent=picked?OPTIONS.find(function(o){return o.id===picked;}).name:'还没选';
+  var current=OPTIONS.find(function(o){return o.id===picked;});
+  if(picked&&!current) picked='';
+  pickedEl.textContent=current?current.name:'还没选';
   grid.innerHTML='';
   OPTIONS.forEach(function(o){
     var card=document.createElement('div');
-    card.className='card'+(picked===o.id?' on':'');
-    card.innerHTML='<div class="stage">'+mascot(o.cls)+'<div class="bubble"><b>阿波：</b>'+o.say+'</div></div>'+
+    card.className='apo-card'+(picked===o.id?' on':'');
+    card.innerHTML='<div class="apo-stage">'+mascot(o.cls)+'<div class="bubble"><b>阿波：</b>'+o.say+'</div></div>'+
       '<div class="meta"><div class="name">'+o.name+' <span class="tag">'+o.tag+'</span></div>'+
       '<div class="notes"><span>适合：'+o.fit+'</span><span>风险：'+o.risk+'</span></div>'+
       '<button class="choose" type="button">选这个方向</button></div>';
     card.querySelector('.choose').onclick=function(){
       picked=o.id;
-      localStorage.setItem('apo-pick',picked);
+      setStore('apo-pick',picked);
       render();
     };
     grid.appendChild(card);
