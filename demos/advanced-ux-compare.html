@@ -13,10 +13,12 @@
   .top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px}
   h1{margin:0 0 5px;font-size:24px;line-height:1.2;font-weight:900;color:var(--ink)}
   .sub{margin:0;color:var(--ink-dim);font-size:13px;line-height:1.65;font-weight:750;max-width:850px}
+  .sub code{background:#eef1fb;color:var(--violet-d);padding:1px 5px;border-radius:6px}
   .back{height:38px;padding:0 14px;border-radius:12px;background:#fff;color:var(--violet-d);border:1.5px solid var(--line);box-shadow:0 3px 0 #dfe4ef;text-decoration:none;font-size:13px;font-weight:900;display:inline-flex;align-items:center;flex:none}
   .tabs{display:flex;gap:9px;overflow-x:auto;padding:5px 1px 13px;scrollbar-width:thin;scroll-snap-type:x proximity}
   .tabs::-webkit-scrollbar{height:6px}.tabs::-webkit-scrollbar-thumb{background:#d8d5f2;border-radius:999px}
-  .tab{flex:none;scroll-snap-align:start;border:2px solid var(--line);background:#fff;color:var(--ink-2);border-radius:999px;padding:9px 14px;font:900 12.5px/1 var(--font);cursor:pointer;white-space:nowrap;box-shadow:0 3px 0 #dfe4ef;touch-action:manipulation}
+  .tab{flex:none;scroll-snap-align:start;border:2px solid var(--line);background:#fff;color:var(--ink-2);border-radius:999px;padding:9px 14px;font:900 12.5px/1 var(--font);cursor:pointer;white-space:nowrap;box-shadow:0 3px 0 #dfe4ef;touch-action:manipulation;transition:transform .12s}
+  .tab:active{transform:translateY(2px)}
   .tab.on{color:#fff;border-color:transparent;background:linear-gradient(90deg,var(--violet),var(--cyan));box-shadow:0 4px 0 var(--violet-dd),0 10px 20px rgba(139,92,246,.2)}
   .proto-card{width:100%;max-width:none;background:#fff;border:1.5px solid var(--line);border-radius:20px;padding:16px;box-shadow:0 7px 0 #dfe4ef,0 16px 30px rgba(60,50,110,.08)}
   .head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:2px 2px 14px}
@@ -24,62 +26,83 @@
   .note{margin:5px 0 0;color:var(--ink-dim);font-size:12.5px;line-height:1.55;font-weight:750}
   .pill{flex:none;padding:5px 10px;border-radius:999px;background:#ecfeff;color:#0891b2;border:1px solid #bae6fd;font-size:12px;font-weight:900}
   .stage{position:relative;min-height:450px;border:1.5px solid var(--line);border-radius:18px;background:linear-gradient(160deg,#faf8ff,#eef1fb);padding:16px;overflow:hidden}
-  .stage-inner{min-height:416px;border:1.5px solid var(--line);border-radius:16px;background:#fff;padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;overflow:hidden}
-  .btn{appearance:none;border:none;cursor:pointer;border-radius:12px;padding:10px 16px;background:var(--correct);color:#fff;font:900 13px/1 var(--font);box-shadow:0 4px 0 var(--correct-d);touch-action:manipulation}
+  .stage-inner{position:relative;min-height:430px;border:1.5px solid var(--line);border-radius:16px;background:#fff;padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;overflow-y:auto}
+  .btn{appearance:none;border:none;cursor:pointer;border-radius:12px;padding:10px 16px;background:var(--correct);color:#fff;font:900 13px/1 var(--font);box-shadow:0 4px 0 var(--correct-d);touch-action:manipulation;transition:transform .1s,box-shadow .1s}
   .btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--correct-d)}
   .btn.v{background:linear-gradient(90deg,var(--violet),var(--cyan));box-shadow:0 4px 0 var(--violet-dd)}
+  .btn.v:active{box-shadow:0 1px 0 var(--violet-dd)}
   .btn.ghost{background:#fff;color:var(--violet-d);border:1.5px solid var(--line);box-shadow:0 3px 0 #dfe4ef}
+  .btn.ghost:active{box-shadow:0 1px 0 #dfe4ef}
+  .btn.ghost.on{background:linear-gradient(90deg,var(--violet),var(--cyan));color:#fff;border-color:transparent;box-shadow:0 4px 0 var(--violet-dd)}
+  .btn.sm{padding:7px 12px;font-size:12px}
   .row{display:flex;gap:9px;flex-wrap:wrap;justify-content:center;align-items:center}
   .grid{display:grid;gap:8px}
-  .msg{min-height:20px;color:var(--ink-2);font-size:12.5px;line-height:1.55;font-weight:850;text-align:center}
+  .msg{min-height:20px;color:var(--ink-2);font-size:12.5px;line-height:1.55;font-weight:850;text-align:center;max-width:600px}
   .small{color:var(--ink-dim);font-size:11.5px;line-height:1.45;font-weight:800}
-  .chip{padding:7px 10px;border-radius:11px;background:#fff;border:1.5px solid var(--line);box-shadow:0 3px 0 #dfe4ef;color:var(--ink-2);font-size:12px;font-weight:900}
+  .chip{padding:7px 10px;border-radius:11px;background:#fff;border:1.5px solid var(--line);box-shadow:0 3px 0 #dfe4ef;color:var(--ink-2);font-size:12px;font-weight:900;text-align:center}
   .chip.on{background:#dcfce7;border-color:var(--correct);color:#15803d;box-shadow:0 3px 0 var(--correct-d)}
   .chip.v{background:#ede9fe;border-color:#c4b5fd;color:var(--violet-d)}
   .meter{height:12px;border-radius:999px;background:#e6e9f2;overflow:hidden}
   .meter i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,var(--violet),var(--cyan),var(--correct));transition:width .2s}
   .range{width:100%;accent-color:var(--violet)}
   .svg{width:100%;max-width:760px;height:260px;overflow:visible}
-  .node{fill:#fff;stroke:#c4b5fd;stroke-width:2}
+  .node{fill:#fff;stroke:#c4b5fd;stroke-width:2;transition:fill .2s,stroke .2s}
   .node.on{fill:#f5f3ff;stroke:#8b5cf6}
   .wire{fill:none;stroke:#c4b5fd;stroke-width:3;stroke-linecap:round}
   .wire.live{stroke:#22d3ee;stroke-dasharray:8 8;animation:dash 1s linear infinite}
   @keyframes dash{to{stroke-dashoffset:-32}}
-  .txt{font:900 10px var(--font);fill:#4b4869;text-anchor:middle}
-  .tiny{font:800 8px var(--font);fill:#8b90a6;text-anchor:middle}
+  .txt{font:900 11px var(--font);fill:#4b4869;text-anchor:middle}
+  .tiny{font:800 9px var(--font);fill:#8b90a6;text-anchor:middle}
   .nav{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:14px}
-  .soft-panel{display:grid;grid-template-columns:90px minmax(190px,1fr) minmax(190px,1fr);gap:14px;width:100%;align-items:center}
-  .barline{display:grid;grid-template-columns:58px 1fr 42px;gap:8px;align-items:center;font-size:12px;font-weight:900;color:var(--ink-2)}
-  .matrix{display:grid;grid-template-columns:repeat(6,38px);gap:5px;justify-content:center}
-  .cell{width:38px;height:38px;border-radius:11px;background:#fff;border:1.5px solid #d9d6f2;box-shadow:0 3px 0 #dfe4ef;display:grid;place-items:center;font-size:12px;font-weight:900;color:var(--ink-2)}
+  .soft-panel{display:grid;grid-template-columns:84px minmax(170px,1fr) minmax(170px,1fr);gap:14px;width:100%;align-items:start}
+  .barline{display:grid;grid-template-columns:50px 1fr 42px;gap:8px;align-items:center;font-size:12px;font-weight:900;color:var(--ink-2);margin-bottom:6px}
+  .matrix{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;width:100%;max-width:300px}
+  .cell{aspect-ratio:1;border-radius:11px;background:#fff;border:1.5px solid #d9d6f2;box-shadow:0 3px 0 #dfe4ef;display:grid;place-items:center;font-size:13px;font-weight:900;color:var(--ink-2)}
   .cell.allow{background:#ccfbf1;border-color:#2dd4bf;color:#0f766e}
   .cell.lock{background:#f1f5f9;color:#94a3b8}
-  .heat{display:grid;grid-template-columns:repeat(5,42px);gap:6px;justify-content:center}
-  .heat .cell{width:42px;height:42px}
-  .split{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;align-items:stretch}
-  .panel{background:#fff;border:1.5px solid var(--line);border-radius:15px;padding:12px;box-shadow:0 4px 0 #dfe4ef}
+  .cell.cur{outline:3px solid var(--violet);outline-offset:1px}
+  .heat{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;width:100%;max-width:240px}
+  .heat .cell{cursor:pointer;transition:transform .1s}
+  .heat .cell:active{transform:scale(.94)}
+  .split{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;width:100%;align-items:stretch}
+  .controls3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:560px}
+  .panel{background:#fff;border:1.5px solid var(--line);border-radius:15px;padding:12px;box-shadow:0 4px 0 #dfe4ef;text-align:center}
   .panel h3{margin:0 0 8px;font-size:14px;color:var(--ink);font-weight:900}
   .data-pool{display:grid;grid-template-columns:repeat(auto-fit,minmax(92px,1fr));gap:8px;width:100%}
-  .data-card{border:1.5px solid var(--line);border-radius:13px;background:#fff;padding:8px;cursor:pointer;text-align:center;box-shadow:0 3px 0 #dfe4ef;font-weight:900;color:var(--ink-2);font-size:12px}
+  .data-card{border:1.5px solid var(--line);border-radius:13px;background:#fff;padding:8px;cursor:pointer;text-align:center;box-shadow:0 3px 0 #dfe4ef;font-weight:900;color:var(--ink-2);font-size:12px;transition:transform .12s}
+  .data-card:active{transform:translateY(2px)}
   .data-card.on{background:#f5f3ff;border-color:#8b5cf6;color:#6d28d9}
-  .radar{position:relative;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,#fff 0 25%,#f5f3ff 26% 55%,#ecfeff 56% 100%);border:1.5px solid var(--line)}
-  .radar .center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:76px;height:76px;border-radius:24px;background:linear-gradient(135deg,var(--violet),var(--cyan));display:grid;place-items:center;color:#fff;font-size:30px;box-shadow:0 5px 0 var(--violet-dd);font-weight:900}
-  .radar button{position:absolute;width:72px;height:54px;border:none;border-radius:16px;background:#fff;border:1.5px solid #c4b5fd;color:#6d28d9;font-weight:900;box-shadow:0 3px 0 #dfe4ef;cursor:pointer}
-  .scan-scene{display:grid;grid-template-columns:repeat(3,96px);gap:9px;justify-content:center}
-  .thing{height:76px;border-radius:16px;background:#fff;border:1.5px solid var(--line);box-shadow:0 3px 0 #dfe4ef;display:grid;place-items:center;cursor:pointer;font-size:26px;font-weight:900}
-  .thing.on{background:#ecfeff;border-color:#22d3ee}
-  .agi-matrix{display:grid;grid-template-columns:82px repeat(5,64px);gap:6px;align-items:center}
-  .agi-matrix div{min-height:36px;border-radius:10px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;text-align:center;font-size:11px;font-weight:900;color:var(--ink-2);padding:4px}
+  .scan-scene{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:9px;width:100%;max-width:440px}
+  .thing{min-height:74px;border-radius:14px;background:#fff;border:1.5px solid var(--line);box-shadow:0 3px 0 #dfe4ef;display:grid;place-items:center;cursor:pointer;font-size:24px;font-weight:900;color:var(--ink-2);transition:transform .12s}
+  .thing:active{transform:translateY(2px)}
+  .thing.on{background:#ecfeff;border-color:#22d3ee;color:#0e7490}
+  .agi-matrix{display:grid;grid-template-columns:60px repeat(5,1fr);gap:5px;width:100%;max-width:440px}
+  .agi-matrix div{min-height:34px;border-radius:9px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;text-align:center;font-size:11px;font-weight:900;color:var(--ink-2);padding:3px}
   .agi-matrix .m-on{background:#dcfce7;border-color:#58cc02;color:#15803d}
-  .console{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%}
-  .box{min-height:86px;border-radius:15px;background:#fff;border:1.5px solid var(--line);box-shadow:0 3px 0 #dfe4ef;padding:10px;text-align:center;color:var(--ink-2);font-size:12px;font-weight:850}
+  .agi-matrix .m-lbl{background:transparent;border:none;color:var(--ink-dim);justify-self:end;box-shadow:none}
+  .console{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;max-width:560px}
+  .box{min-height:78px;border-radius:14px;background:#fff;border:1.5px solid var(--line);box-shadow:0 3px 0 #dfe4ef;padding:10px;text-align:center;color:var(--ink-2);font-size:12px;font-weight:850}
   .box.on{background:#f5f3ff;border-color:#8b5cf6;color:#6d28d9}
-  .pipe{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;width:100%}
-  .pipe .box{min-width:104px}
-  .prompt-area{display:grid;grid-template-columns:180px 1fr 170px;gap:12px;width:100%}
-  .prompt-box{min-height:210px;border-radius:15px;border:1.5px solid #c4b5fd;background:#faf8ff;padding:10px;display:flex;flex-direction:column;gap:7px}
-  @media(max-width:800px){.soft-panel,.split,.prompt-area{grid-template-columns:1fr}.console{grid-template-columns:1fr 1fr}.stage-inner{justify-content:flex-start}.svg{height:220px}.agi-matrix{grid-template-columns:70px repeat(5,48px)}}
-  @media(max-width:520px){.wrap{padding:18px 10px 70px}.top{flex-direction:column}.stage{padding:10px}.stage-inner{min-height:430px;padding:12px}.matrix{grid-template-columns:repeat(6,32px)}.cell{width:32px;height:32px}.heat{grid-template-columns:repeat(5,34px)}.heat .cell{width:34px;height:34px}.scan-scene{grid-template-columns:repeat(2,92px)}.radar{width:245px;height:245px}.console{grid-template-columns:1fr}.agi-matrix{grid-template-columns:58px repeat(5,42px);gap:4px}.agi-matrix div{font-size:9px;min-height:32px}}
+  .ctxbox{width:100%;max-width:560px;padding:10px 12px;border-radius:14px;background:#f5f3ff;border:1.5px solid #c4b5fd;color:var(--violet-d);text-align:left;font-size:12px;font-weight:900}
+  .ctxbox .small{color:var(--violet-d)}
+  .pipe{position:relative;display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;width:100%;max-width:560px;margin-top:14px}
+  .pipe .box{min-width:80px;flex:1}
+  .packet{position:absolute;top:-12px;width:132px;padding:8px;border-radius:12px;background:#fff;border:2px solid var(--violet);box-shadow:0 4px 0 var(--violet-dd);transition:left .4s var(--ease-bounce);z-index:3;font-size:11px;font-weight:850;text-align:left}
+  .prompt-area{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:12px;width:100%;max-width:640px}
+  .prompt-box{min-height:190px;border-radius:15px;border:1.5px solid #c4b5fd;background:#faf8ff;padding:10px;display:flex;flex-direction:column;gap:7px;text-align:left}
+  .flowrow{display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:wrap}
+  .arrow{color:var(--violet);font-weight:900;font-size:16px}
+  .ragarea{width:100%;max-width:560px;display:flex;flex-direction:column;gap:10px}
+  .arch{display:flex;gap:5px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:6px}
+  .bigflash{position:absolute;inset:0;display:grid;place-items:center;font-size:42px;font-weight:900;z-index:9;pointer-events:none;animation:bigF .7s ease-out forwards}
+  @keyframes bigF{0%{opacity:0;transform:scale(.4)}30%{opacity:1;transform:scale(1.1)}70%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1)}}
+  @keyframes shk{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}60%{transform:translateX(8px)}}
+  .shake{animation:shk .35s ease}
+  .adv-note{width:100%;max-width:600px;margin:0 0 2px;padding:8px 11px;border-radius:11px;background:#f5f3ff;color:var(--violet-d);font-size:12px;font-weight:800;line-height:1.45;text-align:center}
+  .spark{position:fixed;pointer-events:none;font-size:18px;z-index:99;animation:sparkUp .9s ease-out forwards}
+  @keyframes sparkUp{0%{opacity:1;transform:translate(0,0) scale(.6)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.3)}}
+  @media(max-width:800px){.soft-panel,.prompt-area{grid-template-columns:1fr}.svg{height:220px}.controls3{grid-template-columns:1fr}}
+  @media(max-width:520px){.wrap{padding:18px 10px 70px}.top{flex-direction:column}.stage,.stage-inner{padding:10px}.agi-matrix{grid-template-columns:46px repeat(5,1fr)}.agi-matrix div{font-size:9px;min-height:30px}.console{grid-template-columns:1fr}.pipe .box{min-width:64px}}
 </style>
 </head>
 <body>
@@ -87,7 +110,7 @@
   <div class="top">
     <div>
       <h1>进阶课程 UX 重做原型台</h1>
-      <p class="sub">按 `ux-component-redesign-spec.md` 重做。每个 tab 是一个独立 HTML 互动/动画原型，目标是让知识点机制本身可见，而不是复用小游戏外壳。</p>
+      <p class="sub">按 <code>ux-component-redesign-spec.md</code> 重做。每个 tab 是一个独立 HTML 互动/动画原型，目标是让知识点机制本身可见，而不是复用小游戏外壳。</p>
     </div>
     <a class="back" href="index.html">返回 Demo 库</a>
   </div>
@@ -102,6 +125,7 @@
   <div class="nav"><button class="btn ghost" id="prev">← 上一个</button><button class="btn v" id="next">下一个 →</button></div>
 </div>
 <script>
+// ============ 公共工具（与主 Demo 库一致） ============
 function el(t,c,h){var e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e}
 function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
 function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t}return a}
@@ -109,6 +133,8 @@ function bar(v){return '<div class="meter"><i style="width:'+clamp(v,0,100)+'%">
 function fmt(n){return Math.round(n)}
 var timers=[];function clearTimers(){timers.forEach(clearInterval);timers=[]}
 function setTimer(fn,t){var id=setInterval(fn,t);timers.push(id);return id}
+function spark(x,y){var E=['✨','⭐','🎉','💫','🌟'];for(var i=0;i<9;i++){var s=document.createElement('div');s.className='spark';s.textContent=E[i%5];s.style.left=x+'px';s.style.top=y+'px';var a=Math.PI*2*i/9;s.style.setProperty('--dx',Math.cos(a)*66+'px');s.style.setProperty('--dy',(Math.sin(a)*66-24)+'px');document.body.appendChild(s);(function(p){setTimeout(function(){p.remove();},900);})(s);}}
+function bigFlash(stage,txt,ok){var f=document.createElement('div');f.className='bigflash';f.textContent=txt;f.style.color=ok?'#58cc02':'#ffd166';stage.appendChild(f);stage.classList.add('shake');setTimeout(function(){f.remove();stage.classList.remove('shake');},700);if(ok){var r=stage.getBoundingClientRect();spark(r.left+r.width/2,r.top+r.height/2);}}
 
 var DEMOS=[
  {id:'grad',t:'RNN S3 · 梯度消失',k:'机制动画',n:'错误信号从后往前传，越传越弱；门控模式能缓解长期信息丢失。',m:uxGradientFadeTunnel},
@@ -134,110 +160,392 @@ var cur=0, tabs=document.getElementById('tabs'), stage=document.getElementById('
 DEMOS.forEach(function(d,i){var b=el('button','tab'+(i?'':' on'),d.t);b.type='button';b.onclick=function(){show(i)};tabs.appendChild(b)});
 document.getElementById('prev').onclick=function(){show(cur-1)};
 document.getElementById('next').onclick=function(){show(cur+1)};
-function show(i){clearTimers();cur=(i+DEMOS.length)%DEMOS.length;Array.from(tabs.children).forEach(function(b,k){b.classList.toggle('on',k===cur)});tabs.children[cur].scrollIntoView({inline:'center',block:'nearest'});var d=DEMOS[cur];document.getElementById('title').textContent=d.t;document.getElementById('note').textContent=d.n;document.getElementById('kind').textContent=d.k;stage.innerHTML='';d.m(stage)}
+function show(i){clearTimers();cur=(i+DEMOS.length)%DEMOS.length;Array.from(tabs.children).forEach(function(b,k){b.classList.toggle('on',k===cur)});tabs.children[cur].scrollIntoView({inline:'center',block:'nearest'});var d=DEMOS[cur];document.getElementById('title').textContent=d.t;document.getElementById('note').textContent=d.n;document.getElementById('kind').textContent=d.k;stage.innerHTML='';stage.scrollTop=0;d.m(stage)}
 
+// ---------- RNN S3 · 梯度消失 · 反向信号衰减隧道 ----------
 function uxGradientFadeTunnel(s){
- var words=['小猫','昨天','在','沙发','睡觉'], row=el('div','row'), nums=el('div','row'), msg=el('div','msg','点击一种模式，看错误信号怎样从后往前传。');
- words.forEach(function(w){row.appendChild(el('div','chip',w))}); words.forEach(function(){nums.appendChild(el('div','chip v','0.00'))});
- var ball=el('div');ball.style.cssText='width:34px;height:34px;border-radius:50%;background:#22d3ee;box-shadow:0 0 18px rgba(34,211,238,.6);transition:.28s;position:relative';
- var lane=el('div');lane.style.cssText='width:100%;max-width:520px;height:52px;border-radius:999px;background:#eef2ff;display:flex;align-items:center;justify-content:flex-end;padding:9px';lane.appendChild(ball);
- function run(mode){var vals=mode==='gate'?[.62,.72,.82,.92,1]:[.09,.21,.38,.62,1],i=4;msg.textContent=mode==='gate'?'门控模式：信号保留得更久':'普通 RNN：越往前信号越弱';Array.from(nums.children).forEach(function(n,k){n.textContent='0.00';n.classList.remove('on')});var id=setTimer(function(){var left=(4-i)*25;ball.style.transform='translateX(-'+left+'%) scale('+(.45+vals[i]*.65)+')';ball.style.opacity=.25+vals[i]*.75;nums.children[i].textContent=vals[i].toFixed(2);nums.children[i].classList.add('on');i--;if(i<0)clearInterval(id)},420)}
- s.appendChild(row);s.appendChild(lane);s.appendChild(nums);s.appendChild(el('div','row',''));var buttons=s.lastChild;var a=el('button','btn v','普通 RNN');a.onclick=function(){run('plain')};var b=el('button','btn','门控模式');b.onclick=function(){run('gate')};buttons.append(a,b);s.appendChild(msg)
+ s.appendChild(el('div','adv-note','核心动作＝反向错误信号一格格往左传，越传越弱；门控能把早期信号留得更久。不是读句子。'));
+ var words=['小猫','昨天','在','沙发','睡觉'], nums=[], msg=el('div','msg','点一种模式，看错误信号怎样从后往前传。');
+ var chain=el('div');chain.style.cssText='display:flex;gap:10px;justify-content:center;flex-wrap:wrap';
+ words.forEach(function(w){var col=el('div');col.style.cssText='display:flex;flex-direction:column;align-items:center;gap:6px';col.appendChild(el('div','chip',w));var n=el('div','chip v','—');n.style.minWidth='56px';col.appendChild(n);chain.appendChild(col);nums.push(n)});
+ var lane=el('div');lane.style.cssText='position:relative;width:100%;max-width:560px;height:54px;border-radius:999px;background:#eef2ff;overflow:hidden';
+ var ball=el('div');ball.style.cssText='position:absolute;right:2%;top:50%;width:30px;height:30px;margin-top:-15px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#67e8f9,#22d3ee);box-shadow:0 0 18px rgba(34,211,238,.7);transition:right .42s var(--ease-bounce),transform .42s,opacity .42s';lane.appendChild(ball);
+ function run(mode){
+  clearTimers();
+  var vals=mode==='gate'?[0.62,0.72,0.82,0.92,1]:[0.09,0.21,0.38,0.62,1], i=4;
+  nums.forEach(function(n){n.textContent='0.00';n.classList.remove('on')});
+  ball.style.right='2%';ball.style.opacity=1;ball.style.transform='scale(1)';
+  msg.textContent=mode==='gate'?'门控记忆：信号保留更久，开头的词也能学到。':'普通 RNN：越往前越弱，开头的词几乎收不到学习信号。';
+  var id=setTimer(function(){
+   var v=vals[i];
+   nums[i].textContent=v.toFixed(2);nums[i].classList.add('on');
+   ball.style.right=(2+(4-i)*23)+'%';
+   ball.style.transform='scale('+(0.4+v*0.7)+')';
+   ball.style.opacity=(0.25+v*0.75);
+   i--;
+   if(i<0){clearInterval(id);setTimeout(function(){bigFlash(s,mode==='gate'?'长期依赖保留 ✓':'梯度消失 ✓',mode==='gate');},220);}
+  },440);
+ }
+ var row=el('div','row');var a=el('button','btn v','普通 RNN');a.onclick=function(){run('plain')};var b=el('button','btn','门控记忆');b.onclick=function(){run('gate')};row.append(a,b);
+ s.append(chain,lane,row,msg);
 }
+
+// ---------- 注意力 S2 · softmax 权重秤 ----------
 function uxSoftmaxScale(s){
- var scores=[-1.1,2.4,.8,1.6], names=['在','沙发','上','睡觉'], temp=1, bars=el('div'), weights=el('div'), msg=el('div','msg');
- function soft(){var ex=scores.map(function(x){return Math.exp(x/temp)}),sum=ex.reduce((a,b)=>a+b,0);return ex.map(x=>x/sum*100)}
- function draw(){bars.innerHTML='';weights.innerHTML='';var w=soft();names.forEach(function(n,i){var line=el('div','barline','<span>'+n+'</span>'+bar((scores[i]+2)/5*100)+'<span>'+scores[i].toFixed(1)+'</span>');var r=el('input');r.type='range';r.min=-2;r.max=3;r.step=.1;r.value=scores[i];r.className='range';r.oninput=function(){scores[i]=+r.value;draw()};bars.append(line,r);weights.appendChild(el('div','barline','<span>'+n+'</span>'+bar(w[i])+'<span>'+fmt(w[i])+'%</span>'))});msg.textContent='softmax 后权重总和 = '+fmt(w.reduce((a,b)=>a+b,0))+'%。Value 按这些比例混合。'}
+ s.appendChild(el('div','adv-note','核心动作＝分数经 softmax 变成总和 100% 的权重，再按权重混合 Value。拖分数柱，权重实时重算。'));
+ var scores=[-1.1,2.4,0.8,1.6], names=['在','沙发','上','睡觉'], vcols=['#38bdf8','#fb7185','#fbbf24','#a78bfa'], temp=1;
+ var bars=el('div'), weights=el('div'), mix=el('div'), msg=el('div','msg');
+ function soft(){var ex=scores.map(function(x){return Math.exp(x/temp)}),sum=ex.reduce(function(a,b){return a+b},0);return ex.map(function(x){return x/sum*100})}
+ function draw(){
+  bars.innerHTML='';weights.innerHTML='';mix.innerHTML='';
+  var w=soft();
+  names.forEach(function(n,i){
+   bars.appendChild(el('div','barline','<span>'+n+'</span>'+bar(clamp((scores[i]+2)/5*100,0,100))+'<span>'+scores[i].toFixed(1)+'</span>'));
+   var r=el('input');r.type='range';r.min=-2;r.max=3;r.step=.1;r.value=scores[i];r.className='range';r.oninput=function(){scores[i]=+r.value;draw()};bars.appendChild(r);
+   weights.appendChild(el('div','barline','<span>'+n+'</span>'+bar(w[i])+'<span>'+fmt(w[i])+'%</span>'));
+  });
+  var segs='';w.forEach(function(p,i){segs+='<div style="height:28px;display:inline-block;background:'+vcols[i]+';width:'+p+'%;transition:width .2s"></div>'});
+  mix.innerHTML='<div style="width:100%;max-width:340px;height:28px;border-radius:8px;overflow:hidden;display:flex;box-shadow:0 3px 0 #dfe4ef">'+segs+'</div><div class="small" style="margin-top:5px">↑ Value 按权重混合成的输出</div>';
+  msg.textContent='softmax 权重总和 = '+fmt(w.reduce(function(a,b){return a+b},0))+'%。高分被放大、低分被压低。';
+ }
  var tempR=el('input');tempR.type='range';tempR.min=.4;tempR.max=2;tempR.step=.1;tempR.value=1;tempR.className='range';tempR.oninput=function(){temp=+tempR.value;draw()};
- s.appendChild(el('div','soft-panel','<div class="chip on">Query<br>小猫</div><div><b>点积分数</b></div><div><b>softmax 权重</b></div>'));s.lastChild.children[1].appendChild(bars);s.lastChild.children[2].appendChild(weights);s.appendChild(el('div','small','温度：'));s.appendChild(tempR);s.appendChild(msg);draw()
+ var head=el('div','soft-panel','<div class="chip on" style="text-align:center">Query<br>小猫</div><div><b>点积分数</b><div class="small">拖动改变</div></div><div><b>softmax 权重</b><div class="small">总和 100%</div></div>');
+ head.children[1].appendChild(bars);head.children[2].appendChild(weights);
+ s.append(head,el('div','small','温度（低＝更尖锐，高＝更平均）'),tempR,mix,msg);draw();
 }
+
+// ---------- 注意力 S3 · 多头关系透镜 ----------
 function uxMultiHeadLens(s){
- var words=['小猫','在','沙发','上','睡觉'], heads=[['语法头','#8b5cf6',[0,4]],['位置头','#22d3ee',[2,3]],['动作头','#58cc02',[4,0]],['场景头','#fbbf24',[0,2]]], svg=el('div'), msg=el('div','msg','点击不同头，看它关注哪种关系。');
- svg.innerHTML='<svg class="svg" viewBox="0 0 500 220" id="mh"></svg>';var root=svg.firstChild;
- function draw(which){root.innerHTML='';words.forEach(function(w,i){root.innerHTML+='<rect class="node" x="'+(55+i*92)+'" y="150" width="62" height="38" rx="12"/><text class="txt" x="'+(86+i*92)+'" y="174">'+w+'</text>'});heads.forEach(function(h,hi){if(which!==hi&&which!=='all')return;var a=86+h[2][0]*92,b=86+h[2][1]*92;root.innerHTML='<path d="M'+a+' 150 Q250 '+(35+hi*18)+' '+b+' 150" fill="none" stroke="'+h[1]+'" stroke-width="4" stroke-linecap="round" opacity=".85"/>'+root.innerHTML});}
- var row=el('div','row');heads.forEach(function(h,i){var b=el('button','btn ghost',h[0]);b.onclick=function(){draw(i);msg.textContent=h[0]+'：只看一种关系'};row.appendChild(b)});var all=el('button','btn v','合并多头');all.onclick=function(){draw('all');msg.textContent='多头合并：多种关系同时进入下一层'};row.appendChild(all);s.append(row,svg,msg);draw(0)
+ s.appendChild(el('div','adv-note','核心动作＝不同头看不同关系，合并后句子理解更丰富。线是主角，不是卡片说明。'));
+ var words=['小猫','在','沙发','上','睡觉'];
+ var heads=[{n:'语法头',c:'#8b5cf6',links:[[0,4]]},{n:'位置头',c:'#22d3ee',links:[[1,2],[3,4]]},{n:'动作头',c:'#58cc02',links:[[0,2]]},{n:'指代头',c:'#fbbf24',links:[[0,4],[4,2]]}];
+ var svg=el('div');svg.innerHTML='<svg class="svg" viewBox="0 0 500 230" id="mh"></svg>';var root=svg.firstChild;
+ var active={0:1}, msg=el('div','msg','点不同头看它关注的关系；合并多头把多种关系叠在一起。');
+ function draw(){
+  root.innerHTML='';
+  words.forEach(function(w,i){root.innerHTML+='<rect class="node" x="'+(40+i*92)+'" y="158" width="62" height="42" rx="12"/><text class="txt" x="'+(71+i*92)+'" y="184">'+w+'</text>'});
+  Object.keys(active).forEach(function(k){
+   var h=heads[k];
+   h.links.forEach(function(pair,li){
+    var a=71+pair[0]*92,b=71+pair[1]*92;
+    root.innerHTML='<path d="M'+a+' 160 Q'+((a+b)/2)+' '+(58+li*12)+' '+b+' 160" fill="none" stroke="'+h.c+'" stroke-width="4" stroke-linecap="round" opacity=".85"/>'+root.innerHTML;
+   });
+  });
+ }
+ var chips=el('div','row');
+ heads.forEach(function(h,i){
+  var b=el('button','chip '+(active[i]?'on':''),h.n);
+  b.onclick=function(){if(active[i])delete active[i];else active[i]=1;b.classList.toggle('on',!!active[i]);draw();msg.textContent=h.n+'：'+(active[i]?'显示这种关系':'已关闭')};
+  chips.appendChild(b);
+ });
+ var ctrls=el('div','row');
+ var single=el('button','btn ghost','只开单头');single.onclick=function(){active={0:1};Array.from(chips.children).forEach(function(c,i){c.classList.toggle('on',i===0)});draw();msg.textContent='只开一个头：只能看到一种关系，信息单一。'};
+ var all=el('button','btn v','合并多头');all.onclick=function(){active={0:1,1:1,2:1,3:1};Array.from(chips.children).forEach(function(c){c.classList.add('on')});draw();msg.textContent='多头合并：多种关系同时进入下一层，理解更丰富。';bigFlash(s,'多头叠加 ✓',true)};
+ ctrls.append(single,all);
+ s.append(chips,ctrls,svg,msg);draw();
 }
+
+// ---------- Transformer S1 · 位置编码对照实验 ----------
 function uxPositionCodeLab(s){
- var bag=el('div','row'), msg=el('div','msg','先看无位置词袋：两句话的词一样，含义会混。'), on=false;
- function draw(){bag.innerHTML='';var rows=on?[['1:我','2:打','3:你','我打你'],['1:你','2:打','3:我','你打我']]:[['我','打','你','含义?'],['你','打','我','含义?']];rows.forEach(function(r){var p=el('div','panel');p.style.minWidth='230px';p.innerHTML='<h3>'+(on?'加位置编码':'无位置词袋')+'</h3>';r.forEach(function(x,i){var c=el('span','chip '+(on?'on':'v'),x);c.style.margin='4px';p.appendChild(c)});bag.appendChild(p)});msg.textContent=on?'位置条把“第几个”写进 token，两个句子分开了。':'没有位置时，并行模型只看到词集合，顺序信息丢失。'}
- var btn=el('button','btn v','切换位置编码');btn.onclick=function(){on=!on;draw()};s.append(bag,btn,msg);draw()
+ s.appendChild(el('div','adv-note','核心动作＝并行模型本身没有顺序，位置编码把「第几个」写进 token，顺序才改变含义。'));
+ var A=['我','打','你'], B=['你','打','我'], on=false, bag=el('div'), msg=el('div','msg');
+ function posC(i){return ['#38bdf8','#fb7185','#fbbf24'][i]}
+ function draw(){
+  bag.innerHTML='';
+  if(!on){
+   var p=el('div','panel');p.style.maxWidth='340px';
+   p.innerHTML='<b>无位置词袋</b><div class="small" style="margin:4px 0 8px">两句话词一样，模型只看到一个集合，顺序丢了</div>';
+   shuffle(A.concat(B)).forEach(function(w){var c=el('span','chip v');c.style.cssText='margin:3px';c.textContent=w;p.appendChild(c)});
+   bag.appendChild(p);
+   msg.textContent='没有位置时，「我打你」和「你打我」混成一袋，含义分不开。';
+  }else{
+   [['我打你',A],['你打我',B]].forEach(function(r){
+    var p=el('div','panel');p.style.maxWidth='220px';
+    p.innerHTML='<b>'+r[0]+'</b>';
+    r[1].forEach(function(w,i){var c=el('div');c.style.cssText='margin:5px;display:flex;align-items:center;gap:6px;justify-content:center';var st=el('span');st.style.cssText='width:9px;height:26px;border-radius:4px;background:'+posC(i);c.appendChild(st);c.appendChild(el('span','chip on',w));p.appendChild(c)});
+    bag.appendChild(p);
+   });
+   msg.textContent='加上位置编码，「第几个」写进 token，两句分开，含义变成「我打你」/「你打我」。';
+  }
+ }
+ var btn=el('button','btn v','加位置编码');btn.onclick=function(){on=!on;btn.textContent=on?'去掉位置编码':'加位置编码';draw();if(on)bigFlash(s,'顺序回来了 ✓',true)};
+ s.append(bag,btn,msg);draw();
 }
+
+// ---------- Transformer S2 · Block 工厂剖面图 ----------
 function uxTransformerBlockFactory(s){
- var step=0, svg=el('div'), msg=el('div','msg','走一步，看 token 穿过一个 Transformer Block。');
- svg.innerHTML='<svg class="svg" viewBox="0 0 620 250"><path id="w1" class="wire" d="M75 125 C135 55 185 55 245 125"/><path id="w2" class="wire" d="M270 125 L345 125"/><path id="w3" class="wire" d="M390 125 L470 125"/><path id="res" class="wire" d="M75 90 C235 10 340 10 470 90"/><rect id="n0" class="node on" x="30" y="92" width="90" height="66" rx="16"/><rect id="n1" class="node" x="215" y="92" width="105" height="66" rx="16"/><rect id="n2" class="node" x="340" y="92" width="80" height="66" rx="16"/><rect id="n3" class="node" x="470" y="92" width="100" height="66" rx="16"/><text class="txt" x="75" y="130">Token</text><text class="txt" x="268" y="130">Attention</text><text class="txt" x="380" y="125">Add</text><text class="tiny" x="380" y="140">Norm</text><text class="txt" x="520" y="130">FFN</text></svg>';
- function draw(){['n1','n2','n3'].forEach((id,i)=>svg.querySelector('#'+id).classList.toggle('on',step>i));['w1','res','w2','w3'].forEach((id,i)=>svg.querySelector('#'+id).classList.toggle('live',step>=i));msg.textContent=['Token 进入 block','Attention：token 互相取信息','残差旁路：原信息加回来','Add & Norm：稳定信号','FFN：逐 token 加工输出'][step]}
- var b=el('button','btn v','走一步');b.onclick=function(){step=(step+1)%5;draw()};s.append(svg,b,msg);draw()
+ s.appendChild(el('div','adv-note','核心动作＝一个 block 先 token 间交换(Attention)，再残差旁路加回原信息，最后逐 token 加工(FFN)。线流动起来。'));
+ var step=0, svg=el('div'), msg=el('div','msg','点「走一步」，看 token 穿过一个 Transformer Block。');
+ svg.innerHTML='<svg class="svg" viewBox="0 0 620 250">'+
+  '<path id="w1" class="wire" d="M90 125 C150 60 200 60 260 125"/>'+
+  '<path id="w2" class="wire" d="M285 125 L360 125"/>'+
+  '<path id="w3" class="wire" d="M405 125 L480 125"/>'+
+  '<path id="res" class="wire" d="M90 80 C250 15 360 15 480 80" stroke-dasharray="6 6"/>'+
+  '<text class="tiny" x="285" y="45">残差旁路（原信息加回来）</text>'+
+  '<rect id="n0" class="node on" x="40" y="92" width="100" height="66" rx="16"/><text class="txt" x="90" y="130">Token 行</text>'+
+  '<rect id="n1" class="node" x="225" y="92" width="115" height="66" rx="16"/><text class="txt" x="282" y="122">Attention</text><text class="tiny" x="282" y="140">token 交换</text>'+
+  '<rect id="n2" class="node" x="350" y="92" width="90" height="66" rx="16"/><text class="txt" x="395" y="122">Add</text><text class="tiny" x="395" y="140">Norm</text>'+
+  '<rect id="n3" class="node" x="480" y="92" width="100" height="66" rx="16"/><text class="txt" x="530" y="122">FFN</text><text class="tiny" x="530" y="140">逐 token</text></svg>';
+ var states=['Token 进入 block','Attention：token 之间互相取信息','Add & Norm：信号稳定','残差旁路：原信息加回来','FFN：逐 token 加工，输出到下一层'];
+ function draw(){
+  svg.querySelector('#n1').classList.toggle('on',step>=1);
+  svg.querySelector('#n2').classList.toggle('on',step>=2);
+  svg.querySelector('#n3').classList.toggle('on',step>=4);
+  svg.querySelector('#w1').classList.toggle('live',step>=1);
+  svg.querySelector('#w2').classList.toggle('live',step>=2);
+  svg.querySelector('#w3').classList.toggle('live',step>=4);
+  svg.querySelector('#res').classList.toggle('live',step>=3);
+  msg.textContent=states[step];
+ }
+ var b=el('button','btn v','走一步');b.onclick=function(){if(step<4){step++;draw();if(step===4)setTimeout(function(){bigFlash(s,'block 走完 ✓',true)},260)}else{step=0;draw()}};
+ s.append(svg,b,msg);draw();
 }
+
+// ---------- Transformer S3 · 因果遮罩 ----------
 function uxCausalMaskBoard(s){
- var gen=0, grid=el('div','matrix'), out=el('div','row'), msg=el('div','msg','蓝绿色格子表示“当前位置能看见谁”。未来格被锁住。');
- function draw(){grid.innerHTML='';for(var r=0;r<6;r++)for(var c=0;c<6;c++){var cell=el('div','cell '+(c<=r?'allow':'lock'),c<=r?'✓':'🔒');if(r>gen)cell.style.opacity=.35;grid.appendChild(cell)}out.innerHTML='';['我','喜欢','看','星星','。','✓'].forEach(function(w,i){out.appendChild(el('span','chip '+(i<=gen?'on':''),i<=gen?w:'?'))});msg.textContent='生成到第 '+(gen+1)+' 格：只能用已经生成的 token 预测下一格。'}
- var b=el('button','btn v','生成下一格');b.onclick=function(){gen=(gen+1)%6;draw()};s.append(out,grid,b,msg);draw()
+ s.appendChild(el('div','adv-note','核心动作＝自回归生成只能看过去，mask 决定每个位置能看谁。主角是 mask，不是猜词。'));
+ var N=6, gen=0, words=['我','喜','欢','看','星','星'], grid=el('div','matrix'), out=el('div','row'), msg=el('div','msg','绿格＝能看见，🔒＝未来被锁。点「生成下一格」。');
+ function draw(){
+  grid.innerHTML='';
+  for(var r=0;r<N;r++)for(var c=0;c<N;c++){
+   var allow=c<=r, cell=el('div','cell '+(allow?'allow':'lock'),allow?'✓':'🔒');
+   if(r===gen&&gen<N)cell.classList.add('cur');
+   if(r>gen)cell.style.opacity='.35';
+   cell.title='位置'+(r+1)+' '+(allow?'能看见第'+(c+1)+'个':'看不到未来的第'+(c+1)+'个');
+   grid.appendChild(cell);
+  }
+  out.innerHTML='';
+  words.forEach(function(w,i){out.appendChild(el('span','chip '+(i<gen?'on':''),i<gen?w:'?'))});
+  msg.textContent=gen===0?'还没生成：第一格只能看到自己。':'生成到第 '+gen+' 格，只能用前面的 token 预测下一格。';
+ }
+ var b=el('button','btn v','生成下一格');b.onclick=function(){if(gen<N){gen++;draw();if(gen===N)bigFlash(s,'整句生成完 ✓',true)}else{gen=0;draw()}};
+ s.append(out,grid,b,msg);draw();
 }
+
+// ---------- 大模型 S1 · 苦涩教训 ----------
 function uxBitterLessonRace(s){
- var rng=el('input'), svg=el('div'), msg=el('div','msg');rng.type='range';rng.min=0;rng.max=100;rng.value=15;rng.className='range';
- svg.innerHTML='<svg class="svg" viewBox="0 0 600 260"><path d="M55 210 L560 210 M55 35 L55 210" stroke="#e6e9f2" stroke-width="4"/><path id="rule" fill="none" stroke="#fbbf24" stroke-width="6" stroke-linecap="round"/><path id="learn" fill="none" stroke="#22d3ee" stroke-width="6" stroke-linecap="round"/><circle id="dot" r="8" fill="#8b5cf6"/><text class="txt" x="140" y="48">专家规则</text><text class="txt" x="435" y="62">通用学习</text></svg>';
- function draw(){var v=+rng.value, r='M55 150 C150 75 245 72 555 74', l='M55 208 C160 198 300 '+(190-v*.85)+' 555 '+(175-v*1.25);svg.querySelector('#rule').setAttribute('d',r);svg.querySelector('#learn').setAttribute('d',l);var x=55+v*5;svg.querySelector('#dot').setAttribute('cx',x);svg.querySelector('#dot').setAttribute('cy',v<48?155:92);msg.textContent=v<48?'早期：手写规则看起来更聪明。':'交叉后：能吃数据和算力的通用方法长期胜出。'}
- rng.oninput=draw;s.append(svg,rng,msg);draw()
+ s.appendChild(el('div','adv-note','核心动作＝拖动算力时代，看通用学习什么时候超过手写规则。是历史趋势，不是胜负游戏。'));
+ var rng=el('input');rng.type='range';rng.min=0;rng.max=100;rng.value=15;rng.className='range';
+ var svg=el('div'), msg=el('div','msg'), crossed=false;
+ svg.innerHTML='<svg class="svg" viewBox="0 0 600 260">'+
+  '<path d="M55 215 L560 215 M55 35 L55 215" stroke="#e6e9f2" stroke-width="4"/>'+
+  '<text class="tiny" x="300" y="245">算力 / 时间 →</text><text class="tiny" x="22" y="40">能力</text>'+
+  '<path id="rule" fill="none" stroke="#fbbf24" stroke-width="6" stroke-linecap="round"/>'+
+  '<path id="learn" fill="none" stroke="#22d3ee" stroke-width="6" stroke-linecap="round"/>'+
+  '<circle id="cross" r="8" fill="#fb7185" style="display:none"/>'+
+  '<text class="txt" x="150" y="48" fill="#92400e">专家规则</text><text class="txt" x="430" y="62" fill="#0e7490">通用学习</text></svg>';
+ function draw(){
+  var v=+rng.value;
+  svg.querySelector('#rule').setAttribute('d','M55 150 C150 75 245 72 555 74');
+  svg.querySelector('#learn').setAttribute('d','M55 208 C160 198 300 '+(190-v*0.85)+' 555 '+(175-v*1.25));
+  var cr=svg.querySelector('#cross');
+  if(v>=48){cr.style.display='';cr.setAttribute('cx',295);cr.setAttribute('cy',114)}
+  else cr.style.display='none';
+  if(v>=48&&!crossed){crossed=true;bigFlash(s,'苦涩交叉点 ✓',true)}
+  if(v<48)crossed=false;
+  msg.textContent=v<48?'早期：手写规则看起来更聪明，但已到平台期。':'交叉后：能吃数据和算力的通用方法长期胜出。';
+ }
+ rng.oninput=draw;s.append(svg,rng,msg);draw();
 }
+
+// ---------- 大模型 S2 · 规模控制台 ----------
 function uxScalingConsole(s){
- var vals={data:55,param:50,compute:45}, controls=el('div','split'), chart=el('div'), lights=el('div','row'), msg=el('div','msg');
- function mk(k,n){var p=el('div','panel','<h3>'+n+'</h3>');var r=el('input');r.type='range';r.min=5;r.max=100;r.value=vals[k];r.className='range';r.oninput=function(){vals[k]=+r.value;draw()};p.appendChild(r);return p}
- controls.append(mk('data','数据'),mk('param','参数'),mk('compute','算力'));chart.innerHTML='<svg class="svg" viewBox="0 0 520 190"><path d="M35 155 C150 115 260 80 485 38" fill="none" stroke="#e6e9f2" stroke-width="8" stroke-linecap="round"/><path id="curve" fill="none" stroke="#22d3ee" stroke-width="6" stroke-linecap="round"/></svg>';
- ['语言','迁移','代码','涌现'].forEach(x=>lights.appendChild(el('div','chip',x)));
- function draw(){var bal=100-(Math.max(vals.data,vals.param,vals.compute)-Math.min(vals.data,vals.param,vals.compute)),pow=(vals.data+vals.param+vals.compute)/3*.7+bal*.3,pts=[];for(var i=0;i<8;i++){pts.push((i?'L':'M')+(35+i*64)+' '+(160-Math.pow(pow/100,1.35)*(22+i*13)))}chart.querySelector('#curve').setAttribute('d',pts.join(' '));Array.from(lights.children).forEach((c,i)=>c.classList.toggle('on',pow>[25,48,68,84][i]));var warn=bal<55?'三件套失衡：会浪费或训练不稳。':'三件套比较均衡：能力提升更稳。';msg.textContent='综合能力 '+fmt(pow)+'% · '+warn}
- s.append(controls,chart,lights,msg);draw()
+ s.appendChild(el('div','adv-note','核心动作＝数据/参数/算力要配平，只堆一个会浪费。涌现能力过阈值才突然亮。'));
+ var vals={data:55,param:50,compute:45}, controls=el('div','controls3'), chart=el('div'), lights=el('div','row'), msg=el('div','msg');
+ function mk(k,n){var p=el('div','panel');p.innerHTML='<h3>'+n+'</h3>';var r=el('input');r.type='range';r.min=5;r.max=100;r.value=vals[k];r.className='range';r.oninput=function(){vals[k]=+r.value;draw()};p.appendChild(r);return p}
+ controls.append(mk('data','数据量'),mk('param','参数量'),mk('compute','算力'));
+ chart.innerHTML='<svg class="svg" viewBox="0 0 520 190"><path d="M35 158 C150 118 260 82 485 40" fill="none" stroke="#e6e9f2" stroke-width="8" stroke-linecap="round"/><path id="curve" fill="none" stroke="#22d3ee" stroke-width="6" stroke-linecap="round"/><text class="tiny" x="250" y="180">综合能力 →</text></svg>';
+ [['语言',25],['迁移',48],['代码',68],['涌现',84]].forEach(function(x){lights.appendChild(el('div','chip',x[0]))});
+ function draw(){
+  var bal=100-(Math.max(vals.data,vals.param,vals.compute)-Math.min(vals.data,vals.param,vals.compute));
+  var pow=(vals.data+vals.param+vals.compute)/3*0.7+bal*0.3;
+  var pts=[];for(var i=0;i<8;i++){pts.push((i?'L':'M')+(35+i*64)+' '+(160-Math.pow(pow/100,1.35)*(22+i*13)))}
+  chart.querySelector('#curve').setAttribute('d',pts.join(' '));
+  Array.from(lights.children).forEach(function(c,i){c.classList.toggle('on',pow>[25,48,68,84][i])});
+  msg.textContent='综合能力 '+fmt(pow)+'% · '+(bal<55?'三件套失衡：会浪费或训练不稳。':'三件套较均衡：能力提升更稳。');
+ }
+ s.append(controls,chart,lights,msg);draw();
 }
+
+// ---------- 强化学习 S3 · 价值函数热力图 ----------
 function uxValueHeatmap(s){
- var vals=Array(25).fill(0), goal=24, pit=12, grid=el('div','heat'), step=0, msg=el('div','msg','点击传播，价值从奖励格向前扩散。');vals[goal]=100;
+ s.appendChild(el('div','adv-note','核心动作＝状态价值是未来奖励的估计，从目标奖励向前回传，越远越低。'));
+ var N=5, total=N*N, goal=total-1, pit=12, vals=Array(total).fill(0), step=0, grid=el('div','heat'), msg=el('div','msg','点「传播价值」，看奖励从⭐向周围扩散。点格子看数值。');
+ vals[goal]=100;
  function col(v){var a=v/100;return 'rgb('+fmt(255-167*a)+','+fmt(255-51*a)+','+fmt(255-253*a)+')'}
- function draw(){grid.innerHTML='';vals.forEach(function(v,i){var c=el('div','cell',i===goal?'⭐':i===pit?'坑':v?fmt(v):'');c.style.background=i===pit?'#fef3c7':col(v);c.onclick=function(){msg.textContent='这个状态价值约 '+fmt(vals[i])+'：代表未来可能拿到的折扣奖励。'};grid.appendChild(c)})}
- function prop(){step++;var next=vals.slice();for(var i=0;i<25;i++){if(i===pit)continue;var r=Math.floor(i/5),c=i%5,m=next[i];[[1,0],[-1,0],[0,1],[0,-1]].forEach(function(d){var rr=r+d[0],cc=c+d[1],j=rr*5+cc;if(rr>=0&&rr<5&&cc>=0&&cc<5&&j!==pit)m=Math.max(m,vals[j]*.78)});next[i]=m}vals=next;msg.textContent='第 '+step+' 轮：价值从未来奖励回传。';draw()}
- var b=el('button','btn v','传播价值');b.onclick=prop;s.append(grid,b,msg);draw()
+ function draw(){grid.innerHTML='';vals.forEach(function(v,i){var c=el('div','cell',i===goal?'⭐':i===pit?'坑':(v?fmt(v):''));c.style.background=i===pit?'#fef3c7':col(v);c.onclick=function(){msg.textContent='这个状态价值约 '+fmt(vals[i])+'：代表从这里起未来可能拿到的折扣奖励。'};grid.appendChild(c)})}
+ function prop(){step++;var next=vals.slice();for(var i=0;i<total;i++){if(i===pit)continue;var r=Math.floor(i/N),c=i%N,m=next[i];[[1,0],[-1,0],[0,1],[0,-1]].forEach(function(d){var rr=r+d[0],cc=c+d[1],j=rr*N+cc;if(rr>=0&&rr<N&&cc>=0&&cc<N&&j!==pit)m=Math.max(m,vals[j]*0.78)});next[i]=m}vals=next;msg.textContent='第 '+step+' 轮：价值从未来奖励回传，越靠近⭐越高。';draw();if(step>=5)bigFlash(s,'价值收敛 ✓',true)}
+ var b=el('button','btn v','传播价值');b.onclick=prop;
+ s.append(grid,b,msg);draw();
 }
+
+// ---------- 机器学习 S4 · 数据诊断台 ----------
 function uxDataClinic(s){
- var pool=[['清晰猫',1,1,0,'🐱'],['黑猫',1,1,0,'🐈‍⬛'],['侧脸猫',1,1,0,'🐈'],['错标狗',0,1,0,'🐶'],['模糊图',1,0,1,'🌫️'],['重复橘猫',1,.2,0,'🐱']], sel=[], cards=el('div','data-pool'), meters=el('div','split'), msg=el('div','msg');
+ s.appendChild(el('div','adv-note','核心动作＝数据质量要拆成标签干净度/多样性/噪声，不只是好/坏。选数据→训练→看测试结果。'));
+ var pool=[['清晰猫',1,1,0,'🐱'],['黑猫',1,1,0,'🐈‍⬛'],['侧脸猫',1,1,0,'🐈'],['错标狗',0,1,0,'🐶'],['模糊图',1,0,1,'🌫️'],['重复橘猫',1,0.2,0,'🐱']], sel=[], cards=el('div','data-pool'), meters=el('div','split'), test=el('div','row'), msg=el('div','msg','选训练数据，再点训练看测试表现。');
+ var TEST=[['橘猫','🐱'],['黑猫','🐈‍⬛'],['狗','🐶'],['模糊猫','🌫️']];
  pool.forEach(function(p,i){var c=el('button','data-card',p[4]+'<br>'+p[0]);c.onclick=function(){sel[i]=!sel[i];c.classList.toggle('on',sel[i]);draw()};cards.appendChild(c)});
- function meter(n,v){return '<div class="panel"><h3>'+n+'</h3>'+bar(v)+'</div>'}
- function draw(){var chosen=pool.filter((_,i)=>sel[i]), n=chosen.length||1, clean=chosen.reduce((a,p)=>a+p[1],0)/n*100, div=chosen.reduce((a,p)=>a+p[2],0)/Math.max(1,chosen.length)*80, noise=chosen.reduce((a,p)=>a+p[3],0)/n*100;meters.innerHTML=meter('标签干净度',clean)+meter('多样性覆盖',div)+meter('噪声比例',noise);msg.textContent=chosen.length?'测试表现：'+(clean>75&&div>55&&noise<30?'黑猫/侧脸猫也能认出来。':'会偏、会错或怕模糊图。'):'先选择训练数据。'}
- s.append(cards,meters,msg);draw()
+ function meter(n,v){return '<div class="panel"><h3>'+n+'</h3>'+bar(v)+'<div class="small">'+fmt(v)+'%</div></div>'}
+ function draw(){
+  var chosen=pool.filter(function(_,i){return sel[i]}), n=chosen.length||1;
+  var clean=chosen.reduce(function(a,p){return a+p[1]},0)/n*100;
+  var div=chosen.reduce(function(a,p){return a+p[2]},0)/n*80;
+  var noise=chosen.reduce(function(a,p){return a+p[3]},0)/n*100;
+  meters.innerHTML=meter('标签干净度',clean)+meter('多样性覆盖',div)+meter('噪声比例',Math.max(0,100-noise));
+  var ok=clean>70&&div>55&&noise<30;
+  test.innerHTML='';
+  TEST.forEach(function(t){var pass=ok?true:(t[0]==='橘猫'||t[0]==='狗');test.appendChild(el('div','chip '+(pass?'on':''),t[1]+'<br><span class="small">'+(pass?'✓ 认对':'✗ 认错')+'</span>'))});
+  msg.textContent=chosen.length?('测试：'+(ok?'黑猫/侧脸猫也能认对 ✓':'会偏、会错或怕模糊图。')):'先选训练数据，再训练。';
+ }
+ var train=el('button','btn v','训练并测试');train.onclick=function(){if(sel.some(function(x){return x})){draw();var chosen=pool.filter(function(_,i){return sel[i]});var ok=chosen.reduce(function(a,p){return a+p[1]},0)/chosen.length>0.7;bigFlash(s,ok?'训练完成 ✓':'数据有问题',ok)}else{msg.textContent='先选数据再训练。'}};
+ s.append(cards,meters,el('div','small','测试集：'),test,train,msg);draw();
 }
+
+// ---------- AI 大观 S1 · 能力雷达 ----------
 function uxAICapabilityRadar(s){
- var r=el('div','radar'), msg=el('div','msg','点亮四种能力：看、学、说、做。'), seen={};r.appendChild(el('div','center','AI'));[['看','20px','105px','图片→标签'],['学','104px','18px','例子→规律'],['说','188px','105px','上文→下词'],['做','104px','205px','目标→工具']].forEach(function(x){var b=el('button',null,x[0]);b.style.left=x[1];b.style.top=x[2];b.onclick=function(){b.classList.add('on');b.style.background='#dcfce7';seen[x[0]]=1;msg.textContent=x[0]+'：'+x[3]+'。AI 是这些能力拼起来，不是魔法。'};r.appendChild(b)});s.append(r,msg)
+ s.appendChild(el('div','adv-note','核心动作＝AI 不是魔法，是看/学/说/做四种计算能力拼起来。点亮四瓣合成完整 AI。'));
+ var caps=[['看','#38bdf8','图片→模型→标签'],['学','#8b5cf6','例子→规律'],['说','#2dd4bf','上文→下词'],['做','#fb7185','目标→工具']];
+ var svg=el('div'), msg=el('div','msg','点一瓣能力，看它的输入→模型→输出。四瓣都点亮＝完整 AI。'), seen={};
+ svg.innerHTML='<svg class="svg" viewBox="0 0 400 260" id="radar"></svg>';var root=svg.firstChild;
+ function ang(i){return (-90+i*90)*Math.PI/180}
+ function draw(){
+  root.innerHTML='<circle cx="200" cy="130" r="100" fill="none" stroke="#e6e9f2" stroke-width="2"/><circle cx="200" cy="130" r="55" fill="none" stroke="#eef1fb" stroke-width="2"/><line x1="200" y1="30" x2="200" y2="230" stroke="#eef1fb" stroke-width="2"/><line x1="100" y1="130" x2="300" y2="130" stroke="#eef1fb" stroke-width="2"/>';
+  var lit=Object.keys(seen).length===4;
+  root.innerHTML+='<circle cx="200" cy="130" r="26" fill="'+(lit?'#58cc02':'#ede9fe')+'" stroke="'+(lit?'#46a302':'#c4b5fd')+'" stroke-width="2"/><text x="200" y="134" style="font-size:13px;font-weight:900;fill:'+(lit?'#fff':'#6d28d9')+';text-anchor:middle">AI</text>';
+  caps.forEach(function(c,i){
+   var a=ang(i),R=92,x=200+Math.cos(a)*R,y=130+Math.sin(a)*R,on=seen[i];
+   root.innerHTML+='<circle cx="'+x+'" cy="'+y+'" r="22" fill="'+(on?c[1]:'#fff')+'" stroke="'+c[1]+'" stroke-width="3" style="cursor:pointer" data-i="'+i+'"/>';
+   root.innerHTML+='<text x="'+x+'" y="'+(y+4)+'" style="font-size:12px;font-weight:900;fill:'+(on?'#fff':'#8b90a6')+';text-anchor:middle">'+c[0]+'</text>';
+  });
+  root.querySelectorAll('[data-i]').forEach(function(e){e.onclick=function(){var i=+e.getAttribute('data-i');seen[i]=1;draw();msg.textContent=caps[i][0]+'：'+caps[i][2]+'。';if(Object.keys(seen).length===4)bigFlash(s,'四瓣齐亮＝完整 AI ✓',true)}});
+ }
+ s.append(svg,msg);draw();
 }
+
+// ---------- AI 大观 S2 · 系统扫描 ----------
 function uxAISystemScanner(s){
- var things=[['相册识猫','📷','图片→模型→猫标签',1],['普通台灯','💡','开关→电路→亮',0],['视频推荐','📱','历史行为→模型→推荐',1],['闹钟','⏰','时间规则→响铃',0],['智能音箱','🔊','语音→模型→回答',1]], scene=el('div','scan-scene'), msg=el('div','msg','点物品，看内部流程。');
- things.forEach(function(t){var b=el('button','thing',t[1]+'<br><span class="small">'+t[0]+'</span>');b.onclick=function(){Array.from(scene.children).forEach(x=>x.classList.remove('on'));b.classList.add('on');msg.innerHTML='<b>'+t[0]+'</b>：'+t[2]+' · '+(t[3]?'有模型预测/生成，是 AI。':'固定规则，不算 AI。')};scene.appendChild(b)});s.append(scene,msg)
+ s.appendChild(el('div','adv-note','核心动作＝判断是不是 AI，要看内部有没有模型预测/生成/推荐，而不是看外壳。'));
+ var things=[['相册识猫','📷','图片','模型','猫标签',1],['普通台灯','💡','开关','电路','亮',0],['视频推荐','📱','你的行为','推荐模型','推荐',1],['闹钟','⏰','设定时间','计时芯片','响铃',0],['智能音箱','🔊','语音','语言模型','回答',1]];
+ var scene=el('div','scan-scene'), flow=el('div','panel'), msg=el('div','msg','点一个物品，看它内部怎么运作。');
+ things.forEach(function(t){
+  var b=el('button','thing',t[1]+'<br><span class="small">'+t[0]+'</span>');
+  b.onclick=function(){Array.from(scene.children).forEach(function(x){x.classList.remove('on')});b.classList.add('on');
+   flow.innerHTML='<h3>'+t[0]+' 内部</h3><div class="flowrow"><span class="chip v">'+t[2]+'</span><span class="arrow">→</span><b style="color:'+(t[5]?'#0891b2':'#92400e')+'">'+t[3]+'</b><span class="arrow">→</span><span class="chip '+(t[5]?'on':'')+'">'+t[4]+'</span></div><div class="small" style="margin-top:8px">'+(t[5]?'中间有模型在预测/识别 → 算 AI。':'只有固定规则/电路 → 不算 AI。')+'</div>';
+   msg.textContent=t[0]+'：'+(t[5]?'是 AI（内部有模型）':'不是 AI（固定规则）');};
+   scene.appendChild(b);
+ });
+ s.append(scene,flow,msg);scene.children[0].click();
 }
+
+// ---------- AGI S1 · 能力迁移矩阵 ----------
 function uxAGIMatrix(s){
+ s.appendChild(el('div','adv-note','核心动作＝AGI 不只是会聊天，而是跨任务迁移/执行/可靠都要稳。矩阵呈现边界，不神化。'));
  var modes={narrow:[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0],llm:[1,1,1,0,1,1,1,1,0,0,1,1,0,0,0],agi:[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]}, mode='llm', grid=el('div','agi-matrix'), msg=el('div','msg');
- function draw(){grid.innerHTML='<div></div><div>语言</div><div>图像</div><div>数学</div><div>机器人</div><div>计划</div>';['理解','迁移','可靠'].forEach(function(r,ri){grid.appendChild(el('div',null,r));for(var c=0;c<5;c++){grid.appendChild(el('div',modes[mode][ri*5+c]?'m-on':'',modes[mode][ri*5+c]?'亮':'空'))}});msg.textContent=mode==='narrow'?'窄 AI：只擅长一类任务。':mode==='llm'?'今天的大模型：跨域更强，但执行和可靠性有缺口。':'理想 AGI：跨任务迁移、执行、可靠都稳定。'}
- var row=el('div','row');[['narrow','窄 AI'],['llm','大模型'],['agi','理想 AGI']].forEach(function(x){var b=el('button','btn ghost',x[1]);b.onclick=function(){mode=x[0];draw()};row.appendChild(b)});s.append(row,grid,msg);draw()
+ function draw(){
+  grid.innerHTML='<div class="m-lbl"></div><div>语言</div><div>图像</div><div>数学</div><div>机器人</div><div>计划</div>';
+  ['理解','迁移','可靠'].forEach(function(r,ri){grid.appendChild(el('div','m-lbl',r));for(var c=0;c<5;c++){var on=modes[mode][ri*5+c];grid.appendChild(el('div',on?'m-on':'',on?'✓':'·'))}});
+  msg.textContent=mode==='narrow'?'窄 AI：只擅长一类任务，换一个就不会。':mode==='llm'?'今天的大模型：跨域更强，但执行和可靠性还有缺口。':'理想 AGI：迁移、执行、可靠都稳定过关。';
+ }
+ var row=el('div','row');[['narrow','窄 AI'],['llm','大模型'],['agi','理想 AGI']].forEach(function(x){var b=el('button','btn ghost'+(mode===x[0]?' on':''),x[1]);b.onclick=function(){mode=x[0];Array.from(row.children).forEach(function(c){c.classList.remove('on')});b.classList.add('on');draw()};row.appendChild(b)});
+ s.append(row,grid,msg);draw();
 }
+
+// ---------- Agent S2 · ReAct 控制台 ----------
 function uxReActConsole(s){
- var boxes={}, step=0, data=[['Thought','先查天气，再判断能不能出门'],['Action','调用天气工具：北京今天'],['Observation','返回：小雨，风力 3 级'],['Context','把“小雨”写回上下文'],['Thought','建议带伞，或改室内活动']], msg=el('div','msg','每轮观察结果会写回上下文，改变下一步。');
- var con=el('div','console');['Thought','Action','Observation','Context'].forEach(function(x){boxes[x]=el('div','box','<b>'+x+'</b><br><span class="small">等待</span>');con.appendChild(boxes[x])});
- var b=el('button','btn v','下一步');b.onclick=function(){var d=data[step%data.length];boxes[d[0]].classList.add('on');boxes[d[0]].innerHTML='<b>'+d[0]+'</b><br><span>'+d[1]+'</span>';msg.textContent=d[0]+' 更新了。';step++};s.append(con,b,msg)
+ s.appendChild(el('div','adv-note','核心动作＝ReAct 是闭环：观察写回上下文，改变下一轮思考。不是单向流水线。'));
+ var SEQ=[['Thought','下雨能出门运动吗？先查天气'],['Action','天气工具：北京今天'],['Observation','小雨，风力 3 级'],['Context','记下：今天小雨'],['Thought','下雨不适合户外→查室内场馆'],['Action','查附近室内场馆'],['Observation','附近体育馆开放'],['Context','追加：有室内场馆'],['Thought','建议去体育馆打球']], i=0, boxes={}, msg=el('div','msg','点「下一步」，看观察怎样写回上下文、改变下一轮思考。');
+ var con=el('div','console');['Thought','Action','Observation'].forEach(function(x){boxes[x]=el('div','box','<b>'+x+'</b><br><span class="small">待开始</span>');con.appendChild(boxes[x])});
+ var ctx=el('div','ctxbox');ctx.innerHTML='<b>🧠 上下文 Context</b><div class="small" id="ctxlist" style="min-height:36px">（空）</div>';
+ function draw(){
+  if(i>=SEQ.length){msg.textContent='完成：每轮观察都写回上下文，下一轮思考引用了它。';bigFlash(s,'闭环完成 ✓',true);return}
+  var step=SEQ[i], box=boxes[step[0]];
+  if(box){box.classList.add('on');box.innerHTML='<b>'+step[0]+'</b><br><span>'+step[1]+'</span>';msg.textContent=step[0]+'：'+step[1]+(step[0]==='Thought'&&i>=4?'（引用了上面的观察）':'');}
+  if(step[0]==='Context'){var list=document.getElementById('ctxlist');list.innerHTML=(list.textContent==='（空）'?'':list.innerHTML)+'<div>• '+step[1]+'</div>';msg.textContent='🧠 上下文更新：'+step[1]+'；下一轮思考会用到它。';}
+  i++;
+ }
+ var b=el('button','btn v','下一步');b.onclick=draw;
+ var rb=el('button','btn ghost','重置');rb.onclick=function(){i=0;['Thought','Action','Observation'].forEach(function(x){boxes[x].classList.remove('on');boxes[x].innerHTML='<b>'+x+'</b><br><span class="small">待开始</span>'});document.getElementById('ctxlist').innerHTML='（空）';msg.textContent='已重置，再走一遍闭环。'};
+ var ctrls=el('div','row');ctrls.append(b,rb);
+ s.append(con,ctx,ctrls,msg);
 }
+
+// ---------- Agent S3 · RAG 管道 ----------
 function uxRAGPipeline(s){
- var steps=['文档切块','向量化','相似检索','放入上下文','基于资料回答'], i=0, pipe=el('div','pipe'), msg=el('div','msg','RAG 不是把资料背进模型，而是检索后塞进上下文。');
- steps.forEach(function(x){pipe.appendChild(el('div','box','<b>'+x+'</b><br><span class="small">等待</span>'))});
- var b=el('button','btn v','走一步');b.onclick=function(){var box=pipe.children[i%steps.length];box.classList.add('on');box.innerHTML='<b>'+steps[i%steps.length]+'</b><br><span>完成</span>';msg.textContent=steps[i%steps.length]+'：资料离回答更近一步。';i++};s.append(pipe,b,msg)
+ s.appendChild(el('div','adv-note','核心动作＝RAG 检索后把资料塞进上下文槽，模型只看槽里回答。资料不进脑子，进上下文。'));
+ var CHUNKS=[['小猫喜欢在沙发睡觉','#38bdf8',0.2],['沙发在客厅','#fbbf24',0.15],['小猫怕打雷','#fb7185',0.95],['客厅有窗户','#a78bfa',0.1]];
+ var step=0, area=el('div','ragarea'), msg=el('div','msg','点「下一步」走完 RAG 管道。');
+ function draw(){
+  area.innerHTML='';
+  if(step===0){area.innerHTML='<div class="panel"><b>📄 原始文档</b><div class="small" style="margin-top:6px">小猫喜欢在沙发睡觉。沙发在客厅。小猫怕打雷。客厅有窗户。</div></div>';msg.textContent='第 1 步：一篇长文档。';}
+  else if(step===1){var p=el('div','panel');p.innerHTML='<b>✂️ 切块</b>';CHUNKS.forEach(function(c,i){var chip=el('div','chip v');chip.style.cssText='margin:3px';chip.textContent='资料片 '+(i+1);p.appendChild(chip)});area.appendChild(p);msg.textContent='第 2 步：文档切成资料片。';}
+  else if(step===2){var p=el('div','panel');p.innerHTML='<b>🔢 向量化</b><div class="small">每片变成一个坐标点</div>';CHUNKS.forEach(function(c){var d=el('div');d.style.cssText='display:inline-block;width:18px;height:18px;border-radius:50%;background:'+c[1]+';margin:3px;box-shadow:0 2px 4px rgba(0,0,0,.1)';p.appendChild(d)});area.appendChild(p);msg.textContent='第 3 步：资料片变成向量点。';}
+  else if(step===3){var p=el('div','panel');p.innerHTML='<b>🔍 相似检索</b><div class="small">问题：小猫怕什么？</div>';CHUNKS.forEach(function(c,i){var hit=c[2]>0.5;var chip=el('div','chip '+(hit?'on':''));chip.style.cssText='margin:3px;opacity:'+(hit?'1':'.45');chip.textContent='片'+(i+1)+(hit?' ✓ 相似':'');p.appendChild(chip)});area.appendChild(p);msg.textContent='第 4 步：和问题最像的资料片被检索出来。';}
+  else if(step===4){var p=el('div','ctxbox');p.innerHTML='<b>🧠 上下文槽</b>';CHUNKS.filter(function(c){return c[2]>0.5}).forEach(function(c){var chip=el('div','chip on');chip.style.cssText='margin:3px;text-align:left';chip.textContent=c[0];p.appendChild(chip)});area.appendChild(p);msg.textContent='第 5 步：检索到的资料塞进上下文槽，不进模型脑子。';}
+  else{area.innerHTML='<div class="panel"><b>💬 模型回答</b><div style="margin-top:6px;font-weight:900;color:var(--correct-d)">小猫怕打雷。⚡</div><div class="small" style="margin-top:6px">（只根据上下文槽里的资料回答，没有瞎编）</div></div>';msg.textContent='第 6 步：模型只看槽里资料 → 回答有据可查。';bigFlash(s,'有据回答 ✓',true);}
+ }
+ var b=el('button','btn v','下一步');b.onclick=function(){if(step<5){step++;draw()}else{step=0;draw()}};
+ s.append(area,b,msg);draw();
 }
+
+// ---------- 上手 AI S1 · API 请求包旅行 ----------
 function uxAPIRequestTrip(s){
- var pipe=el('div','pipe'), msg=el('div','msg','填 prompt 后发送，请求包会经过后端再到模型服务。');['前端','后端','模型服务','响应'].forEach(x=>pipe.appendChild(el('div','box','<b>'+x+'</b><br><span class="small">等待</span>')));var req=el('div','panel','<h3>请求包</h3><div class="small">model: gpt<br>messages: 你好<br>temperature: 0.7<br>key: 后端补上</div>'), i=0;
- var b=el('button','btn v','发送/下一站');b.onclick=function(){Array.from(pipe.children).forEach((x,k)=>x.classList.toggle('on',k<=i));msg.textContent=['前端打包 prompt','后端验证并补 Key','模型服务生成回答','返回 output / usage / status'][i%4];i=(i+1)%4};s.append(req,pipe,b,msg)
+ s.appendChild(el('div','adv-note','核心动作＝请求包是结构化的：字段从前端到后端补 Key，再到模型，最后返回响应包。'));
+ var ST=['前端','后端','模型服务','响应'], stage=0, errMode=false;
+ var inp=el('input');inp.type='text';inp.value='写一首关于猫的诗';inp.style.cssText='width:100%;max-width:340px;padding:8px 10px;border-radius:10px;border:1.5px solid var(--line);font-family:var(--font);font-weight:800';
+ var wrap=el('div');wrap.style.cssText='position:relative;width:100%;max-width:560px';
+ var pipe=el('div','pipe');ST.forEach(function(x){pipe.appendChild(el('div','box','<b>'+x+'</b>'))});
+ var pkt=el('div','packet');pkt.innerHTML='<b>请求包</b>';wrap.appendChild(pipe);wrap.appendChild(pkt);
+ var msg=el('div','msg','填 prompt，点发送看请求包旅行。缺 Key 会失败。');
+ function draw(){
+  if(errMode&&stage>=1){pkt.style.left='32%';pkt.innerHTML='<b>✗ 被拦截</b><div class="small" style="color:#b45309">401：后端没有 Key</div>';msg.textContent='缺 Key：请求在后端被拦截 → 401。';return}
+  pkt.style.left=['2%','34%','66%','92%'][stage];
+  if(stage===0)pkt.innerHTML='<b>请求包</b><div class="small">model: gpt<br>messages: '+(inp.value||'你好').slice(0,10)+'…<br>temperature: .7<br>key: 待补</div>';
+  else if(stage===1)pkt.innerHTML='<b>请求包</b><div class="small">+ key: sk-***（后端补上）<br>→ 转发给模型</div>';
+  else if(stage===2)pkt.innerHTML='<b>⏳ 生成中</b><div class="small">模型用请求包里的字段算…</div>';
+  else pkt.innerHTML='<b>响应包</b><div class="small">output: "喵喵…" ✓<br>usage: 120 tokens<br>status: 200 OK</div>';
+  msg.textContent=['前端打包 prompt','后端验证并补 Key','模型服务生成回答','返回响应包：output / usage / status'][stage];
+ }
+ var send=el('button','btn v','发送 / 下一站');send.onclick=function(){if(errMode){stage=stage>=1?0:1;}else{stage=stage>=3?0:stage+1;}draw();if(errMode&&stage===1)msg.textContent='缺 Key：请求在后端被拦截 → 401。';if(!errMode&&stage===3)bigFlash(s,'200 OK ✓',true)};
+ var err=el('button','btn ghost','缺 Key 模式');err.onclick=function(){errMode=!errMode;err.classList.toggle('on',errMode);err.textContent=errMode?'恢复 Key':'缺 Key 模式';stage=0;draw()};
+ var ctrls=el('div','row');ctrls.append(send,err);
+ s.append(inp,wrap,ctrls,msg);draw();
 }
+
+// ---------- 上手 AI S2 · Key 泄漏模拟器 ----------
 function uxKeyLeakSimulator(s){
+ s.appendChild(el('div','adv-note','核心动作＝API Key 是调用权限，放前端会暴露；正确做法是后端代理。看源码就知道。'));
  var mode='bad', cost=0, view=el('div','split'), msg=el('div','msg');
- function draw(){view.innerHTML='';var bad=el('div','panel','<h3>错误架构</h3><div class="small">浏览器源码：<br><b style="color:#b45309">sk-live-123...</b><br>任何人都能复制</div>'), good=el('div','panel','<h3>正确架构</h3><div class="small">浏览器 → 自家后端 → 模型<br>Key 只在后端环境变量里</div>');bad.classList.toggle('on',mode==='bad');good.classList.toggle('on',mode==='good');view.append(bad,good);msg.textContent=mode==='bad'?'泄漏模式：别人复制 Key 后，费用 $'+cost+'。':'安全模式：前端看不到 Key，只能请求受控后端。'}
- var row=el('div','row'), leak=el('button','btn ghost','别人复制 Key'), sw=el('button','btn v','切换架构');leak.onclick=function(){if(mode==='bad')cost+=12;draw()};sw.onclick=function(){mode=mode==='bad'?'good':'bad';draw()};row.append(leak,sw);s.append(view,row,msg);draw()
+ function draw(){
+  view.innerHTML='';
+  var bad=el('div','panel');bad.style.borderColor=mode==='bad'?'#fb7185':'';bad.innerHTML='<h3>✗ 错误架构</h3><div class="arch"><span class="chip v">浏览器</span><span class="arrow">→</span><b style="color:#dc2626">直接带 Key</b><span class="arrow">→</span><span class="chip">模型</span></div><div class="small" style="margin-top:6px">源码里能看到 <b style="color:#b45309">sk-live-123…</b></div>';
+  var good=el('div','panel');good.style.borderColor=mode==='good'?'var(--correct)':'';good.innerHTML='<h3>✓ 正确架构</h3><div class="arch"><span class="chip v">浏览器</span><span class="arrow">→</span><span class="chip on">自家后端</span><span class="arrow">→</span><span class="chip">模型</span></div><div class="small" style="margin-top:6px">Key 只在后端环境变量，前端看不到</div>';
+  view.append(bad,good);
+  msg.textContent=mode==='bad'?'泄漏模式：别人复制 Key 后，费用 $'+cost+'。':'安全模式：前端看不到 Key，只能请求受控后端。';
+ }
+ var leak=el('button','btn ghost','别人复制 Key');leak.onclick=function(){if(mode==='bad'){cost+=12;draw();bigFlash(s,'Key 被盗用！',false)}};
+ var sw=el('button','btn v','切换架构');sw.onclick=function(){mode=mode==='bad'?'good':'bad';cost=0;draw();if(mode==='good')bigFlash(s,'Key 藏好了 ✓',true)};
+ var ctrls=el('div','row');ctrls.append(leak,sw);
+ s.append(view,ctrls,msg);draw();
 }
+
+// ---------- 上手 AI S3 · Prompt 搭建器 ----------
 function uxPromptBuilder(s){
- var blocks=[['目标','写一封邀请信'],['背景','给同学参加科学节'],['格式','三段，每段不超过两句'],['限制','语气友好，不夸张'],['示例','例：大家好，我想邀请你...']], used=[], left=el('div'), mid=el('div','prompt-box'), score=el('div','panel'), msg=el('div','msg','把提示词积木加入中间，观察输出稳定度。');
- left.className='panel';left.innerHTML='<h3>积木块</h3>';blocks.forEach(function(b,i){var bt=el('button','btn ghost',b[0]);bt.style.margin='4px';bt.onclick=function(){if(used.indexOf(i)<0){used.push(i);draw()}};left.appendChild(bt)});
- function draw(){mid.innerHTML='';used.forEach(i=>mid.appendChild(el('div','chip on','<b>'+blocks[i][0]+'</b>：'+blocks[i][1])));var v=used.length*20;score.innerHTML='<h3>输出稳定度</h3>'+bar(v)+'<div class="small">'+(v<40?'容易跑题':v<80?'结构逐渐稳定':'格式清楚，输出稳定')+'</div>';msg.textContent=used.indexOf(4)>=0?'few-shot 示例正在锁定输出格式。':'加入示例后，模型更容易照格式输出。'}
- s.appendChild(el('div','prompt-area',''));s.firstChild.append(left,mid,score);s.appendChild(msg);draw()
+ s.appendChild(el('div','adv-note','核心动作＝好提示词由目标/背景/格式/限制/示例组成。few-shot 示例能锁住输出格式。'));
+ var blocks=[['目标','写一封邀请信','#38bdf8'],['背景','给同学参加科学节','#a78bfa'],['格式','三段每段不超两句','#22d3ee'],['限制','语气友好不夸张','#fbbf24'],['示例','例：大家好，我想邀请你...','#fb7185']], used=[], msg=el('div','msg');
+ var area=el('div','prompt-area');var left=el('div','panel');left.innerHTML='<h3>积木块</h3><div class="small">点一下加入</div>';
+ var mid=el('div','prompt-box');var score=el('div','panel');
+ blocks.forEach(function(b,i){var bt=el('button','btn ghost sm',b[0]);bt.style.cssText='margin:4px 0;width:100%';bt.onclick=function(){if(used.indexOf(i)<0){used.push(i);draw()}};left.appendChild(bt)});
+ function draw(){
+  mid.innerHTML='<b>提示词</b>';
+  used.forEach(function(i){var c=el('div','chip on');c.style.cssText='border-color:'+blocks[i][2]+';color:'+blocks[i][2]+';text-align:left';c.innerHTML='<b>'+blocks[i][0]+'</b>：'+blocks[i][1]+' <span style="float:right;cursor:pointer;color:#dc2626">✕</span>';c.onclick=function(){used.splice(used.indexOf(i),1);draw()};mid.appendChild(c)});
+  var v=Math.min(100,used.length*15+(used.indexOf(2)>=0?15:0)+(used.indexOf(4)>=0?30:0)+(used.indexOf(0)>=0?10:0));
+  var preview=used.indexOf(4)>=0?'<div class="small" style="margin-top:6px">💬 输出：「大家好，我想邀请你…」（照示例格式）</div>':v>=40?'<div class="small" style="margin-top:6px">💬 输出：结构稳定</div>':'<div class="small" style="margin-top:6px">💬 输出：容易跑题</div>';
+  score.innerHTML='<h3>输出稳定度</h3>'+bar(v)+'<div class="small">'+(v<40?'容易跑题':v<80?'结构逐渐稳定':'格式锁定，输出稳定')+' · '+fmt(v)+'%</div>'+preview;
+  msg.textContent=used.indexOf(4)>=0?'few-shot 示例正在锁定输出格式。':'加入示例（few-shot）后，模型更容易照格式输出。';
+ }
+ area.append(left,mid,score);s.append(area,msg);draw();
 }
+
 show(0);
 </script>
 </body>
