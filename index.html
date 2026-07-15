@@ -27,20 +27,20 @@
   .anchor-line{font-size:13px;color:#8b5cf6;font-weight:800;text-align:center;margin-top:12px;padding-top:10px;border-top:1px dashed #ece9f7;}
   .hook{background:linear-gradient(135deg,#fef9ff,#eef1fb);border:1.5px solid #ece9f7;border-left:4px solid var(--violet);border-radius:12px;padding:12px 14px;font-size:14.5px;color:#4b4869;line-height:1.6;margin-bottom:14px;}
   .hook b{color:#6d28d9;}
-  .apo-talk{display:grid;grid-template-columns:74px 1fr;gap:10px;align-items:end;margin:2px 0 16px;animation:fadeUp .35s ease both;}
-  .apo-bot{position:relative;width:66px;height:74px;align-self:end;filter:drop-shadow(0 8px 10px rgba(109,40,217,.12));animation:apoFloat 2.8s ease-in-out infinite;}
-  .apo-bot:before{content:"";position:absolute;left:10px;right:10px;top:13px;height:44px;border-radius:18px 18px 16px 16px;background:linear-gradient(180deg,#fff,#eef6ff);border:2px solid #c4b5fd;box-shadow:inset 0 -5px 0 rgba(139,92,246,.08);}
-  .apo-bot:after{content:"";position:absolute;left:20px;right:20px;bottom:4px;height:14px;border-radius:999px;background:#c4b5fd;box-shadow:0 3px 0 #8b5cf6;}
-  .apo-ant{position:absolute;left:31px;top:0;width:4px;height:15px;border-radius:99px;background:#8b5cf6;transform-origin:bottom;animation:apoWiggle 1.4s ease-in-out infinite;}
-  .apo-ant:after{content:"";position:absolute;left:-5px;top:-8px;width:14px;height:14px;border-radius:50%;background:#ffd66d;box-shadow:0 0 0 3px rgba(255,214,109,.28);}
-  .apo-eye{position:absolute;top:29px;width:12px;height:14px;border-radius:8px;background:#1e1b3a;z-index:2;animation:apoBlink 4.6s infinite;}
+  .apo-talk{display:grid;grid-template-columns:86px 1fr;gap:12px;align-items:end;margin:2px 0 16px;animation:fadeUp .35s ease both;}
+  .apo-bot{position:relative;width:78px;height:86px;align-self:end;filter:drop-shadow(0 10px 12px rgba(109,40,217,.16));animation:apoFloat 2.8s ease-in-out infinite;}
+  .apo-bot:before{content:"";position:absolute;left:7px;right:7px;top:10px;height:58px;border-radius:31px 31px 25px 25px;background:radial-gradient(circle at 28% 24%,#fff 0 18%,transparent 19%),linear-gradient(180deg,#fdfcff 0%,#eef7ff 58%,#e6e9ff 100%);border:3px solid #c4b5fd;box-shadow:inset 0 -7px 0 rgba(139,92,246,.10),0 3px 0 #a78bfa;}
+  .apo-bot:after{content:"";position:absolute;left:21px;right:21px;bottom:3px;height:25px;border-radius:18px 18px 20px 20px;background:linear-gradient(180deg,#a78bfa,#8b5cf6);box-shadow:inset 0 -4px 0 rgba(30,27,58,.12),0 4px 0 #6d28d9;}
+  .apo-ant{position:absolute;left:37px;top:0;width:5px;height:15px;border-radius:99px;background:#8b5cf6;transform-origin:bottom;animation:apoWiggle 1.6s ease-in-out infinite;}
+  .apo-ant:after{content:"";position:absolute;left:-6px;top:-10px;width:17px;height:17px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff7b8 0 20%,#ffd66d 22% 100%);box-shadow:0 0 0 4px rgba(255,214,109,.25),0 3px 0 #eab308;}
+  .apo-eye{position:absolute;top:32px;width:15px;height:18px;border-radius:50%;background:#1e1b3a;z-index:3;animation:apoBlink 4.6s infinite;box-shadow:inset 3px 3px 0 rgba(255,255,255,.92);}
   .apo-eye.l{left:22px}.apo-eye.r{right:22px}
-  .apo-cheek{position:absolute;top:43px;width:9px;height:5px;border-radius:999px;background:#fca5a5;z-index:2;opacity:.8}
-  .apo-cheek.l{left:17px}.apo-cheek.r{right:17px}
-  .apo-mouth{position:absolute;left:29px;top:45px;width:9px;height:5px;border-radius:0 0 10px 10px;border-bottom:2px solid #6d28d9;z-index:2;animation:apoMouth .42s steps(2,end) infinite;}
-  .apo-arm{position:absolute;top:40px;width:15px;height:6px;border-radius:999px;background:#8b5cf6;z-index:1;transform-origin:center;}
-  .apo-arm.l{left:1px;transform:rotate(-25deg);animation:apoArmL 1.6s ease-in-out infinite;}
-  .apo-arm.r{right:1px;transform:rotate(25deg);animation:apoArmR 1.6s ease-in-out infinite;}
+  .apo-cheek{position:absolute;top:51px;width:12px;height:7px;border-radius:999px;background:#fda4af;z-index:3;opacity:.86}
+  .apo-cheek.l{left:16px}.apo-cheek.r{right:16px}
+  .apo-mouth{position:absolute;left:34px;top:53px;width:12px;height:7px;border-radius:0 0 12px 12px;background:#6d28d9;z-index:3;animation:apoMouth .46s steps(2,end) infinite;}
+  .apo-arm{position:absolute;top:48px;width:22px;height:10px;border-radius:999px;background:#a78bfa;z-index:0;transform-origin:center;box-shadow:0 3px 0 #7c3aed;}
+  .apo-arm.l{left:-4px;transform:rotate(-25deg);animation:apoArmL 1.7s ease-in-out infinite;}
+  .apo-arm.r{right:-4px;transform:rotate(25deg);animation:apoArmR 1.7s ease-in-out infinite;}
   .apo-bubble{position:relative;min-height:54px;background:#fff;border:2px solid #e6e9f2;border-radius:18px;padding:12px 14px 13px;box-shadow:0 5px 0 #dfe4ef;color:#4b4869;font-size:14.5px;line-height:1.65;font-weight:650;}
   .apo-bubble:before{content:"";position:absolute;left:-10px;bottom:18px;width:18px;height:18px;background:#fff;border-left:2px solid #e6e9f2;border-bottom:2px solid #e6e9f2;transform:rotate(45deg);border-radius:4px;}
   .apo-name{display:inline-flex;align-items:center;gap:4px;margin-right:4px;color:#6d28d9;font-weight:900;}
@@ -51,11 +51,11 @@
   @keyframes apoFloat{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-5px) rotate(1deg)}}
   @keyframes apoWiggle{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(10deg)}}
   @keyframes apoBlink{0%,92%,100%{transform:scaleY(1)}94%,96%{transform:scaleY(.12)}}
-  @keyframes apoMouth{0%,100%{height:4px}50%{height:8px}}
-  @keyframes apoArmL{0%,100%{transform:rotate(-25deg)}50%{transform:rotate(-42deg) translateY(-1px)}}
-  @keyframes apoArmR{0%,100%{transform:rotate(25deg)}50%{transform:rotate(46deg) translateY(-2px)}}
+  @keyframes apoMouth{0%,100%{transform:scaleY(.65)}50%{transform:scaleY(1.15)}}
+  @keyframes apoArmL{0%,100%{transform:rotate(-22deg)}50%{transform:rotate(-40deg) translateY(-2px)}}
+  @keyframes apoArmR{0%,100%{transform:rotate(24deg)}50%{transform:rotate(52deg) translateY(-4px)}}
   @keyframes apoCursor{0%,49%{opacity:1}50%,100%{opacity:0}}
-  @media (max-width:560px){.apo-talk{grid-template-columns:58px 1fr;gap:8px}.apo-bot{width:54px;height:64px;transform:scale(.88);transform-origin:left bottom}.apo-bubble{font-size:14px;padding:11px 12px}.apo-bubble:before{left:-8px}}
+  @media (max-width:560px){.apo-talk{grid-template-columns:66px 1fr;gap:8px}.apo-bot{width:62px;height:72px;transform:scale(.86);transform-origin:left bottom}.apo-bubble{font-size:14px;padding:11px 12px}.apo-bubble:before{left:-8px}}
   @media (prefers-reduced-motion:reduce){.apo-bot,.apo-ant,.apo-eye,.apo-mouth,.apo-arm,.apo-cursor{animation:none!important}}
   .peg{display:inline-block;margin-top:8px;font-size:13px;background:#f5f3ff;color:#6d28d9;padding:4px 10px;border-radius:999px;font-weight:700;}
   .apo{font-weight:800;color:#6d28d9;}
