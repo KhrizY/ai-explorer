@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>阿波 Apo · 角色风格候选</title>
+<link rel="stylesheet" href="ui-system.css">
+<style>
+  :root { color-scheme:light; }
+  * { user-select:none; -webkit-user-select:none; }
+  body { background:linear-gradient(180deg,var(--paper),var(--paper-2)); min-height:100vh; }
+  .wrap { max-width:1180px; margin:0 auto; padding:24px 16px 86px; }
+  .top { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:18px; }
+  h1 { font-size:24px; line-height:1.2; color:var(--ink); margin:0 0 6px; font-weight:900; letter-spacing:0; }
+  .sub { color:var(--ink-dim); font-size:13px; line-height:1.65; margin:0; max-width:760px; }
+  .back { flex:none; display:inline-flex; align-items:center; gap:6px; height:38px; padding:0 14px; border-radius:12px; text-decoration:none;
+    background:#fff; color:var(--violet-d); border:1.5px solid var(--line); font-weight:900; font-size:13px; box-shadow:0 3px 0 #dfe4ef; }
+  .pickbar { margin:12px 0 18px; padding:10px 12px; border-radius:14px; background:#fff; border:1.5px solid var(--line);
+    box-shadow:0 5px 0 #dfe4ef; display:flex; align-items:center; justify-content:space-between; gap:10px; color:var(--ink-2); font-size:13px; font-weight:800; }
+  .pickbar b { color:var(--violet-d); }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:18px; }
+  .card { background:#fff; border:1.5px solid var(--line); border-radius:18px; padding:14px; box-shadow:0 6px 0 #dfe4ef,0 14px 24px rgba(60,50,110,.08);
+    transition:transform .18s var(--ease-bounce), box-shadow .18s; position:relative; overflow:hidden; }
+  .card:hover { transform:translateY(-4px); box-shadow:0 10px 0 #dfe4ef,0 20px 34px rgba(60,50,110,.13); }
+  .card.on { border-color:var(--correct); box-shadow:0 6px 0 var(--correct-d),0 18px 32px rgba(88,204,2,.16); }
+  .card.on::after { content:"已选"; position:absolute; top:12px; right:12px; padding:4px 9px; border-radius:999px; background:var(--correct); color:#fff; font-size:12px; font-weight:900; }
+  .stage { min-height:232px; border-radius:16px; border:1.5px solid var(--line); background:linear-gradient(160deg,#faf8ff,#eef1fb);
+    display:grid; grid-template-columns:124px 1fr; gap:12px; align-items:center; padding:18px 16px; overflow:hidden; }
+  .meta { display:grid; gap:8px; padding:13px 2px 0; }
+  .name { display:flex; align-items:center; gap:8px; font-weight:900; color:var(--ink); font-size:16px; }
+  .tag { display:inline-flex; width:max-content; padding:3px 8px; border-radius:999px; background:#ede9fe; color:var(--violet-d); font-size:11px; font-weight:900; }
+  .notes { display:grid; gap:4px; color:var(--ink-2); font-size:12px; line-height:1.5; font-weight:700; }
+  .choose { justify-self:start; appearance:none; border:none; cursor:pointer; height:34px; padding:0 16px; border-radius:11px;
+    background:var(--correct); color:#fff; font-family:var(--font); font-weight:900; box-shadow:0 4px 0 var(--correct-d); }
+  .choose:active { transform:translateY(3px); box-shadow:0 1px 0 var(--correct-d); }
+  .bubble { position:relative; align-self:center; background:#fff; border:2px solid #e7e7f2; border-radius:18px; padding:13px 14px; color:var(--ink-2);
+    font-size:13px; line-height:1.55; font-weight:800; box-shadow:0 5px 0 #dfe4ef; }
+  .bubble::before { content:""; position:absolute; left:-10px; top:46px; width:18px; height:18px; background:#fff; border-left:2px solid #e7e7f2; border-bottom:2px solid #e7e7f2; transform:rotate(45deg); }
+  .bubble b { color:var(--violet-d); }
+  .mascot { position:relative; width:116px; height:136px; margin:auto; filter:drop-shadow(0 9px 0 rgba(91,33,182,.12)); animation:floaty 2.6s ease-in-out infinite; }
+  .card:nth-child(2n) .mascot { animation-delay:-.55s; }
+  .card:nth-child(3n) .mascot { animation-delay:-1.05s; }
+  @keyframes floaty { 0%,100%{transform:translateY(3px) rotate(-1deg)} 50%{transform:translateY(-6px) rotate(1deg)} }
+  @keyframes blink { 0%,88%,100%{transform:scaleY(1)} 92%{transform:scaleY(.12)} }
+  @keyframes wave { 0%,100%{transform:rotate(-12deg)} 50%{transform:rotate(14deg)} }
+  @keyframes bobStar { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-5px) scale(1.08)} }
+  @keyframes jiggle { 0%,100%{border-radius:46% 54% 50% 50%} 50%{border-radius:55% 45% 48% 52%} }
+  @keyframes glow { 0%,100%{box-shadow:0 0 0 rgba(34,211,238,0)} 50%{box-shadow:0 0 20px rgba(34,211,238,.6)} }
+  .eye { position:absolute; background:#17142c; border-radius:50%; animation:blink 4s infinite; transform-origin:center; }
+  .eye::after { content:""; position:absolute; width:28%; height:28%; border-radius:50%; background:#fff; left:18%; top:18%; }
+  .mouth { position:absolute; left:50%; transform:translateX(-50%); width:24px; height:12px; border-bottom:4px solid #17142c; border-radius:0 0 20px 20px; }
+  .cheek { position:absolute; width:14px; height:8px; border-radius:999px; background:#fb7185; opacity:.48; }
+  .arm { position:absolute; width:18px; height:42px; border-radius:999px; background:var(--violet-l); transform-origin:50% 10%; }
+  .arm.r { animation:wave 1.8s ease-in-out infinite; }
+
+  /* 1. round buddy */
+  .round .head { position:absolute; left:13px; top:20px; width:90px; height:90px; border-radius:38px; background:linear-gradient(150deg,#ffffff,#dff7ff 62%,#c4b5fd); border:3px solid #fff; }
+  .round .ear { position:absolute; top:13px; width:22px; height:22px; border-radius:50%; background:#8b5cf6; }
+  .round .ear.l { left:19px; } .round .ear.r { right:19px; }
+  .round .eye.l { left:37px; top:52px; width:15px; height:18px; } .round .eye.r { right:37px; top:52px; width:15px; height:18px; }
+  .round .mouth { top:78px; } .round .cheek.l { left:25px; top:73px; } .round .cheek.r { right:25px; top:73px; }
+  .round .arm.l { left:0; top:64px; transform:rotate(18deg); } .round .arm.r { right:0; top:60px; background:#22d3ee; }
+  .round .foot { position:absolute; bottom:13px; width:27px; height:15px; border-radius:999px; background:#8b5cf6; }
+  .round .foot.l { left:29px; } .round .foot.r { right:29px; }
+
+  /* 2. star guide */
+  .star .helmet { position:absolute; left:11px; top:22px; width:94px; height:94px; border-radius:50%; background:rgba(255,255,255,.62); border:3px solid #fff; box-shadow:inset 0 -10px 18px rgba(34,211,238,.16); }
+  .star .face { position:absolute; left:23px; top:39px; width:70px; height:61px; border-radius:28px; background:linear-gradient(150deg,#fef3c7,#ffffff); }
+  .star .eye.l { left:43px; top:62px; width:12px; height:16px; } .star .eye.r { right:43px; top:62px; width:12px; height:16px; }
+  .star .mouth { top:83px; width:20px; }
+  .star .antenna { position:absolute; left:57px; top:2px; width:4px; height:28px; background:#8b5cf6; border-radius:999px; }
+  .star .spark { position:absolute; left:48px; top:-5px; font-size:24px; animation:bobStar 1.4s ease-in-out infinite; }
+  .star .pack { position:absolute; right:8px; top:78px; width:21px; height:34px; border-radius:10px; background:#8b5cf6; }
+  .star .arm.l { left:5px; top:72px; background:#fbbf24; transform:rotate(25deg); } .star .arm.r { right:6px; top:72px; background:#22d3ee; }
+
+  /* 3. jelly */
+  .jelly .body { position:absolute; left:13px; top:22px; width:90px; height:96px; border-radius:46% 54% 50% 50%; background:linear-gradient(150deg,#c4b5fd,#67e8f9); border:3px solid rgba(255,255,255,.9); animation:jiggle 2.2s ease-in-out infinite; }
+  .jelly .shine { position:absolute; left:33px; top:35px; width:18px; height:30px; border-radius:999px; background:rgba(255,255,255,.42); transform:rotate(24deg); }
+  .jelly .eye.l { left:38px; top:63px; width:14px; height:17px; } .jelly .eye.r { right:38px; top:63px; width:14px; height:17px; }
+  .jelly .mouth { top:88px; width:22px; }
+  .jelly .cheek.l { left:27px; top:83px; } .jelly .cheek.r { right:27px; top:83px; }
+  .jelly .drop { position:absolute; bottom:6px; width:18px; height:16px; border-radius:50%; background:#67e8f9; }
+  .jelly .drop.a { left:21px; } .jelly .drop.b { left:49px; } .jelly .drop.c { right:21px; }
+
+  /* 4. capsule */
+  .capsule .body { position:absolute; left:24px; top:18px; width:68px; height:106px; border-radius:999px; background:linear-gradient(180deg,#fff 0 49%,#8b5cf6 50% 100%); border:3px solid #fff; overflow:hidden; }
+  .capsule .visor { position:absolute; left:36px; top:42px; width:44px; height:34px; border-radius:18px; background:#17142c; animation:glow 2.4s ease-in-out infinite; }
+  .capsule .eye.l { left:47px; top:52px; width:8px; height:10px; background:#67e8f9; } .capsule .eye.r { right:47px; top:52px; width:8px; height:10px; background:#67e8f9; }
+  .capsule .mouth { top:87px; border-color:#fff; width:19px; }
+  .capsule .arm.l { left:7px; top:64px; background:#8b5cf6; transform:rotate(24deg); } .capsule .arm.r { right:7px; top:64px; background:#8b5cf6; }
+  .capsule .foot { position:absolute; bottom:4px; width:24px; height:14px; border-radius:999px; background:#5b21b6; }
+  .capsule .foot.l { left:32px; } .capsule .foot.r { right:32px; }
+
+  /* 5. cloud */
+  .cloud .puff { position:absolute; background:linear-gradient(160deg,#fff,#dff7ff); border:3px solid #fff; }
+  .cloud .p1 { left:10px; top:52px; width:44px; height:44px; border-radius:50%; }
+  .cloud .p2 { left:34px; top:30px; width:58px; height:58px; border-radius:50%; }
+  .cloud .p3 { right:8px; top:54px; width:44px; height:44px; border-radius:50%; }
+  .cloud .base { position:absolute; left:20px; top:66px; width:78px; height:42px; border-radius:24px; background:#fff; }
+  .cloud .eye.l { left:43px; top:67px; width:11px; height:14px; } .cloud .eye.r { right:43px; top:67px; width:11px; height:14px; }
+  .cloud .mouth { top:88px; width:19px; }
+  .cloud .zap { position:absolute; left:51px; top:108px; font-size:28px; animation:bobStar 1.5s infinite; }
+  .cloud .cheek.l { left:29px; top:84px; } .cloud .cheek.r { right:29px; top:84px; }
+
+  /* 6. engineer */
+  .eng .head { position:absolute; left:16px; top:24px; width:84px; height:82px; border-radius:28px; background:linear-gradient(160deg,#fef3c7,#fff); border:3px solid #fff; }
+  .eng .goggle { position:absolute; left:26px; top:54px; width:64px; height:24px; border-radius:999px; background:#17142c; border:3px solid #8b5cf6; }
+  .eng .eye.l { left:41px; top:61px; width:8px; height:10px; background:#22d3ee; } .eng .eye.r { right:41px; top:61px; width:8px; height:10px; background:#22d3ee; }
+  .eng .mouth { top:86px; width:18px; }
+  .eng .cap { position:absolute; left:24px; top:13px; width:68px; height:28px; border-radius:22px 22px 10px 10px; background:#8b5cf6; }
+  .eng .tool { position:absolute; right:0; top:70px; font-size:27px; animation:wave 1.7s ease-in-out infinite; transform-origin:20% 80%; }
+  .eng .body { position:absolute; left:31px; bottom:8px; width:54px; height:34px; border-radius:16px; background:#22d3ee; }
+
+  /* 7. pixel */
+  .pixel { image-rendering:pixelated; animation:pixelHop 1.8s steps(2,end) infinite; }
+  @keyframes pixelHop { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
+  .pixel .body { position:absolute; left:20px; top:26px; width:76px; height:76px; border-radius:8px; background:#8b5cf6; box-shadow:0 0 0 8px #c4b5fd inset; }
+  .pixel .eye { border-radius:3px; background:#fff; animation:none; }
+  .pixel .eye.l { left:42px; top:56px; width:12px; height:12px; } .pixel .eye.r { right:42px; top:56px; width:12px; height:12px; }
+  .pixel .mouth { top:82px; width:24px; height:6px; border:none; background:#17142c; border-radius:3px; }
+  .pixel .ant { position:absolute; left:52px; top:7px; width:12px; height:20px; background:#22d3ee; border-radius:3px; }
+  .pixel .arm.l { left:3px; top:62px; height:28px; border-radius:4px; background:#5b21b6; transform:rotate(0); } .pixel .arm.r { right:3px; top:62px; height:28px; border-radius:4px; background:#5b21b6; }
+
+  /* 8. tiny icon */
+  .tiny .ring { position:absolute; left:16px; top:18px; width:84px; height:84px; border-radius:50%; background:linear-gradient(150deg,#ede9fe,#cffafe); border:4px solid #fff; }
+  .tiny .face { position:absolute; left:33px; top:39px; width:50px; height:46px; border-radius:20px; background:#fff; }
+  .tiny .eye.l { left:47px; top:55px; width:8px; height:11px; } .tiny .eye.r { right:47px; top:55px; width:8px; height:11px; }
+  .tiny .mouth { top:73px; width:15px; border-width:3px; }
+  .tiny .dot { position:absolute; left:51px; top:2px; width:14px; height:14px; border-radius:50%; background:var(--correct); box-shadow:0 0 0 6px rgba(88,204,2,.18); animation:bobStar 1.7s infinite; }
+  .tiny .tail { position:absolute; left:48px; top:99px; width:20px; height:23px; border-radius:0 0 12px 12px; background:#8b5cf6; }
+
+  @media (max-width:640px) {
+    .top { flex-direction:column; }
+    .grid { grid-template-columns:1fr; }
+    .stage { grid-template-columns:1fr; text-align:center; }
+    .bubble::before { left:50%; top:-10px; transform:translateX(-50%) rotate(135deg); }
+    .choose { justify-self:stretch; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1>阿波 Apo · 角色风格候选</h1>
+      <p class="sub">先只看方向，不替换主站。每张卡都包含角色、气泡和待机动效，选中后可把那一款移植到课程开场对话 B。</p>
+    </div>
+    <a class="back" href="index.html">← Demo 库</a>
+  </div>
+
+  <div class="pickbar">
+    <span>当前选择：<b id="picked">还没选</b></span>
+    <span>建议先看“圆滚陪伴型 / 软糖型 / 星际向导型”</span>
+  </div>
+
+  <div class="grid" id="grid"></div>
+</div>
+
+<script>
+var OPTIONS=[
+  {id:'round', name:'圆滚陪伴型', tag:'主推 · 多邻国方向', cls:'round', say:'我先陪你试一下，错了也没关系。', fit:'亲和力最强，适合主线课程。', risk:'需要控制别太像玩具图标。'},
+  {id:'jelly', name:'软糖机器人', tag:'灵动 · 可爱', cls:'jelly', say:'咦？这个数字动了一下，我好像学会一点点了。', fit:'弹性强、表情软，儿童感明显。', risk:'技术感稍弱，适合低龄主线。'},
+  {id:'star', name:'星际小向导', tag:'宇宙主题', cls:'star', say:'准备好了吗？下一站我们去看看 AI 的脑袋里。', fit:'贴合 AI 探险号和星空地图。', risk:'头盔元素多，缩小后要简化。'},
+  {id:'capsule', name:'小胶囊助手', tag:'干净 · 易落地', cls:'capsule', say:'把问题交给我，我会一步一步拆开。', fit:'结构简单，最容易移植到主站。', risk:'个性较弱，需要靠表情补。'},
+  {id:'cloud', name:'小云朵 AI', tag:'柔软 · 非机械', cls:'cloud', say:'我不是魔法云，我只是把线索连起来啦。', fit:'温柔、安全，适合错误反馈。', risk:'机器人身份不够明确。'},
+  {id:'eng', name:'护目镜工程师', tag:'进阶课', cls:'eng', say:'这次我们不猜了，直接拆开里面的结构看。', fit:'适合拓展课程、神经网络课。', risk:'主线低龄感略硬。'},
+  {id:'pixel', name:'像素小伙伴', tag:'反差候选', cls:'pixel', say:'哔哔！我用小方块也能讲清楚。', fit:'适合游戏关卡和复古彩蛋。', risk:'不够圆润，主站慎用。'},
+  {id:'tiny', name:'极简图标版', tag:'密集 UI', cls:'tiny', say:'这里空间小，我就用迷你形态出现。', fit:'适合顶部、小提示、徽章。', risk:'不能承担完整开场表演。'}
+];
+
+function mascot(cls){
+  var parts={
+    round:'<i class="ear l"></i><i class="ear r"></i><i class="head"></i><i class="arm l"></i><i class="arm r"></i><i class="eye l"></i><i class="eye r"></i><i class="cheek l"></i><i class="cheek r"></i><i class="mouth"></i><i class="foot l"></i><i class="foot r"></i>',
+    star:'<i class="antenna"></i><i class="spark">✦</i><i class="helmet"></i><i class="pack"></i><i class="arm l"></i><i class="arm r"></i><i class="face"></i><i class="eye l"></i><i class="eye r"></i><i class="mouth"></i>',
+    jelly:'<i class="body"></i><i class="shine"></i><i class="eye l"></i><i class="eye r"></i><i class="cheek l"></i><i class="cheek r"></i><i class="mouth"></i><i class="drop a"></i><i class="drop b"></i><i class="drop c"></i>',
+    capsule:'<i class="body"></i><i class="visor"></i><i class="arm l"></i><i class="arm r"></i><i class="eye l"></i><i class="eye r"></i><i class="mouth"></i><i class="foot l"></i><i class="foot r"></i>',
+    cloud:'<i class="puff p1"></i><i class="puff p2"></i><i class="puff p3"></i><i class="base"></i><i class="eye l"></i><i class="eye r"></i><i class="cheek l"></i><i class="cheek r"></i><i class="mouth"></i><i class="zap">⚡</i>',
+    eng:'<i class="cap"></i><i class="body"></i><i class="head"></i><i class="goggle"></i><i class="eye l"></i><i class="eye r"></i><i class="mouth"></i><i class="tool">🔧</i>',
+    pixel:'<i class="ant"></i><i class="body"></i><i class="arm l"></i><i class="arm r"></i><i class="eye l"></i><i class="eye r"></i><i class="mouth"></i>',
+    tiny:'<i class="dot"></i><i class="ring"></i><i class="tail"></i><i class="face"></i><i class="eye l"></i><i class="eye r"></i><i class="mouth"></i>'
+  };
+  return '<div class="mascot '+cls+'">'+parts[cls]+'</div>';
+}
+
+var picked=localStorage.getItem('apo-pick')||'';
+var grid=document.getElementById('grid');
+var pickedEl=document.getElementById('picked');
+function render(){
+  pickedEl.textContent=picked?OPTIONS.find(function(o){return o.id===picked;}).name:'还没选';
+  grid.innerHTML='';
+  OPTIONS.forEach(function(o){
+    var card=document.createElement('div');
+    card.className='card'+(picked===o.id?' on':'');
+    card.innerHTML='<div class="stage">'+mascot(o.cls)+'<div class="bubble"><b>阿波：</b>'+o.say+'</div></div>'+
+      '<div class="meta"><div class="name">'+o.name+' <span class="tag">'+o.tag+'</span></div>'+
+      '<div class="notes"><span>适合：'+o.fit+'</span><span>风险：'+o.risk+'</span></div>'+
+      '<button class="choose" type="button">选这个方向</button></div>';
+    card.querySelector('.choose').onclick=function(){
+      picked=o.id;
+      localStorage.setItem('apo-pick',picked);
+      render();
+    };
+    grid.appendChild(card);
+  });
+}
+render();
+</script>
+</body>
+</html>
