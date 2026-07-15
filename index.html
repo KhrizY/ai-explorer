@@ -95,6 +95,20 @@
   .adv-card:hover{transform:translateY(-4px);box-shadow:0 0 22px rgba(139,92,246,.45);}
   .adv-card .ae{font-size:30px;} .adv-card .at{color:#fff;font-weight:800;font-size:14px;margin:6px 0 3px;line-height:1.3;}
   .adv-card .ac{font-size:10.5px;color:#b4aede;} .adv-card .an{font-size:10.5px;color:#8b83b8;margin-top:5px;}
+  .lab-gate{max-width:840px;margin:0 auto 58px;padding:0 14px;}
+  .lab-card{background:linear-gradient(160deg,rgba(255,255,255,.96),rgba(245,243,255,.94));border:1.5px solid rgba(196,181,253,.75);border-radius:18px;padding:16px;box-shadow:0 10px 24px rgba(20,14,48,.22);}
+  .lab-head{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;}
+  .lab-icon{width:44px;height:44px;border-radius:14px;background:#ede9fe;display:grid;place-items:center;font-size:24px;box-shadow:0 4px 0 #c4b5fd;}
+  .lab-head h2{margin:0;color:#1e1b3a;font-size:18px;}
+  .lab-head p{margin:4px 0 0;color:#6b668a;font-size:12.5px;line-height:1.5;}
+  .lab-form{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;}
+  .lab-form input{height:42px;border-radius:12px;border:2px solid #e6e9f2;background:#fff;color:#1e1b3a;font:inherit;font-weight:800;padding:0 12px;outline:none;}
+  .lab-form input:focus{border-color:#8b5cf6;box-shadow:0 0 0 4px rgba(139,92,246,.12);}
+  .lab-form button,.lab-form a{height:42px;border:none;border-radius:12px;padding:0 14px;font:inherit;font-weight:900;cursor:pointer;text-decoration:none;display:inline-grid;place-items:center;white-space:nowrap;}
+  .lab-open{background:#58cc02;color:#fff;box-shadow:0 4px 0 #46a302;}
+  .lab-upload{background:#ede9fe;color:#6d28d9;box-shadow:0 4px 0 #c4b5fd;}
+  .lab-msg{min-height:18px;margin-top:9px;color:#8b5cf6;font-size:12.5px;font-weight:800;}
+  @media(max-width:640px){.lab-form{grid-template-columns:1fr}.lab-form button,.lab-form a{width:100%;}}
   .adv-pop{position:fixed;inset:0;display:none;place-items:center;z-index:80;background:rgba(10,6,32,.6);backdrop-filter:blur(3px);padding:16px;}
   .adv-pop.open{display:grid;}
   .adv-card2{background:#fff;border-radius:18px;padding:22px 24px;max-width:360px;width:100%;max-height:80vh;overflow:auto;box-shadow:0 20px 50px rgba(0,0,0,.5);border-top:6px solid var(--violet);animation:popIn .3s var(--ease-bounce,ease);}
@@ -178,6 +192,23 @@
       <h2 class="adv-title">🎓 进阶课程</h2>
       <div class="adv-sub">相互独立 · 挑战更硬核 · 点开看知识点</div>
       <div class="adv-grid" id="advgrid"></div>
+    </div>
+    <div class="lab-gate">
+      <div class="lab-card">
+        <div class="lab-head">
+          <div class="lab-icon">🧪</div>
+          <div>
+            <h2>实验课程</h2>
+            <p>众包课程先隐藏在实验区。上传后输入课程码查看，审核通过后再归档到正式课程。</p>
+          </div>
+        </div>
+        <div class="lab-form">
+          <input id="labCode" placeholder="输入课程码，如 NET-001" autocomplete="off">
+          <button class="lab-open" onclick="openLabCourse()">查看课程</button>
+          <a class="lab-upload" href="upload.html">上传作品</a>
+        </div>
+        <div class="lab-msg" id="labMsg"></div>
+      </div>
     </div>
   </section>
   <section id="scr-ch" class="screen">
@@ -273,6 +304,21 @@ var WC_G={
 
 // ========== 交互外壳(带重置) ==========
 function ixbox(title,hint,onReset){var b=el('div','ixbox');var head=el('div','ixbox-title',title);if(onReset){var r=el('button','ixr','↻');r.title='重来';r.onclick=onReset;head.appendChild(r);}b.appendChild(head);var body=el('div');b.appendChild(body);if(hint)b.appendChild(el('div','ixbox-hint','👆 '+hint));b._body=body;return b;}
+
+// ========== 实验课程：从上传课程包动态接入主阅读器 ==========
+var LAB_STORE_KEY='ai-explorer-lab-courses-v1';
+function normCode(x){return String(x||'').trim().toUpperCase().replace(/\s+/g,'-');}
+function loadLabStore(){try{return JSON.parse(localStorage.getItem(LAB_STORE_KEY)||'{}')||{};}catch(e){return {};}}
+function saveLabStore(s){try{localStorage.setItem(LAB_STORE_KEY,JSON.stringify(s));}catch(e){}}
+function labMsg(txt,ok){var m=document.getElementById('labMsg');if(!m)return;m.textContent=txt||'';m.style.color=ok?'#16a34a':'#d99a12';}
+function simpleLabComponent(label,hint,doneText){return function(rw,onReset){var b=ixbox(label||'🧪 互动实验',hint||'点一下完成这个互动',onReset);var w=b._body;var stage=el('div');stage.style.cssText='min-height:116px;border:2px dashed #c4b5fd;border-radius:16px;background:linear-gradient(135deg,#f8fafc,#f5f3ff);display:grid;place-items:center;text-align:center;color:#4b4869;font-weight:900;padding:14px;line-height:1.6';stage.innerHTML='<div><div style="font-size:34px;margin-bottom:6px">🧪</div><div>'+(doneText||'这里会承载投稿课程的互动组件。')+'</div></div>';var btn=el('button','next-btn','我体验过了');btn.onclick=function(e){rw(e);lineFeedback(w,true,'已记录互动完成');};w.appendChild(stage);w.appendChild(btn);return b;};}
+function labChoiceComponent(props){return function(rw,onReset){var b=ixbox(props.title||'🧭 选择判断',props.hint||'选出更合适的一项',onReset);var w=b._body,done=false;var q=el('div',null,props.question||'哪一个更符合这节课的原理？');q.style.cssText='background:#fff;border:2px solid #e6e9f2;border-radius:14px;padding:12px;color:#4b4869;font-weight:900;text-align:center;margin-bottom:10px';var row=el('div');row.style.cssText='display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px';var opts=props.options&&props.options.length?props.options:[{text:'更符合机制',ok:true},{text:'只是表面像',ok:false}];opts.forEach(function(o){var bt=el('button','btn btn-ghost',o.text);bt.style.cssText+=';white-space:normal;min-height:44px;color:#4b4869';bt.onclick=function(e){if(o.ok){lineFeedback(w,true,o.feedback||'判断正确');spark(e.clientX,e.clientY);if(!done){done=true;rw(e);}}else lineFeedback(w,false,o.feedback||'再想想它是否真的解释了机制');};row.appendChild(bt);});w.appendChild(q);w.appendChild(row);return b;};}
+function labStepComponent(props){return function(rw,onReset){var b=ixbox(props.title||'🪜 步骤动画',props.hint||'一步步点亮过程',onReset);var w=b._body,steps=props.steps&&props.steps.length?props.steps:['先观察现象','再操作验证','最后命名术语'],i=0,done=false;var box=el('div');box.style.cssText='display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:10px';steps.forEach(function(s,k){var d=el('div',null,'<div style="font-size:24px">'+(k+1)+'</div><b>'+s+'</b>');d.style.cssText='width:96px;min-height:78px;border-radius:14px;background:#fff;border:2px solid #e6e9f2;color:#8b90a6;display:grid;place-items:center;text-align:center;font-size:12px;padding:8px;transition:.2s';box.appendChild(d);});var btn=el('button','next-btn','▶ 走一步');btn.onclick=function(e){var d=box.children[i];if(!d)return;d.style.background='#ecfdf5';d.style.borderColor='#bbf7d0';d.style.color='#15803d';d.style.transform='translateY(-3px)';spark(e.clientX,e.clientY);i++;if(i>=steps.length&&!done){done=true;rw(e);btn.textContent='已完成';btn.disabled=true;}else if(i<steps.length)btn.textContent='▶ 下一步';};w.appendChild(box);w.appendChild(btn);return b;};}
+function labSliderComponent(props){return function(rw,onReset){var b=ixbox(props.title||'🎚️ 滑块探索器',props.hint||'拖动滑块看结果变化',onReset);var w=b._body,done=false;var out=el('div');out.style.cssText='height:92px;border-radius:16px;background:#fff;border:2px solid #e6e9f2;display:grid;place-items:center;color:#4b4869;font-weight:900;text-align:center;padding:12px;margin-bottom:10px';var rng=el('input');rng.type='range';rng.min=0;rng.max=100;rng.value=props.value||40;rng.style.cssText='width:100%;accent-color:#8b5cf6';function upd(e){var v=+rng.value;var text=(props.low&&v<34)?props.low:(props.high&&v>66)?props.high:(props.mid||'刚刚好，变化最稳定');out.innerHTML='<div><div style="font-size:26px;color:#8b5cf6">'+v+'%</div><div>'+text+'</div></div>';if(e&&!done&&(v<12||v>88||Math.abs(v-50)<6)){done=true;rw(e);}}rng.oninput=upd;upd();w.appendChild(out);w.appendChild(rng);return b;};}
+function labComponentFactory(ux){var name=ux&&ux.component,props=(ux&&ux.props)||{};if(name==='labChoice'||name==='uxChoice')return labChoiceComponent(props);if(name==='labSteps'||name==='uxSteps'||name==='uxTimeline')return labStepComponent(props);if(name==='labSlider'||name==='uxSlider')return labSliderComponent(props);return simpleLabComponent(props.title||('🧪 '+(name||'互动组件')),props.hint,props.doneText);}
+function validateLabCourse(c){var errs=[];if(!c||typeof c!=='object')errs.push('课程包不是 JSON 对象');if(!c.id)errs.push('缺少 id');if(!c.code)errs.push('缺少 code 课程码');if(!c.title)errs.push('缺少 title');if(!Array.isArray(c.chapters)||!c.chapters.length)errs.push('至少需要 1 个 chapter');(c.chapters||[]).forEach(function(ch,ci){if(!ch.title)errs.push('第 '+(ci+1)+' 章缺少 title');if(!Array.isArray(ch.sections)||!ch.sections.length)errs.push('第 '+(ci+1)+' 章至少需要 1 个 section');(ch.sections||[]).forEach(function(s,si){['heading','hook','paras','ux','after','terms','close'].forEach(function(k){if(s[k]==null)errs.push('第 '+(ci+1)+' 章第 '+(si+1)+' 节缺少 '+k);});if(s.paras&&!Array.isArray(s.paras))errs.push('第 '+(ci+1)+' 章第 '+(si+1)+' 节 paras 必须是数组');if(s.after&&!Array.isArray(s.after))errs.push('第 '+(ci+1)+' 章第 '+(si+1)+' 节 after 必须是数组');});});return errs;}
+function labCourseToChapter(c){var ch=c.chapters[0],id='lab:'+normCode(c.code||c.id),secs=(ch.sections||[]).map(function(s,i){return{n:i+1,heading:s.heading,hook:/^\s*阿波\s*[:：]/.test(s.hook)?s.hook:'<span class="apo">阿波：</span>'+s.hook,build:labComponentFactory(s.ux),paras:s.paras||[],after:s.after||[],terms:s.terms||{},peg:s.peg||'🧪 实验课程 · 待审核归档',close:s.close,nextHint:s.nextHint||'下一节 →'};});return{id:id,title:(c.emoji||'🧪')+' '+(c.title||ch.title),badge:{e:c.emoji||'🧪',t:(c.badge&&c.badge.title)||((c.title||'实验课程')+'体验者'),s:(c.badge&&c.badge.summary)||'你完成了一门实验课程'},endGame:buildAdvRecap(c.title||'实验课程',[[c.emoji||'🧪','实验作品','这是一门课程码解锁的众包实验课程'],['🧭','结构化','它遵守 hook/正文/UX/深入/收束格式'],['✅','可归档','审核通过后可进入正式课程']]),beat:true,sections:secs};}
+function openLabCourse(){var input=document.getElementById('labCode'),code=normCode(input&&input.value),store=loadLabStore(),course=store[code];if(!code){labMsg('请输入课程码。',false);return;}if(!course){labMsg('没有找到这个课程码。请先在上传页保存课程包，或确认同源预览。',false);return;}var errs=validateLabCourse(course);if(errs.length){labMsg('课程包校验失败：'+errs[0],false);return;}var ch=labCourseToChapter(course);CHAPTERS[ch.id]=ch;labMsg('已加载「'+course.title+'」，正在进入阅读器。',true);enterChapter(ch.id);}
 
 // —— S1 分拣(可取消选中) ——
 function buildSort(rw,onReset){var b=ixbox('🃏 把它们分到正确的筐','点选中/再点取消，然后点筐',onReset);var w=b._body;
@@ -1347,6 +1393,8 @@ var _goMap0=goMap;goMap=function(){_goMap0();renderAdv();};
 syncTop();renderAdv();goMap();
 (function debugEndRoute(){var p=new URLSearchParams(location.search),id=p.get('end');if(id&&CHAPTERS[id]){document.body.classList.add('debug-end');ST={xp:0,done:{},badges:[],collected:{}};save();setTimeout(function(){CH=CHAPTERS[id];show('scr-ch');document.getElementById('chtitle').textContent=CH.title;curSec=CH.sections.length;document.getElementById('chbody').innerHTML='';syncTop();renderSec();},80);}})();
 (function debugSecRoute(){var p=new URLSearchParams(location.search),id=p.get('sec');if(id&&CHAPTERS[id]){document.body.classList.add('debug-end');ST={xp:0,done:{},badges:[],collected:{}};save();var nn=parseInt(p.get('n'),10)||0;setTimeout(function(){CH=CHAPTERS[id];show('scr-ch');document.getElementById('chtitle').textContent=CH.title;curSec=Math.max(0,Math.min(nn,CH.sections.length-1));document.getElementById('chbody').innerHTML='';syncTop();renderSec();},80);}})();
+(function labRoute(){var p=new URLSearchParams(location.search),code=p.get('lab');if(code){setTimeout(function(){var input=document.getElementById('labCode');if(input)input.value=normCode(code);openLabCourse();},120);}})();
+var _labInput=document.getElementById('labCode');if(_labInput)_labInput.addEventListener('keydown',function(e){if(e.key==='Enter')openLabCourse();});
 </script>
 </body>
 </html>

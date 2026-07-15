@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 探险号 · 众包课程上传</title>
+<link rel="stylesheet" href="ui-system.css">
+<style>
+  html{color-scheme:light}body{margin:0;background:#eef7ff;color:#1e1b3a;font-family:var(--font,system-ui,sans-serif);}
+  .page{min-height:100vh;background:radial-gradient(circle at 20% 0,#dff7ff 0 22%,transparent 38%),radial-gradient(circle at 90% 10%,#ede9fe 0 20%,transparent 34%),#f8fbff;padding:22px 16px 46px;}
+  .shell{max-width:1120px;margin:0 auto;}
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+  .back{height:40px;border:none;border-radius:12px;background:#ede9fe;color:#6d28d9;font-weight:900;padding:0 14px;box-shadow:0 4px 0 #c4b5fd;text-decoration:none;display:inline-grid;place-items:center;}
+  h1{margin:0;font-size:26px}.sub{margin:5px 0 0;color:#5f6477;font-size:14px;line-height:1.6;}
+  .grid{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(320px,.92fr);gap:16px;align-items:start;}
+  .card{background:#fff;border:2px solid #e6e9f2;border-radius:18px;padding:16px;box-shadow:0 6px 0 #dfe4ef;}
+  .card h2{margin:0 0 10px;font-size:18px}.card p{color:#5f6477;line-height:1.65;font-size:14px;}
+  textarea{width:100%;min-height:520px;resize:vertical;border:2px solid #dbe2ef;border-radius:16px;padding:14px;box-sizing:border-box;font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#1f2937;background:#fbfdff;outline:none;}
+  textarea:focus,input:focus{border-color:#8b5cf6;box-shadow:0 0 0 4px rgba(139,92,246,.12);}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0;}
+  .btn{height:40px;border:none;border-radius:12px;padding:0 14px;font-weight:900;cursor:pointer;font-family:inherit;}
+  .primary{background:#58cc02;color:#fff;box-shadow:0 4px 0 #46a302}.violet{background:#ede9fe;color:#6d28d9;box-shadow:0 4px 0 #c4b5fd}.blue{background:#dff7ff;color:#0891b2;box-shadow:0 4px 0 #a5f3fc}.ghost{background:#f8fafc;color:#4b4869;border:2px solid #e6e9f2;}
+  input[type=file]{max-width:240px}.code{height:38px;border:2px solid #dbe2ef;border-radius:12px;padding:0 10px;font-weight:900;color:#1e1b3a;background:#fff;}
+  .result{border-radius:14px;padding:12px;background:#f8fafc;border:1.5px solid #e6e9f2;color:#4b4869;font-size:13px;line-height:1.7;min-height:74px;}
+  .ok{color:#16a34a;font-weight:900}.warn{color:#d99a12;font-weight:900}.bad{color:#dc2626;font-weight:900}
+  .spec{display:grid;gap:8px}.spec-item{background:#f8fafc;border:1.5px solid #e6e9f2;border-radius:14px;padding:10px 12px;font-size:13px;color:#4b4869;line-height:1.55}.spec-item b{color:#6d28d9}
+  .course-list{display:grid;gap:8px;margin-top:10px}.course-item{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;background:#f8fafc;border:1.5px solid #e6e9f2;border-radius:14px;padding:10px}.course-item b{color:#1e1b3a}.course-item span{display:block;color:#6b7280;font-size:12px;margin-top:2px}
+  .mini{height:32px;border:none;border-radius:10px;background:#ede9fe;color:#6d28d9;font-weight:900;padding:0 10px;cursor:pointer}
+  @media(max-width:860px){.grid{grid-template-columns:1fr}textarea{min-height:420px}}
+</style>
+</head>
+<body>
+<main class="page">
+  <div class="shell">
+    <div class="top">
+      <a class="back" href="index.html">← 返回主站</a>
+      <div>
+        <h1>🧪 众包课程上传</h1>
+        <p class="sub">第一阶段 MVP：把结构化课程包保存到浏览器本地。主网页输入课程码后，会动态接入同一个阅读器。</p>
+      </div>
+    </div>
+    <div class="grid">
+      <section class="card">
+        <h2>课程包 JSON</h2>
+        <textarea id="jsonBox" spellcheck="false"></textarea>
+        <div class="row">
+          <button class="btn blue" onclick="loadTemplate()">载入模板</button>
+          <input type="file" id="fileInput" accept=".json,application/json">
+          <button class="btn violet" onclick="validateOnly()">校验格式</button>
+          <button class="btn primary" onclick="saveCourse()">保存到实验区</button>
+        </div>
+      </section>
+      <aside class="card">
+        <h2>上传路径</h2>
+        <div class="spec">
+          <div class="spec-item"><b>1. 复制 skill 生产课程</b><br>每节必须有标题术语、阿波 hook、正文、UX、after、terms、close。</div>
+          <div class="spec-item"><b>2. 按 JSON 格式上传</b><br>课程码 `code` 是隐藏查看入口。小范围测试时，保存到同源 localStorage 即可。</div>
+          <div class="spec-item"><b>3. 主网页输入课程码</b><br>主站动态读取课程包，转成 `CHAPTERS['lab:CODE']`，复用现有阅读器。</div>
+          <div class="spec-item"><b>4. 归档</b><br>好作品后续改 `status: official` 并加入正式课程索引。</div>
+        </div>
+        <div class="row">
+          <a class="btn violet" href="design/crowdsourced-course-authoring-skill.md">查看创作 Skill</a>
+          <a class="btn blue" href="design/crowdsourced-course-pipeline.md">查看工程方案</a>
+        </div>
+        <h2 style="margin-top:18px">校验结果</h2>
+        <div class="result" id="result">等待上传。</div>
+        <div class="row">
+          <input class="code" id="codeJump" placeholder="课程码">
+          <button class="btn primary" onclick="previewCourse()">去主站预览</button>
+        </div>
+        <h2 style="margin-top:18px">本机实验课程</h2>
+        <div class="course-list" id="courseList"></div>
+      </aside>
+    </div>
+  </div>
+</main>
+<script>
+var STORE='ai-explorer-lab-courses-v1';
+function normCode(x){return String(x||'').trim().toUpperCase().replace(/\s+/g,'-');}
+function loadStore(){try{return JSON.parse(localStorage.getItem(STORE)||'{}')||{};}catch(e){return {};}}
+function saveStore(s){localStorage.setItem(STORE,JSON.stringify(s));}
+function setResult(html){document.getElementById('result').innerHTML=html;}
+var TEMPLATE={
+  schemaVersion:'1.0',
+  id:'internet-security-basic',
+  code:'NET-001',
+  status:'lab',
+  title:'网络安全小侦探',
+  subtitle:'密码、隐私和骗子链接',
+  emoji:'🔐',
+  audience:'9-12',
+  track:'public-science',
+  author:{name:'贡献者昵称',contact:''},
+  sourceSkills:['explain-skill','viz-ux-skill'],
+  badge:{title:'密码守门员',summary:'你知道了密码为什么要长、要不容易猜'},
+  chapters:[{
+    id:'password',
+    title:'密码 · 为什么不能太简单',
+    sections:[{
+      id:'password-bruteforce',
+      heading:'暴力破解 · 一个个试出来',
+      hook:'阿波：如果小偷不知道密码，他能不能把所有可能都试一遍？',
+      paras:['很短的密码，可能组合很少。','组合越少，机器就越容易一个个试完。'],
+      ux:{component:'labSlider',props:{title:'🎚️ 密码强度滑块',hint:'拖动长度，看破解难度怎么变',low:'太短，组合很少',mid:'长度变长，试错成本明显上升',high:'组合空间很大，暴力尝试会很慢'}},
+      after:['密码强度本质上和搜索空间有关：可选字符越多、长度越长，组合数量会快速变大。'],
+      terms:{'暴力破解':{s:'把可能的密码一个个试，直到试中。',pro:'它不靠聪明猜测，而是消耗计算时间枚举候选；密码空间越大，成本越高。'}},
+      close:'你刚才看到的一个个试密码，就叫 [[暴力破解]]。所以好密码不是神秘，而是让搜索空间变大。',
+      nextHint:'下一节 →'
+    },{
+      id:'privacy-sort',
+      heading:'隐私 · 哪些信息不能随便给',
+      hook:'阿波：有些信息像家门钥匙，说出去就可能被别人拿去用。',
+      paras:['名字、住址、密码、验证码，都可能让别人冒充你。','和 AI 聊天时，也要先想想这句话会不会暴露自己。'],
+      ux:{component:'labChoice',props:{title:'🧭 信息能不能说',question:'下面哪类信息更不该发给陌生网站或 AI？',options:[{text:'家庭住址和验证码',ok:true,feedback:'对，这类信息能直接影响安全。'},{text:'今天学了什么知识',ok:false,feedback:'普通学习内容通常风险低，关键是别带身份和密码。'}]}},
+      after:['隐私保护的核心是最小披露：完成任务不需要的信息，就不要交给系统。'],
+      terms:{'最小披露':{s:'只说完成事情必须说的内容，多余的私人信息不说。',pro:'安全系统常用这个原则降低风险；即使某个服务泄漏，暴露的数据也尽量少。'}},
+      close:'你刚才做的判断，就是在练 [[最小披露]]。聪明使用 AI，也要守住信息边界。'
+    }]
+  }]
+};
+function loadTemplate(){document.getElementById('jsonBox').value=JSON.stringify(TEMPLATE,null,2);setResult('<span class="ok">已载入模板。</span>');}
+function parseCourse(){try{return{course:JSON.parse(document.getElementById('jsonBox').value),errors:[]};}catch(e){return{course:null,errors:['JSON 解析失败：'+e.message]};}}
+function validate(c){var errs=[];if(!c||typeof c!=='object')errs.push('课程包不是对象');if(!c.schemaVersion)errs.push('缺少 schemaVersion');if(!c.id)errs.push('缺少 id');if(!c.code)errs.push('缺少 code 课程码');if(!c.title)errs.push('缺少 title');if(!c.audience)errs.push('缺少 audience');if(!Array.isArray(c.sourceSkills)||!c.sourceSkills.length)errs.push('缺少 sourceSkills');if(!Array.isArray(c.chapters)||!c.chapters.length)errs.push('至少需要 1 个 chapter');
+  (c.chapters||[]).forEach(function(ch,ci){if(!ch.id)errs.push('第 '+(ci+1)+' 章缺少 id');if(!ch.title)errs.push('第 '+(ci+1)+' 章缺少 title');if(!Array.isArray(ch.sections)||!ch.sections.length)errs.push('第 '+(ci+1)+' 章至少需要 1 个 section');(ch.sections||[]).forEach(function(s,si){['id','heading','hook','paras','ux','after','terms','close'].forEach(function(k){if(s[k]==null)errs.push('第 '+(ci+1)+' 章第 '+(si+1)+' 节缺少 '+k);});if(s.paras&&!Array.isArray(s.paras))errs.push('第 '+(ci+1)+' 章第 '+(si+1)+' 节 paras 必须是数组');if(s.after&&!Array.isArray(s.after))errs.push('第 '+(ci+1)+' 章第 '+(si+1)+' 节 after 必须是数组');var close=s.close||'',terms=s.terms||{};Object.keys(terms).forEach(function(t){if(close.indexOf('[['+t+']]')<0)errs.push('第 '+(ci+1)+' 章第 '+(si+1)+' 节术语「'+t+'」没有在 close 中划线引用');});});});return errs;}
+function validateOnly(){var r=parseCourse(),errs=r.errors.concat(r.course?validate(r.course):[]);if(errs.length)setResult('<span class="bad">未通过：</span><br>'+errs.map(function(e){return '· '+e;}).join('<br>'));else setResult('<span class="ok">校验通过。</span><br>课程码：<b>'+normCode(r.course.code)+'</b><br>小节数：'+r.course.chapters.reduce(function(n,ch){return n+ch.sections.length;},0));}
+function saveCourse(){var r=parseCourse(),errs=r.errors.concat(r.course?validate(r.course):[]);if(errs.length){validateOnly();return;}var store=loadStore(),code=normCode(r.course.code);r.course.code=code;r.course.status=r.course.status||'lab';r.course.updatedAt=new Date().toISOString();store[code]=r.course;saveStore(store);document.getElementById('codeJump').value=code;setResult('<span class="ok">已保存到实验区。</span><br>课程码：<b>'+code+'</b><br>回到主站输入课程码即可查看。');renderList();}
+function previewCourse(){var code=normCode(document.getElementById('codeJump').value);if(!code){setResult('<span class="warn">请先输入或保存课程码。</span>');return;}location.href='index.html?lab='+encodeURIComponent(code);}
+function renderList(){var list=document.getElementById('courseList'),store=loadStore(),codes=Object.keys(store).sort();list.innerHTML='';if(!codes.length){list.innerHTML='<div class="spec-item">暂无本机实验课程。</div>';return;}codes.forEach(function(code){var c=store[code];var row=document.createElement('div');row.className='course-item';row.innerHTML='<div><b>'+c.title+'</b><span>'+code+' · '+(c.status||'lab')+'</span></div>';var btn=document.createElement('button');btn.className='mini';btn.textContent='预览';btn.onclick=function(){location.href='index.html?lab='+encodeURIComponent(code);};row.appendChild(btn);list.appendChild(row);});}
+document.getElementById('fileInput').addEventListener('change',function(){var f=this.files&&this.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){document.getElementById('jsonBox').value=rd.result;validateOnly();};rd.readAsText(f);});
+loadTemplate();renderList();
+</script>
+</body>
+</html>
