@@ -32,7 +32,7 @@
   .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0;min-width:0;}
   .actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px;}
   .edit-actions{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,.8fr);gap:8px;margin-top:10px;}
-  .check-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px;}
+  .check-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px;}
   .btn{height:42px;border:none;border-radius:12px;padding:0 14px;font-weight:900;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-grid;place-items:center;text-align:center;white-space:nowrap;line-height:1;color:inherit;}
   .btn:active{transform:translateY(3px);box-shadow:none}
   .primary{background:#58cc02;color:#fff;box-shadow:0 4px 0 #46a302}.violet{background:#ede9fe;color:#6d28d9;box-shadow:0 4px 0 #c4b5fd}.blue{background:#dff7ff;color:#0891b2;box-shadow:0 4px 0 #a5f3fc}.ghost{background:#f8fafc;color:#4b4869;border:2px solid #e6e9f2;}
@@ -45,7 +45,7 @@
   .modal-card p{margin:8px 0;color:#4b4869;line-height:1.65;font-size:14px}.modal-card code{background:#f5f3ff;color:#6d28d9;padding:2px 6px;border-radius:6px;font-weight:900}
   .ok{color:#16a34a;font-weight:900}.warn{color:#d99a12;font-weight:900}.bad{color:#dc2626;font-weight:900}
   .spec{display:grid;gap:8px}.spec-item{background:#f8fafc;border:1.5px solid #e6e9f2;border-radius:14px;padding:10px 12px;font-size:13px;color:#4b4869;line-height:1.55}.spec-item b{color:#6d28d9}
-  .course-list{display:grid;gap:8px;margin-top:10px}.course-item{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;background:#f8fafc;border:1.5px solid #e6e9f2;border-radius:14px;padding:10px}.course-item b{color:#1e1b3a}.course-item span{display:block;color:#6b7280;font-size:12px;margin-top:2px}
+  .course-list{display:grid;gap:8px;margin-top:10px}.course-item{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;background:#f8fafc;border:1.5px solid #e6e9f2;border-radius:14px;padding:10px}.course-item b{color:#1e1b3a}.course-item span{display:block;color:#6b7280;font-size:12px;margin-top:2px}.pub-code{display:inline-block;margin-left:8px;background:#ecfdf5;color:#15803d;border:1px solid #bbf7d0;border-radius:999px;padding:2px 8px;font-size:12px;font-weight:900;}
   .mini{height:32px;border:none;border-radius:10px;background:#ede9fe;color:#6d28d9;font-weight:900;padding:0 10px;cursor:pointer}
   @media(max-width:920px){.edit-layout{grid-template-columns:1fr}.flow{grid-template-columns:repeat(2,1fr)}textarea{min-height:420px}.actions,.check-actions{grid-template-columns:repeat(2,1fr)}}
   @media(max-width:560px){.page{padding:14px 10px 34px}.top{align-items:flex-start}.back{height:38px;padding:0 10px}h1{font-size:21px}.guide{grid-template-columns:64px 1fr;padding:12px}.abo{transform:scale(.78);transform-origin:left bottom;width:64px}.flow{grid-template-columns:1fr}.actions,.edit-actions,.check-actions{grid-template-columns:1fr}.btn{width:100%}.row{display:grid;grid-template-columns:1fr}.course-item{grid-template-columns:1fr}.mini{width:100%;height:36px}.upload-panel{padding:12px}textarea{min-height:360px;font-size:12px}.bubble{font-size:13px}}
@@ -58,21 +58,21 @@
       <a class="back" href="index.html">← 返回主站</a>
       <div>
         <h1>🧪 众包课程上传</h1>
-        <p class="sub">第一阶段 MVP：把结构化课程包保存到浏览器本地。主网页输入课程码后，会动态接入同一个阅读器。</p>
+        <p class="sub">本地保存用于继续编辑；点击发布后上传服务器并生成 4 位课程码，其他电脑也能预览。</p>
       </div>
     </div>
     <section class="guide">
       <div class="abo" aria-hidden="true">
         <i class="backplate"></i><i class="face"></i><i class="visor"></i><i class="eye l"></i><i class="eye r"></i><i class="side l"></i><i class="side r"></i><i class="bar"></i>
       </div>
-      <div class="bubble"><b>阿波：</b>先下载创作 Skill，照着它写课程包；再导入 JSON、校验、保存课程码。最后回主站输入课程码，就能隐藏预览啦。</div>
+      <div class="bubble"><b>阿波：</b>先下载创作 Skill，照着它写课程包；再导入 JSON、校验并保存到本地。想给别人看时，点实验区里的“发布”，我会给你一个 4 位课程码。</div>
     </section>
     <section class="flow">
       <div class="step"><b>1. 下载 Skill</b><span>先确认风格、节奏、术语和 UX 规范。</span></div>
       <div class="step"><b>2. 写 JSON</b><span>复制模板，用本地 AI 或手写生成课程包。</span></div>
       <div class="step"><b>3. 校验</b><span>检查字段、术语划线和小节结构。</span></div>
-      <div class="step"><b>4. 保存课程码</b><span>课程先隐藏在实验区，不进正式主线。</span></div>
-      <div class="step"><b>5. 主站预览</b><span>输入课程码，动态接入阅读器。</span></div>
+      <div class="step"><b>4. 发布</b><span>上传服务器，生成不重复 4 位课程码。</span></div>
+      <div class="step"><b>5. 预览</b><span>其他电脑输入课程码，也能动态接入阅读器。</span></div>
     </section>
     <div class="upload-stack">
       <section class="upload-panel">
@@ -93,26 +93,22 @@
             </div>
           </div>
           <div class="sidebox">
-            <div class="spec-item"><b>课程码</b><br>`code` 会成为主站隐藏查看入口。</div>
+            <div class="spec-item"><b>课程码</b><br>JSON 不需要写 `code`；点击发布后由服务器生成不重复 4 位码。</div>
             <div class="spec-item"><b>结构</b><br>课程包必须包含章节、小节、UX、术语和收束段。</div>
-            <div class="spec-item"><b>预览</b><br>保存后可直接跳回主站读取这份课程包。</div>
+            <div class="spec-item"><b>发布</b><br>保存只留在本地；发布后其他电脑才能用课程码查看。</div>
           </div>
         </div>
       </section>
       <section class="upload-panel">
-        <h2>3. 校验 / 保存 / 预览</h2>
+        <h2>3. 校验 / 保存</h2>
         <div class="result" id="result">等待上传。</div>
         <div class="check-actions">
           <button type="button" class="btn violet" onclick="validateOnly()">校验格式</button>
           <button type="button" class="btn primary" onclick="saveCourse()">保存到实验区</button>
-          <button type="button" class="btn blue" onclick="previewCourse()">去主站预览</button>
-        </div>
-        <div class="row">
-          <input class="code" id="codeJump" placeholder="课程码">
         </div>
       </section>
       <section class="upload-panel">
-        <h2 style="margin-top:18px">本机实验课程</h2>
+        <h2 style="margin-top:18px">实验区课程</h2>
         <div class="course-list" id="courseList"></div>
       </section>
     </div>
@@ -121,14 +117,15 @@
 <div class="modal" id="planModal" onclick="closePlan(event)">
   <div class="modal-card">
     <div class="modal-head"><h3>工程实现方案</h3><button type="button" onclick="closePlan()">×</button></div>
-    <p><b>第一阶段：</b>上传页把课程 JSON 保存到同源浏览器存储，主站输入课程码后动态加载。</p>
-    <p><b>接入方式：</b>课程包会转换成 <code>CHAPTERS['lab:CODE']</code>，复用现有阅读器、阿波、术语、逐段展开和金币流程。</p>
-    <p><b>归档方式：</b>测试通过后，把课程包移动到正式课程索引；后续再升级为后端上传和审核队列。</p>
+    <p><b>本地保存：</b>保存按钮只把课程 JSON 留在当前浏览器，方便继续修改。</p>
+    <p><b>发布：</b>实验区课程点“发布”后上传服务器，服务器生成不重复 4 位课程码，其他电脑可用课程码预览。</p>
+    <p><b>接入方式：</b>主站按课程码读取课程包，转换成 <code>CHAPTERS['lab:CODE']</code>，复用现有阅读器、阿波、术语、逐段展开和金币流程。</p>
   </div>
 </div>
 <script>
 var STORE='ai-explorer-lab-courses-v1';
 function normCode(x){return String(x||'').trim().toUpperCase().replace(/\s+/g,'-');}
+function localId(){return 'draft-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,6);}
 function loadStore(){try{return JSON.parse(localStorage.getItem(STORE)||'{}')||{};}catch(e){return {};}}
 function saveStore(s){localStorage.setItem(STORE,JSON.stringify(s));}
 function setResult(html){document.getElementById('result').innerHTML=html;}
@@ -137,7 +134,6 @@ function closePlan(ev){if(!ev||ev.target.id==='planModal')document.getElementByI
 var TEMPLATE={
   schemaVersion:'1.0',
   id:'internet-security-basic',
-  code:'NET-001',
   status:'lab',
   title:'网络安全小侦探',
   subtitle:'密码、隐私和骗子链接',
@@ -183,12 +179,13 @@ var TEMPLATE={
 };
 function loadTemplate(){document.getElementById('jsonBox').value=JSON.stringify(TEMPLATE,null,2);setResult('<span class="ok">已载入模板。</span>');}
 function parseCourse(){try{return{course:JSON.parse(document.getElementById('jsonBox').value),errors:[]};}catch(e){return{course:null,errors:['JSON 解析失败：'+e.message]};}}
-function validate(c){var errs=[];if(!c||typeof c!=='object')errs.push('课程包不是对象');if(!c.schemaVersion)errs.push('缺少 schemaVersion');if(!c.id)errs.push('缺少 id');if(!c.code)errs.push('缺少 code 课程码');if(!c.title)errs.push('缺少 title');if(!c.audience)errs.push('缺少 audience');if(!Array.isArray(c.sourceSkills)||!c.sourceSkills.length)errs.push('缺少 sourceSkills');if(!Array.isArray(c.chapters)||!c.chapters.length)errs.push('至少需要 1 个 chapter');
+function validate(c){var errs=[];if(!c||typeof c!=='object')errs.push('课程包不是对象');if(!c.schemaVersion)errs.push('缺少 schemaVersion');if(!c.id)errs.push('缺少 id');if(!c.title)errs.push('缺少 title');if(!c.audience)errs.push('缺少 audience');if(!Array.isArray(c.sourceSkills)||!c.sourceSkills.length)errs.push('缺少 sourceSkills');if(!Array.isArray(c.chapters)||!c.chapters.length)errs.push('至少需要 1 个 chapter');
   (c.chapters||[]).forEach(function(ch,ci){if(!ch.id)errs.push('第 '+(ci+1)+' 章缺少 id');if(!ch.title)errs.push('第 '+(ci+1)+' 章缺少 title');if(!Array.isArray(ch.sections)||!ch.sections.length)errs.push('第 '+(ci+1)+' 章至少需要 1 个 section');(ch.sections||[]).forEach(function(s,si){['id','heading','hook','paras','ux','after','terms','close'].forEach(function(k){if(s[k]==null)errs.push('第 '+(ci+1)+' 章第 '+(si+1)+' 节缺少 '+k);});if(s.paras&&!Array.isArray(s.paras))errs.push('第 '+(ci+1)+' 章第 '+(si+1)+' 节 paras 必须是数组');if(s.after&&!Array.isArray(s.after))errs.push('第 '+(ci+1)+' 章第 '+(si+1)+' 节 after 必须是数组');var close=s.close||'',terms=s.terms||{};Object.keys(terms).forEach(function(t){if(close.indexOf('[['+t+']]')<0)errs.push('第 '+(ci+1)+' 章第 '+(si+1)+' 节术语「'+t+'」没有在 close 中划线引用');});});});return errs;}
-function validateOnly(){var r=parseCourse(),errs=r.errors.concat(r.course?validate(r.course):[]);if(errs.length)setResult('<span class="bad">未通过：</span><br>'+errs.map(function(e){return '· '+e;}).join('<br>'));else setResult('<span class="ok">校验通过。</span><br>课程码：<b>'+normCode(r.course.code)+'</b><br>小节数：'+r.course.chapters.reduce(function(n,ch){return n+ch.sections.length;},0));}
-function saveCourse(){var r=parseCourse(),errs=r.errors.concat(r.course?validate(r.course):[]);if(errs.length){validateOnly();return;}var store=loadStore(),code=normCode(r.course.code);r.course.code=code;r.course.status=r.course.status||'lab';r.course.updatedAt=new Date().toISOString();store[code]=r.course;saveStore(store);document.getElementById('codeJump').value=code;setResult('<span class="ok">已保存到实验区。</span><br>课程码：<b>'+code+'</b><br>回到主站输入课程码即可查看。');renderList();}
-function previewCourse(){var code=normCode(document.getElementById('codeJump').value);if(!code){setResult('<span class="warn">请先输入或保存课程码。</span>');return;}location.href='index.html?lab='+encodeURIComponent(code);}
-function renderList(){var list=document.getElementById('courseList'),store=loadStore(),codes=Object.keys(store).sort();list.innerHTML='';if(!codes.length){list.innerHTML='<div class="spec-item">暂无本机实验课程。</div>';return;}codes.forEach(function(code){var c=store[code];var row=document.createElement('div');row.className='course-item';row.innerHTML='<div><b>'+c.title+'</b><span>'+code+' · '+(c.status||'lab')+'</span></div>';var btn=document.createElement('button');btn.className='mini';btn.textContent='预览';btn.onclick=function(){location.href='index.html?lab='+encodeURIComponent(code);};row.appendChild(btn);list.appendChild(row);});}
+function validateOnly(){var r=parseCourse(),errs=r.errors.concat(r.course?validate(r.course):[]);if(errs.length)setResult('<span class="bad">未通过：</span><br>'+errs.map(function(e){return '· '+e;}).join('<br>'));else setResult('<span class="ok">校验通过。</span><br>小节数：'+r.course.chapters.reduce(function(n,ch){return n+ch.sections.length;},0)+'<br>下一步：保存到实验区，再点击课程旁边的“发布”。');}
+function saveCourse(){var r=parseCourse(),errs=r.errors.concat(r.course?validate(r.course):[]);if(errs.length){validateOnly();return;}var store=loadStore(),id=r.course.localId||localId();r.course.localId=id;r.course.status=r.course.status||'draft';r.course.updatedAt=new Date().toISOString();store[id]=r.course;saveStore(store);setResult('<span class="ok">已保存到本地实验区。</span><br>这一步不会公开课程；请在下方列表点击“发布”生成 4 位课程码。');renderList();}
+async function publishCourse(id){var store=loadStore(),c=store[id];if(!c){setResult('<span class="warn">找不到本地课程。</span>');return;}setResult('<span class="warn">正在发布到服务器...</span>');try{var res=await fetch('api/courses/publish',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({course:c})});var data=await res.json();if(!res.ok)throw new Error(data.error||'发布失败');c.code=data.code;c.status='published';c.expiresAt=data.expiresAt;c.previewUrl=data.previewUrl;store[id]=c;saveStore(store);setResult('<span class="ok">发布成功。</span><br>课程码：<b>'+data.code+'</b><br>有效期至：'+new Date(data.expiresAt).toLocaleString());renderList();}catch(e){setResult('<span class="bad">发布失败：</span>'+e.message);}}
+function previewPublished(code){location.href='index.html?lab='+encodeURIComponent(code);}
+function renderList(){var list=document.getElementById('courseList'),store=loadStore(),ids=Object.keys(store).sort(function(a,b){return String(store[b].updatedAt||'').localeCompare(String(store[a].updatedAt||''));});list.innerHTML='';if(!ids.length){list.innerHTML='<div class="spec-item">暂无本机实验课程。</div>';return;}ids.forEach(function(id){var c=store[id],code=c.code||'';var row=document.createElement('div');row.className='course-item';row.innerHTML='<div><b>'+c.title+'</b>'+(code?'<span class="pub-code">'+code+'</span>':'')+'<span>'+(code?'已发布 · 有效期至 '+new Date(c.expiresAt).toLocaleString():'本地草稿 · 未发布')+'</span></div>';var btn=document.createElement('button');btn.className='mini';btn.textContent=code?'预览':'发布';btn.onclick=function(){code?previewPublished(code):publishCourse(id);};row.appendChild(btn);list.appendChild(row);});}
 document.getElementById('fileInput').addEventListener('change',function(){var f=this.files&&this.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){document.getElementById('jsonBox').value=rd.result;validateOnly();};rd.readAsText(f);});
 loadTemplate();renderList();
 </script>

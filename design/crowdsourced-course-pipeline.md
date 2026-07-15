@@ -723,29 +723,29 @@ Supabase Auth + Postgres + Edge Functions
 ```text
 upload.html
   众包课程上传页
-  支持载入模板、文件导入、格式校验、保存课程码、跳转预览
+  支持载入模板、文件导入、格式校验、保存本地草稿、发布服务器课程
 
 index.html
   首页新增“实验课程”隐藏入口
-  输入课程码后动态加载 localStorage 中的课程包
+  输入课程码后优先读取本地缓存，找不到再请求服务器课程
   复用现有阿波、术语划线、逐段展开、金币、通关流程
 ```
 
 ### 当前课程码机制
 
-课程包里必须有：
+课程包 JSON 不手写 `code`。上传页点击“保存到实验区”时，只写入当前浏览器 `localStorage`，不会公开。点击“发布”后，服务器写入：
 
 ```json
 {
-  "code": "NET-001",
-  "status": "lab"
+  "code": "1234",
+  "status": "published"
 }
 ```
 
-上传后主站输入 `NET-001` 即可查看。也可以访问：
+发布后主站输入 `1234` 即可查看。也可以访问：
 
 ```text
-index.html?lab=NET-001
+index.html?lab=1234
 ```
 
 ### 部署研判
@@ -756,7 +756,9 @@ index.html?lab=NET-001
 
 ```text
 打开 upload.html 保存课程
-  -> 打开 index.html 输入课程码
+  -> 仅留在当前浏览器实验区
+  -> 点击发布
+  -> 获得 4 位课程码
 ```
 
 限制：课程存在当前浏览器的 `localStorage`，换设备/换浏览器不可见。
@@ -928,7 +930,7 @@ value：
 如果使用 Redis：
 
 ```text
-SET course:NET-001 <json> EX 604800
+SET course:1234 <json> EX 604800
 ```
 
 这样 7 天后自动清除，不需要手写清理任务。
@@ -957,9 +959,9 @@ DELETE /api/courses/:code
 
 ```json
 {
-  "code": "NET-001",
+  "code": "1234",
   "expiresAt": "2026-07-22T00:00:00Z",
-  "previewUrl": "/index.html?lab=NET-001"
+  "previewUrl": "/index.html?lab=1234"
 }
 ```
 

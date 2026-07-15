@@ -8,6 +8,7 @@ __pycache__/
 Thumbs.db
 *.log
 .cache/
+.data/
 .next/
 .nuxt/
 *.db
