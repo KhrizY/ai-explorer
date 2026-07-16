@@ -108,6 +108,18 @@ function courseValid(course) {
   );
 }
 
+function courseFingerprint(course) {
+  const chapter = Array.isArray(course?.chapters) && course.chapters[0] ? course.chapters[0] : {};
+  const sections = Array.isArray(chapter.sections) ? chapter.sections : [];
+  const headings = sections.map((s) => String(s?.heading || s?.id || '').trim().toLowerCase()).join('>');
+  return [
+    String(course?.title || '').trim().toLowerCase(),
+    String(chapter.title || chapter.id || '').trim().toLowerCase(),
+    String(sections.length),
+    headings
+  ].join('|');
+}
+
 function makeCode(store) {
   for (let i = 0; i < 100; i++) {
     const code = String(Math.floor(1000 + Math.random() * 9000));
@@ -130,13 +142,18 @@ async function handleApi(req, res, url) {
         return;
       }
       const store = cleanStore(readStore());
-      const code = makeCode(store);
+      const fingerprint = courseFingerprint(course);
+      const oldCode = Object.keys(store).find((code) => {
+        const item = store[code] || {};
+        return (item.fingerprint || courseFingerprint(item.course)) === fingerprint;
+      });
+      const code = oldCode || makeCode(store);
       const expiresAt = new Date(Date.now() + TTL_MS).toISOString();
       course.code = code;
       course.status = 'published';
       course.publishedAt = new Date().toISOString();
       course.expiresAt = expiresAt;
-      store[code] = { course, expiresAt };
+      store[code] = { course, expiresAt, fingerprint };
       writeStore(store);
       json(res, 200, {
         code,
@@ -150,13 +167,14 @@ async function handleApi(req, res, url) {
   }
   if (req.method === 'GET' && url.pathname === '/api/courses') {
     const store = cleanStore(readStore());
-    const courses = Object.keys(store)
-      .map((code) => {
+    const seen = new Map();
+    Object.keys(store).forEach((code) => {
         const item = store[code] || {};
         const course = item.course || {};
         const chapter = Array.isArray(course.chapters) && course.chapters[0] ? course.chapters[0] : {};
         const sections = Array.isArray(chapter.sections) ? chapter.sections.length : 0;
-        return {
+        const fp = item.fingerprint || courseFingerprint(course) || code;
+        const row = {
           code,
           title: course.title || chapter.title || `实验课程 ${code}`,
           emoji: course.emoji || '🧪',
@@ -165,9 +183,12 @@ async function handleApi(req, res, url) {
           publishedAt: course.publishedAt || '',
           expiresAt: item.expiresAt || course.expiresAt || ''
         };
+        const prev = seen.get(fp);
+        if (!prev || String(row.publishedAt || '').localeCompare(String(prev.publishedAt || '')) > 0) seen.set(fp, row);
       })
+    const courses = Array.from(seen.values())
       .sort((a, b) => String(b.publishedAt || '').localeCompare(String(a.publishedAt || '')));
-    json(res, 200, { ok: true, courses });
+    json(res, 200, { ok: true, total: courses.length, courses });
     return;
   }
   const m = url.pathname.match(/^\/api\/courses\/([0-9]{4})$/);
