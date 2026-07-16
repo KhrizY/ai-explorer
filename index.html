@@ -279,6 +279,7 @@ function buildArcadeGame(cfg,onWin,onReset){var b=ixbox(cfg.title,cfg.hint,onRes
 var ST;try{ST=JSON.parse(localStorage.getItem('ai-explorer-2')||'null');}catch(e){ST=null;}
 if(!ST)ST={xp:0,done:{},badges:[]};if(!ST.collected)ST.collected={};
 function save(){try{localStorage.setItem('ai-explorer-2',JSON.stringify(ST));}catch(e){}}
+function isFullUnlock(){return !!ST.debugUnlock;}
 var LEVELS=[
   {n:'AI 新手',e:'🚀',xp:0,d:'刚刚启程，先完成序章和第一站。'},
   {n:'见习探险家',e:'🛰️',xp:100,d:'开始理解 AI 的基本工作方式。'},
@@ -291,6 +292,21 @@ function levelInfo(){var xp=ST.xp||0,idx=0;for(var i=0;i<LEVELS.length;i++){if(x
 function courseCatalog(){var arr=[];STATIONS.forEach(function(s){var ch=CHAPTERS[s.id];if(ch)arr.push({id:s.id,type:'主线',cls:'main',name:s.id+' · '+s.name,badge:ch.badge});});if(typeof ADV!=='undefined')ADV.forEach(function(a){var id=a.chapter,ch=id&&CHAPTERS[id];if(ch)arr.push({id:id,type:'进阶',cls:'adv',name:a.t,badge:ch.badge});});Object.keys(ST.done||{}).forEach(function(id){if(id.indexOf('lab:')===0&&!arr.some(function(x){return x.id===id;})){var ch=CHAPTERS[id];arr.push({id:id,type:'实验',cls:'lab',name:ch?ch.title.replace(/^[^ ]+ /,''):'实验课程',badge:ch?ch.badge:{e:'🧪',t:id.replace('lab:','实验课程 '),s:'你完成了一门实验课程'}});}});return arr;}
 function progressStats(){var all=courseCatalog(),main=all.filter(function(x){return x.cls==='main';}),adv=all.filter(function(x){return x.cls==='adv';});function count(a){return a.filter(function(x){return ST.done&&ST.done[x.id];}).length;}return{all:all,main:main,adv:adv,doneAll:count(all),doneMain:count(main),doneAdv:count(adv)};}
 function syncTop(){var li=levelInfo();document.getElementById('lvl').textContent=li.cur.n;document.getElementById('gem').textContent='✨ '+ST.xp;document.getElementById('xpbar').style.width=li.pct+'%';document.getElementById('chxp').textContent='✨ '+ST.xp;}
+var coinTapCount=0,coinTapTimer=null;
+function handleCoinDebugTap(){
+  coinTapCount++;
+  if(coinTapTimer)clearTimeout(coinTapTimer);
+  coinTapTimer=setTimeout(function(){coinTapCount=0;},1600);
+  if(coinTapCount<5)return;
+  coinTapCount=0;
+  var next=!ST.debugUnlock;
+  if(confirm(next?'进入全解锁调试模式？\\n所有章节会默认展开全部 S 小节和 beat 语句块。':'退出全解锁调试模式？')){
+    ST.debugUnlock=next;save();syncTop();toast(next?'全解锁模式已开启':'全解锁模式已关闭',next);
+    if(CH&&document.getElementById('scr-ch').classList.contains('on'))enterChapter(CH.id);
+  }
+}
+document.getElementById('gem').addEventListener('click',handleCoinDebugTap);
+document.getElementById('chxp').addEventListener('click',handleCoinDebugTap);
 function awardCoins(n,ev){ST.xp+=n;save();
   var x=(ev&&ev.clientX)?ev.clientX:innerWidth/2,y=(ev&&ev.clientY)?ev.clientY:140;
   var mapOn=document.getElementById('scr-map').classList.contains('on');var g=document.getElementById(mapOn?'gem':'chxp');var t=g.getBoundingClientRect();var tx=t.left+t.width/2,ty=t.top+t.height/2;
@@ -304,7 +320,7 @@ function awardCoins(n,ev){ST.xp+=n;save();
   var f=el('div','coin one','+'+n+' ✨');f.style.left=(x+10)+'px';f.style.top=(y-34)+'px';f.style.opacity='0';document.body.appendChild(f);
   requestAnimationFrame(function(){f.style.transition='transform .75s ease,opacity .75s';f.style.opacity='1';f.style.transform='translateY(-36px) scale(1.18)';});
   setTimeout(function(){f.remove();},850);}
-function resetProgress(){if(!confirm('确定要重置所有金币、章节进度和勋章吗？'))return;ST={xp:0,done:{},badges:[],collected:{}};save();syncTop();renderMap();renderBadges();toast('进度已重置',false);}
+function resetProgress(){if(!confirm('确定要重置所有金币、章节进度和勋章吗？'))return;var debug=ST.debugUnlock;ST={xp:0,done:{},badges:[],collected:{},debugUnlock:debug};save();syncTop();renderMap();renderBadges();toast('进度已重置',false);}
 function hideBadges(){document.getElementById('badgepop').classList.remove('open');}
 function renderBadges(){var stat=document.getElementById('badgestat'),grid=document.getElementById('badgegrid');if(!stat||!grid)return;var ps=progressStats(),gotCount=ps.all.filter(function(x){return ST.badges.indexOf(x.badge.t)>=0;}).length;
   stat.innerHTML='<div>金币<b>✨ '+ST.xp+'</b></div><div>主线<b>'+ps.doneMain+' / '+ps.main.length+'</b></div><div>进阶<b>'+ps.doneAdv+' / '+ps.adv.length+'</b></div>';
@@ -948,7 +964,7 @@ CHAPTERS['序']={id:'序',title:'🎬 序 · AI 到底是不是魔法？',badge:
 
 // ========== 章节渲染 ==========
 var curSec=0;
-function enterChapter(id){CH=CHAPTERS[id];show('scr-ch');document.getElementById('chtitle').textContent=CH.title;curSec=(ST.done[id]&&id.indexOf('adv:')!==0&&!CH.beat)?CH.sections.length:0;document.getElementById('chbody').innerHTML='';syncTop();renderSec();}
+function enterChapter(id){CH=CHAPTERS[id];show('scr-ch');document.getElementById('chtitle').textContent=CH.title;curSec=(ST.done[id]&&id.indexOf('adv:')!==0&&!CH.beat)?CH.sections.length:0;document.getElementById('chbody').innerHTML='';syncTop();if(isFullUnlock()){window._fullUnlockBatch=true;for(curSec=0;curSec<CH.sections.length;curSec++)renderSec();renderEnd();window._fullUnlockBatch=false;window.scrollTo(0,0);return;}renderSec();}
 function hookText(html){var d=document.createElement('div');d.innerHTML=html||'';var txt=d.textContent||'';return txt.replace(/^\s*阿波\s*[:：]\s*/,'').trim();}
 function buildApoTalk(html,instant){
   var box=el('div','apo-talk');
@@ -990,12 +1006,12 @@ function renderSec(){
   var sec=CH.sections[curSec];
   var wrap=el('div','section');
   wrap.appendChild(el('div','section-heading','<span class="section-num">'+sec.n+'</span>'+sec.heading));
-  var reviewHook=!!(ST.done[CH.id]||ST.collected[CH.id+'.'+sec.n]);
+  var reviewHook=!!(isFullUnlock()||ST.done[CH.id]||ST.collected[CH.id+'.'+sec.n]);
   wrap.appendChild(buildApoTalk(sec.hook,reviewHook));
   var host=el('div');
   var rw=function(ev){var k=CH.id+'.'+sec.n;if(ST.collected[k]){completeFeedback(host,'这关已经完成过啦');return;}ST.collected[k]=true;save();awardCoins(10,ev);completeFeedback(host,'完成！金币已入库');};
   function mountIx(){host.innerHTML='';host.appendChild(sec.build(rw,mountIx));}
-  function addNextBtn(){var nw=el('div','next-wrap');var btn=el('button','next-btn',sec.nextHint||'完成这一章 →');btn.onclick=function(){curSec++;renderSec();};nw.appendChild(btn);wrap.appendChild(nw);}
+  function addNextBtn(){if(isFullUnlock())return;var nw=el('div','next-wrap');var btn=el('button','next-btn',sec.nextHint||'完成这一章 →');btn.onclick=function(){curSec++;renderSec();};nw.appendChild(btn);wrap.appendChild(nw);}
   if(!CH.beat){
     // —— 旧渲染（未开启 beat 的章保持原样）——
     mountIx();wrap.appendChild(host);
@@ -1009,15 +1025,15 @@ function renderSec(){
     blocks.push(function(){var d=el('div','beat');mountIx();d.appendChild(host);return d;});
     if(sec.after)sec.after.forEach(function(p){blocks.push(function(){var d=el('div','beat');d.appendChild(parseP(p,sec.terms));return d;});});
     blocks.push(function(){var d=el('div','beat');d.appendChild(parseP(sec.close,sec.terms));if(sec.peg)d.appendChild(el('div','anchor-line',sec.peg));return d;});
-    var review=!!(ST.done[CH.id]||ST.collected[CH.id+'.'+sec.n]),idx=0;
+    var review=!!(isFullUnlock()||ST.done[CH.id]||ST.collected[CH.id+'.'+sec.n]),idx=0;
     function showArrow(){var a=el('button','beat-more','<span>▽</span>');a.title='点一下，继续';a.onclick=function(){a.remove();var node=blocks[idx++]();wrap.appendChild(node);if(node.scrollIntoView)node.scrollIntoView({behavior:'smooth',block:'center'});if(idx<blocks.length)showArrow();else addNextBtn();};wrap.appendChild(a);}
     if(review){while(idx<blocks.length)wrap.appendChild(blocks[idx++]());addNextBtn();}
     else showArrow();
   }
   document.getElementById('chbody').appendChild(wrap);
-  wrap.scrollIntoView({behavior:'smooth',block:'start'});
+  if(!window._fullUnlockBatch)wrap.scrollIntoView({behavior:'smooth',block:'start'});
 }
-function renderEnd(){if(document.getElementById('end-'+CH.id))return;var wrap=el('div','section');wrap.id='end-'+CH.id;wrap.appendChild(el('div','section-heading','<span class="section-num">🎮</span>通关挑战'));var host=el('div');var won=false;function mountG(){won=false;var old=document.getElementById('finish-'+CH.id);if(old)old.remove();host.innerHTML='';host.appendChild((CH.endGame||buildChallenge)(function(e){if(won)return;won=true;finishChapter(e);},mountG));}mountG();wrap.appendChild(host);var back=el('div','next-wrap');var backBtn=el('button','next-btn','🗺️ 返回主页面');backBtn.onclick=goMap;back.appendChild(backBtn);wrap.appendChild(back);document.getElementById('chbody').appendChild(wrap);wrap.scrollIntoView({behavior:document.body.classList.contains('debug-end')?'auto':'smooth'});}
+function renderEnd(){if(document.getElementById('end-'+CH.id))return;var wrap=el('div','section');wrap.id='end-'+CH.id;wrap.appendChild(el('div','section-heading','<span class="section-num">🎮</span>通关挑战'));var host=el('div');var won=false;function mountG(){won=false;var old=document.getElementById('finish-'+CH.id);if(old)old.remove();host.innerHTML='';host.appendChild((CH.endGame||buildChallenge)(function(e){if(won)return;won=true;finishChapter(e);},mountG));}mountG();wrap.appendChild(host);var back=el('div','next-wrap');var backBtn=el('button','next-btn','🗺️ 返回主页面');backBtn.onclick=goMap;back.appendChild(backBtn);wrap.appendChild(back);document.getElementById('chbody').appendChild(wrap);if(!window._fullUnlockBatch)wrap.scrollIntoView({behavior:document.body.classList.contains('debug-end')?'auto':'smooth'});}
 function finishChapter(e){if(window._finishingChapter===CH.id||document.getElementById('finish-'+CH.id))return;window._finishingChapter=CH.id;if(!ST.done[CH.id])awardCoins(50,e);if(ST.badges.indexOf(CH.badge.t)<0)ST.badges.push(CH.badge.t);ST.done[CH.id]=true;save();syncTop();if(e&&e.stayInGame){setTimeout(function(){window._finishingChapter=null;},800);return;}
   var wrap=el('div','section');wrap.style.textAlign='center';
   wrap.id='finish-'+CH.id;
