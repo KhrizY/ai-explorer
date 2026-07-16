@@ -148,6 +148,28 @@ async function handleApi(req, res, url) {
     }
     return;
   }
+  if (req.method === 'GET' && url.pathname === '/api/courses') {
+    const store = cleanStore(readStore());
+    const courses = Object.keys(store)
+      .map((code) => {
+        const item = store[code] || {};
+        const course = item.course || {};
+        const chapter = Array.isArray(course.chapters) && course.chapters[0] ? course.chapters[0] : {};
+        const sections = Array.isArray(chapter.sections) ? chapter.sections.length : 0;
+        return {
+          code,
+          title: course.title || chapter.title || `实验课程 ${code}`,
+          emoji: course.emoji || '🧪',
+          summary: course.summary || course.description || (course.badge && course.badge.summary) || '同学上传的互动实验课程',
+          sections,
+          publishedAt: course.publishedAt || '',
+          expiresAt: item.expiresAt || course.expiresAt || ''
+        };
+      })
+      .sort((a, b) => String(b.publishedAt || '').localeCompare(String(a.publishedAt || '')));
+    json(res, 200, { ok: true, courses });
+    return;
+  }
   const m = url.pathname.match(/^\/api\/courses\/([0-9]{4})$/);
   if (req.method === 'GET' && m) {
     const code = m[1];
