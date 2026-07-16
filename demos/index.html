@@ -817,12 +817,21 @@ demo({id:'uxReActConsole',cat:'v',title:'ReAct 闭环控制台',teach:'Agent S2 
 
 demo({id:'uxRAGPipeline',cat:'v',title:'RAG 检索管道',teach:'Agent S3 · 文档切块、向量化、相似检索，再把资料塞进上下文',mount:function(s){
   s.classList.add('light');
-  var phase=0,done=false,labels=['文档','切块','向量库','问题向量','相似检索','上下文槽','回答'];
-  var pipe=el('div');pipe.style.cssText='width:100%;max-width:430px;display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:wrap;background:#fff;border:2px solid #e6e9f2;border-radius:18px;padding:12px';
-  var msg=el('div','stg-msg','RAG 不是让模型凭空背：先把外部资料找出来。');
-  function draw(){pipe.innerHTML='';labels.forEach(function(l,i){var p=el('span',null,l);p.style.cssText='padding:8px 9px;border-radius:12px;border:1.5px solid '+(i<=phase?'#67e8f9':'#dbe2ef')+';background:'+(i<=phase?'#ecfeff':'#f8fafc')+';color:#1e1b3a;font-size:12px;font-weight:900';pipe.appendChild(p);if(i<labels.length-1)pipe.appendChild(el('b',null,'→'));});}
-  var row=el('div');row.style.cssText='display:flex;gap:8px;justify-content:center;flex-wrap:wrap';['切块','向量化','检索 Top3','注入上下文'].forEach(function(t){var b=el('button','stg-btn',t);b.onclick=function(e){phase=Math.min(6,phase+(t==='切块'?1:t==='向量化'?2:t==='检索 Top3'?2:1));draw();msg.textContent=t==='检索 Top3'?'最近的资料块被吸进上下文槽。':t+' 完成，管道继续往右走。';spark(e.clientX,e.clientY);if(phase>=6&&!done){done=true;bigFlash(s,'资料接上了!',true);}};row.appendChild(b);});
-  s.appendChild(pipe);s.appendChild(row);s.appendChild(msg);draw();
+  if(window._ragDemoTimer){clearInterval(window._ragDemoTimer);window._ragDemoTimer=null;}
+  var done=false,step=0,nodes=[
+    ['文档',10,24,'资料先切块'],['切块',30,24,'长资料拆成小片'],['向量库',50,24,'资料片变坐标'],
+    ['问题',26,76,'问题也变向量'],['相似检索',50,76,'找最近资料片'],['上下文槽',72,76,'资料塞给模型'],['回答',90,76,'基于资料生成']
+  ];
+  var stage=el('div');stage.style.cssText='position:relative;width:100%;max-width:430px;height:238px;background:#fff;border:2px solid #e6e9f2;border-radius:18px;overflow:hidden';
+  var svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 100 100');svg.style.cssText='position:absolute;inset:0;width:100%;height:100%;pointer-events:none';
+  function wire(d,c,w,dash){var p=document.createElementNS(svg.namespaceURI,'path');p.setAttribute('d',d);p.setAttribute('fill','none');p.setAttribute('stroke',c||'#dbe2ef');p.setAttribute('stroke-width',w||2);p.setAttribute('stroke-linecap','round');if(dash)p.setAttribute('stroke-dasharray',dash);svg.appendChild(p);}
+  wire('M10 24 L30 24 L50 24','#dbe2ef',3);wire('M26 76 L50 76','#dbe2ef',3);wire('M50 24 C58 38 58 62 50 76','#c4b5fd',3,'5 5');wire('M50 76 L72 76 L90 76','#dbe2ef',3);stage.appendChild(svg);
+  var chips=[];nodes.forEach(function(n,i){var d=el('div',null,'<b>'+n[0]+'</b><small>'+n[3]+'</small>');d.style.cssText='position:absolute;left:'+n[1]+'%;top:'+n[2]+'%;transform:translate(-50%,-50%);width:70px;min-height:48px;border-radius:15px;background:#f8fafc;border:2px solid #dbe2ef;color:#1e1b3a;display:grid;place-items:center;text-align:center;font-size:12px;font-weight:900;line-height:1.15;transition:.18s;z-index:2';d.querySelector('small').style.cssText='font-size:9.5px;color:#6b7280;font-weight:800';stage.appendChild(d);chips.push(d);});
+  var pulse=el('div',null,'●');pulse.style.cssText='position:absolute;left:10%;top:24%;transform:translate(-50%,-50%);color:#8b5cf6;font-size:24px;text-shadow:0 0 12px #c4b5fd;opacity:0;transition:left .34s ease,top .34s ease,opacity .2s;z-index:3';stage.appendChild(pulse);
+  var btn=el('button','stg-btn v','启动检索'),msg=el('div','stg-msg','静态图先看结构；点按钮让资料沿管道流一次。');
+  function paint(){chips.forEach(function(c,i){var on=i<=step;c.style.background=on?(i===4?'#f5f3ff':'#ecfeff'):'#f8fafc';c.style.borderColor=on?(i===4?'#c4b5fd':'#67e8f9'):'#dbe2ef';c.style.transform='translate(-50%,-50%) '+(i===step?'scale(1.05)':'scale(1)');});pulse.style.left=nodes[step][1]+'%';pulse.style.top=nodes[step][2]+'%';pulse.style.opacity=1;msg.textContent=nodes[step][0]+'：'+nodes[step][3];}
+  btn.onclick=function(e){if(window._ragDemoTimer)clearInterval(window._ragDemoTimer);step=0;paint();spark(e.clientX,e.clientY);window._ragDemoTimer=setInterval(function(){step++;if(step>=nodes.length){clearInterval(window._ragDemoTimer);window._ragDemoTimer=null;msg.textContent='完成：RAG 把检索到的资料接进上下文，再让模型回答。';if(!done){done=true;bigFlash(s,'资料接上了!',true);}return;}paint();},430);};
+  s.appendChild(stage);s.appendChild(btn);s.appendChild(msg);
 }});
 
 demo({id:'uxAPIRequestTrip',cat:'v',title:'API 请求旅行',teach:'上手用 AI S1 · 请求包从前端到后端，再到模型服务，响应再返回',mount:function(s){
