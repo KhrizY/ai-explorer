@@ -94,13 +94,18 @@ function readBody(req) {
 }
 
 function courseValid(course) {
-  return course &&
-    typeof course === 'object' &&
-    course.title &&
-    Array.isArray(course.chapters) &&
-    course.chapters.length &&
-    Array.isArray(course.chapters[0].sections) &&
-    course.chapters[0].sections.length;
+  if (!course ||
+    typeof course !== 'object' ||
+    !course.title ||
+    !Array.isArray(course.chapters) ||
+    !course.chapters.length) return false;
+  return course.chapters.every((chapter) =>
+    chapter &&
+    typeof chapter === 'object' &&
+    Array.isArray(chapter.sections) &&
+    chapter.sections.length >= 4 &&
+    chapter.sections.length <= 8
+  );
 }
 
 function makeCode(store) {

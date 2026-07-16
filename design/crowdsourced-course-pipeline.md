@@ -119,7 +119,9 @@ courses/
     math-probability-basic.course.json
 ```
 
-课程包最小结构：
+课程包结构：
+
+约束：每个 `chapter.sections` 必须包含 **4-8 个 S 小节**。少于 4 节通常无法形成完整学习弧线，超过 8 节应拆成两门课或两个章节。
 
 ```json
 {
@@ -202,6 +204,12 @@ courses/
 - `id`
 - `title`
 - `sections`
+
+章节结构约束：
+
+- `sections.length >= 4`
+- `sections.length <= 8`
+- 推荐 5-6 节：现象入口、核心机制、变量变化、边界误区、应用迁移、综合挑战。
 
 小节级：
 
