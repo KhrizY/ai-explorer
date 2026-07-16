@@ -11,6 +11,49 @@
   .screen{display:none;min-height:100vh;} .screen.on{display:block;animation:fadeUp .4s ease both;}
   body.debug-end .screen.on,body.debug-end .section,body.debug-end .ixbox-hint,body.debug-end .fbline{animation:none!important;}
   @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  .cover-screen{position:relative;overflow:hidden;background:
+    radial-gradient(circle at 18% 16%,rgba(34,211,238,.18),transparent 30%),
+    radial-gradient(circle at 82% 12%,rgba(139,92,246,.20),transparent 28%),
+    linear-gradient(180deg,#161132 0%,#201454 54%,#120d2c 100%);color:#fff;}
+  .cover-screen:before{content:"";position:absolute;inset:0;background-image:
+    radial-gradient(circle,rgba(255,255,255,.75) 0 1px,transparent 1.4px),
+    linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px);
+    background-size:42px 42px,100% 72px;opacity:.28;pointer-events:none;}
+  .cover-shell{position:relative;z-index:1;min-height:100vh;width:min(1080px,100%);margin:0 auto;padding:38px 22px 30px;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(300px,.95fr);gap:28px;align-items:center;box-sizing:border-box;}
+  .cover-kicker{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.11);border:1px solid rgba(196,181,253,.28);border-radius:999px;padding:8px 12px;color:#c4f1ff;font-size:13px;font-weight:900;box-shadow:0 4px 0 rgba(10,6,32,.24);}
+  .cover-title{margin:18px 0 12px;font-size:clamp(38px,7vw,78px);line-height:.98;letter-spacing:0;font-weight:1000;color:#fff;text-shadow:0 10px 28px rgba(10,6,32,.38);}
+  .cover-title span{display:block;color:#67e8f9;}
+  .cover-lead{max-width:620px;margin:0;color:#e9d5ff;font-size:clamp(16px,2.2vw,22px);line-height:1.65;font-weight:800;}
+  .cover-lead b{color:#fff;}
+  .cover-actions{display:flex;gap:12px;flex-wrap:wrap;margin:24px 0 18px;align-items:center;}
+  .cover-start,.cover-upload{height:52px;border:none;border-radius:16px;padding:0 22px;font:inherit;font-weight:1000;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:transform .15s,filter .15s,box-shadow .15s;white-space:nowrap;}
+  .cover-start{background:#58cc02;color:#fff;box-shadow:0 6px 0 #46a302;font-size:17px;}
+  .cover-upload{background:rgba(255,255,255,.12);color:#e9d5ff;border:1px solid rgba(196,181,253,.34);box-shadow:0 6px 0 rgba(10,6,32,.28);}
+  .cover-start:hover,.cover-upload:hover{transform:translateY(-2px);filter:brightness(1.04);}
+  .cover-start:active,.cover-upload:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(10,6,32,.28);}
+  .cover-pills{display:flex;gap:8px;flex-wrap:wrap;}
+  .cover-pill{border:1px solid rgba(196,181,253,.28);background:rgba(255,255,255,.10);border-radius:999px;padding:7px 10px;color:#cbd5ff;font-size:12px;font-weight:900;}
+  .cover-visual{position:relative;display:grid;gap:14px;}
+  .cover-ship{position:relative;min-height:420px;border:1px solid rgba(196,181,253,.30);border-radius:28px;background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.06));box-shadow:0 24px 70px rgba(10,6,32,.38),inset 0 0 34px rgba(34,211,238,.08);overflow:hidden;padding:22px;box-sizing:border-box;}
+  .cover-orbit{position:absolute;left:50%;top:48%;width:330px;height:330px;border:2px dashed rgba(196,181,253,.20);border-radius:50%;transform:translate(-50%,-50%);animation:coverSpin 18s linear infinite;}
+  .cover-orbit:before,.cover-orbit:after{content:"";position:absolute;width:54px;height:54px;border-radius:18px;display:grid;place-items:center;background:#fff;box-shadow:0 8px 0 rgba(10,6,32,.14);}
+  .cover-orbit:before{left:20px;top:28px;background:#dcfce7;}
+  .cover-orbit:after{right:18px;bottom:34px;background:#ede9fe;}
+  .cover-abo{position:absolute;left:50%;top:45%;transform:translate(-50%,-50%) scale(1.65);}
+  .cover-abo .apo-bot{cursor:default;}
+  .cover-abo .apo-bot:hover{filter:drop-shadow(0 10px 12px rgba(109,40,217,.16));}
+  .cover-tag{position:absolute;display:flex;align-items:center;gap:7px;border-radius:16px;background:#fff;color:#1e1b3a;border:2px solid #e6e9f2;padding:10px 12px;font-size:13px;font-weight:1000;box-shadow:0 6px 0 rgba(10,6,32,.16);animation:coverBob 2.6s ease-in-out infinite;}
+  .cover-tag b{color:#6d28d9;}
+  .cover-tag.t1{left:22px;top:30px}.cover-tag.t2{right:18px;top:94px;animation-delay:.35s}.cover-tag.t3{left:28px;bottom:92px;animation-delay:.7s}.cover-tag.t4{right:22px;bottom:32px;animation-delay:1s}
+  .cover-panel{border-radius:20px;background:#fff;color:#1e1b3a;padding:16px;border:2px solid #e6e9f2;box-shadow:0 7px 0 #dfe4ef;}
+  .cover-panel h2{margin:0 0 8px;font-size:18px;color:#6d28d9;}
+  .cover-panel p{margin:0;color:#4b4869;font-size:13px;line-height:1.65;font-weight:800;}
+  .cover-flow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;}
+  .cover-flow div{border-radius:14px;background:#f8fafc;border:1px solid #e6e9f2;padding:10px;text-align:center;font-size:12px;font-weight:1000;color:#4b4869;}
+  @keyframes coverSpin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+  @keyframes coverBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+  @media(max-width:820px){.cover-shell{grid-template-columns:1fr;padding-top:26px}.cover-visual{order:-1}.cover-ship{min-height:300px}.cover-abo{transform:translate(-50%,-50%) scale(1.22)}.cover-orbit{width:245px;height:245px}.cover-tag{font-size:11px;padding:8px 9px}.cover-title{margin-top:12px}.cover-actions{margin-top:18px}.cover-start,.cover-upload{width:100%;}.cover-flow{grid-template-columns:1fr}}
+  @media(max-width:480px){.cover-shell{padding-left:16px;padding-right:16px}.cover-ship{min-height:270px;border-radius:22px}.cover-tag.t2{top:72px}.cover-tag.t3{bottom:74px}.cover-title{font-size:42px}.cover-lead{font-size:15px}.cover-pills{display:none}}
   .map-title{text-align:center;color:#e9d5ff;padding:8px 0 0;}
   .map-title h1{font-size:24px;margin:0;} .map-title p{font-size:13px;color:#b4aede;margin:6px 0 0;}
   .wb-top{display:flex;align-items:center;gap:12px;max-width:720px;margin:0 auto;padding:14px 18px 0;}
@@ -199,6 +242,44 @@
 </head>
 <body>
 <div id="app">
+  <section id="scr-cover" class="screen cover-screen">
+    <div class="cover-shell">
+      <div class="cover-copy">
+        <div class="cover-kicker">🚀 给 9-12 岁孩子的互动 AI 启蒙</div>
+        <h1 class="cover-title">AI 探险号<span>把人工智能玩懂</span></h1>
+        <p class="cover-lead">从 <b>看、学、说、做、信</b> 出发，用动画、小游戏和阿波的讲解，把大模型、Agent、RAG、提示词这些硬知识拆成能亲手操作的课程。</p>
+        <div class="cover-actions">
+          <button class="cover-start" onclick="enterCover()">🚀 进入主界面</button>
+          <a class="cover-upload" href="upload.html">🧪 众包上传课程</a>
+        </div>
+        <div class="cover-pills">
+          <span class="cover-pill">逐段展开</span>
+          <span class="cover-pill">可玩 UX 组件</span>
+          <span class="cover-pill">进阶课程</span>
+          <span class="cover-pill">课程码隐藏发布</span>
+        </div>
+      </div>
+      <div class="cover-visual" aria-hidden="true">
+        <div class="cover-ship">
+          <div class="cover-orbit"></div>
+          <div class="cover-tag t1">👁️ <b>看</b>懂像素</div>
+          <div class="cover-tag t2">🧠 <b>训练</b>模型</div>
+          <div class="cover-tag t3">💬 <b>拆</b>大模型</div>
+          <div class="cover-tag t4">🛠️ <b>造</b>AI 助手</div>
+          <div class="cover-abo">
+            <div class="apo-bot happy talking">
+              <i class="apo-back"></i><i class="apo-face"></i><i class="apo-bar"></i><i class="apo-side l"></i><i class="apo-side r"></i><i class="apo-visor"></i><span class="apo-eye l"></span><span class="apo-eye r"></span><span class="apo-cheek l"></span><span class="apo-cheek r"></span><i class="apo-scan"></i>
+            </div>
+          </div>
+        </div>
+        <div class="cover-panel">
+          <h2>老师和同学也能一起造课</h2>
+          <p>下载 skill 规范，按统一 JSON 上传课程包；作品先进入实验区，用课程码预览，优秀内容再归档到主线。</p>
+          <div class="cover-flow"><div>写课程包</div><div>发布课程码</div><div>归档精选</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
   <section id="scr-map" class="screen cosmos">
     <div class="topbar">
       <div class="tb-level" onclick="showLevelPanel()" role="button" tabindex="0" title="查看等级与勋章"><span class="ring">🚀</span><b id="lvl">AI 新手</b></div>
@@ -354,6 +435,9 @@ var STATIONS=[{id:'序',emoji:'🎬',name:'是魔法吗',hue:'--st0'},{id:'看',
 function renderMap(){var mp=document.getElementById('mappath');mp.innerHTML='';var firstUndone=-1;STATIONS.forEach(function(st,i){if(firstUndone<0&&CHAPTERS[st.id]&&!ST.done[st.id])firstUndone=i;});STATIONS.forEach(function(st,i){if(i>0)mp.appendChild(el('div','map-connector'));var done=ST.done[st.id],playable=!!CHAPTERS[st.id],locked=!playable&&!done;var s=el('div','station'+(i===firstUndone?' current':'')+(locked?' locked':''));s.style.setProperty('--_h','var('+st.hue+')');s.innerHTML='<div class="st-orb">'+st.emoji+'</div><span class="st-name">'+st.id+' · '+st.name+'</span>'+(done?'<span class="st-done">✓</span>':'');if(playable){s.querySelector('.st-orb').style.cursor='pointer';s.querySelector('.st-orb').onclick=function(){enterChapter(st.id);};}mp.appendChild(s);});}
 function goMap(){if(window._chT){clearInterval(window._chT);window._chT=null;}if(window._waveRaf){cancelAnimationFrame(window._waveRaf);window._waveRaf=null;}clearGame();show('scr-map');renderMap();syncTop();}
 function show(id){document.querySelectorAll('.screen').forEach(function(x){x.classList.remove('on');});document.getElementById(id).classList.add('on');window.scrollTo(0,0);}
+function hasDirectRoute(){var p=new URLSearchParams(location.search);return p.has('lab')||p.has('sec')||p.has('end');}
+function shouldShowCover(){try{return !hasDirectRoute()&&sessionStorage.getItem('ai-cover-seen')!=='1';}catch(e){return !hasDirectRoute();}}
+function enterCover(){try{sessionStorage.setItem('ai-cover-seen','1');}catch(e){}goMap();}
 
 // ========== 共享：词语接龙图（更丰富，句子更长更多变） ==========
 var WC_START=['小猫','今天','我','太阳','机器人'];
@@ -1619,7 +1703,7 @@ renderAdv=function(){var g=document.getElementById('advgrid');if(!g)return;g.inn
 var _goMap0=goMap;goMap=function(){_goMap0();renderAdv();};
 
 // ========== 启动 ==========
-syncTop();renderAdv();goMap();
+syncTop();renderAdv();if(shouldShowCover())show('scr-cover');else goMap();
 (function debugEndRoute(){var p=new URLSearchParams(location.search),id=p.get('end');if(id&&CHAPTERS[id]){document.body.classList.add('debug-end');ST={xp:0,done:{},badges:[],collected:{}};save();setTimeout(function(){CH=CHAPTERS[id];show('scr-ch');document.getElementById('chtitle').textContent=CH.title;curSec=CH.sections.length;document.getElementById('chbody').innerHTML='';syncTop();renderSec();},80);}})();
 (function debugSecRoute(){var p=new URLSearchParams(location.search),id=p.get('sec');if(id&&CHAPTERS[id]){document.body.classList.add('debug-end');ST={xp:0,done:{},badges:[],collected:{}};save();var nn=parseInt(p.get('n'),10)||0;setTimeout(function(){CH=CHAPTERS[id];show('scr-ch');document.getElementById('chtitle').textContent=CH.title;curSec=Math.max(0,Math.min(nn,CH.sections.length-1));document.getElementById('chbody').innerHTML='';syncTop();renderSec();},80);}})();
 (function labRoute(){var p=new URLSearchParams(location.search),code=p.get('lab');if(code){setTimeout(function(){var input=document.getElementById('labCode');if(input)input.value=normCode(code);openLabCourse();},120);}})();
