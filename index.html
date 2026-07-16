@@ -395,8 +395,8 @@ function renderMap(){var mp=document.getElementById('mappath');mp.innerHTML='';v
 function goMap(){if(window._chT){clearInterval(window._chT);window._chT=null;}if(window._waveRaf){cancelAnimationFrame(window._waveRaf);window._waveRaf=null;}clearGame();show('scr-map');renderMap();syncTop();}
 function show(id){document.querySelectorAll('.screen').forEach(function(x){x.classList.remove('on');});document.getElementById(id).classList.add('on');window.scrollTo(0,0);}
 function hasDirectRoute(){var p=new URLSearchParams(location.search);return p.has('lab')||p.has('sec')||p.has('end');}
-function shouldShowCover(){try{return !hasDirectRoute()&&sessionStorage.getItem('ai-cover-seen')!=='1';}catch(e){return !hasDirectRoute();}}
-function enterCover(){try{sessionStorage.setItem('ai-cover-seen','1');}catch(e){}goMap();}
+function shouldShowCover(){return !hasDirectRoute();}
+function enterCover(){goMap();}
 document.addEventListener('keydown',function(e){var c=document.getElementById('scr-cover');if(c&&c.classList.contains('on')){e.preventDefault();enterCover();}});
 
 // ========== 共享：词语接龙图（更丰富，句子更长更多变） ==========
